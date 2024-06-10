@@ -1,13 +1,13 @@
 from decimal import Decimal
 
-from demo_uniswap import models as models
-from demo_uniswap.models.repo import USDC_WETH_03_POOL
-from demo_uniswap.models.repo import get_ctx_factory
-from demo_uniswap.models.repo import models_repo
-from demo_uniswap.models.token import WHITELIST_TOKENS
-from demo_uniswap.models.token import convert_token_amount
-from demo_uniswap.models.token import token_derive_eth
-from demo_uniswap.types.pool.evm_events.swap import Swap
+from demo_evm_uniswap import models as models
+from demo_evm_uniswap.models.repo import USDC_WETH_03_POOL
+from demo_evm_uniswap.models.repo import get_ctx_factory
+from demo_evm_uniswap.models.repo import models_repo
+from demo_evm_uniswap.models.token import WHITELIST_TOKENS
+from demo_evm_uniswap.models.token import convert_token_amount
+from demo_evm_uniswap.models.token import token_derive_eth
+from demo_evm_uniswap.types.pool.evm_events.swap import Swap
 from dipdup.context import HandlerContext
 from dipdup.models.evm_subsquid import SubsquidEvent
 

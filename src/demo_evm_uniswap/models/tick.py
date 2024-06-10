@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from demo_uniswap import models as models
+from demo_evm_uniswap import models as models
 
 
 async def tick_get_or_create(tick_idx: int, pool: models.Pool, level: int, timestamp: int) -> models.Tick:

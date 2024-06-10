@@ -1,13 +1,13 @@
 from dipdup.context import HandlerContext
 from dipdup.models.evm_subsquid import SubsquidEvent
 
-from demo_uniswap import models
-from demo_uniswap.models.repo import get_ctx_factory
-from demo_uniswap.models.repo import models_repo
-from demo_uniswap.models.tick import tick_get_or_create
-from demo_uniswap.models.token import convert_token_amount
-from demo_uniswap.types.pool.evm_events.burn import Burn
-from demo_uniswap.types.pool.evm_events.mint import Mint
+from demo_evm_uniswap import models
+from demo_evm_uniswap.models.repo import get_ctx_factory
+from demo_evm_uniswap.models.repo import models_repo
+from demo_evm_uniswap.models.tick import tick_get_or_create
+from demo_evm_uniswap.models.token import convert_token_amount
+from demo_evm_uniswap.types.pool.evm_events.burn import Burn
+from demo_evm_uniswap.types.pool.evm_events.mint import Mint
 
 
 class PoolUpdateSign:

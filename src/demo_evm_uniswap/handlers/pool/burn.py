@@ -1,7 +1,7 @@
-from demo_uniswap import models
-from demo_uniswap.models.pool import PoolUpdateSign
-from demo_uniswap.models.pool import pool_update
-from demo_uniswap.types.pool.evm_events.burn import Burn
+from demo_evm_uniswap import models
+from demo_evm_uniswap.models.pool import PoolUpdateSign
+from demo_evm_uniswap.models.pool import pool_update
+from demo_evm_uniswap.types.pool.evm_events.burn import Burn
 from dipdup.context import HandlerContext
 from dipdup.models.evm_subsquid import SubsquidEvent
 

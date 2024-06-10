@@ -1,7 +1,7 @@
-from demo_uniswap import models
-from demo_uniswap.models.position import save_position_snapshot
-from demo_uniswap.models.token import convert_token_amount
-from demo_uniswap.types.position_manager.evm_events.collect import Collect
+from demo_evm_uniswap import models
+from demo_evm_uniswap.models.position import save_position_snapshot
+from demo_evm_uniswap.models.token import convert_token_amount
+from demo_evm_uniswap.types.position_manager.evm_events.collect import Collect
 from dipdup.context import HandlerContext
 from dipdup.models.evm_subsquid import SubsquidEvent
 

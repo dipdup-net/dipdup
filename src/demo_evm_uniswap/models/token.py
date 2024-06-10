@@ -5,9 +5,9 @@ from eth_typing import ChecksumAddress
 from eth_utils.address import to_checksum_address
 from web3 import AsyncWeb3
 
-from demo_uniswap import models as models
-from demo_uniswap.models.abi import get_abi
-from demo_uniswap.models.repo import models_repo
+from demo_evm_uniswap import models as models
+from demo_evm_uniswap.models.abi import get_abi
+from demo_evm_uniswap.models.repo import models_repo
 
 MINIMUM_ETH_LOCKED = Decimal('60')
 STABLE_COINS = {

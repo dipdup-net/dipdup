@@ -1,10 +1,10 @@
 from contextlib import suppress
 from typing import cast
 
-from demo_uniswap import models as models
-from demo_uniswap.models.token import WHITELIST_TOKENS
-from demo_uniswap.models.token import ERC20Token
-from demo_uniswap.types.factory.evm_events.pool_created import PoolCreated
+from demo_evm_uniswap import models as models
+from demo_evm_uniswap.models.token import WHITELIST_TOKENS
+from demo_evm_uniswap.models.token import ERC20Token
+from demo_evm_uniswap.types.factory.evm_events.pool_created import PoolCreated
 from dipdup.config.evm import EvmContractConfig
 from dipdup.context import HandlerContext
 from dipdup.models.evm_subsquid import SubsquidEvent
