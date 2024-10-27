@@ -878,3 +878,8 @@ class HandlerContext(DipDupContext):
         )
         ctx._link(new_ctx)
         return new_ctx
+
+    @property
+    def is_finalized(self) -> bool:
+        # FIXME: check the datasource
+        return 1
