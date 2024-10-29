@@ -736,8 +736,6 @@ class DipDupContext:
         # NOTE: Do not wrap known errors like ProjectImportError
         except FrameworkException:
             raise
-        # except Exception as e:
-        #     raise CallbackError(module, e) from e
 
     def _get_handler(self, name: str, index: str) -> HandlerConfig:
         try:
@@ -882,4 +880,4 @@ class HandlerContext(DipDupContext):
     @property
     def is_finalized(self) -> bool:
         # FIXME: check the datasource
-        return 1
+        return True

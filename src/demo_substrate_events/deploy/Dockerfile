@@ -1,5 +1,6 @@
-FROM dipdup/dipdup:8
+# FROM dipdup/dipdup:8
 # FROM ghcr.io/dipdup-io/dipdup:8
+# FIXME: substrate preview
 FROM ghcr.io/dipdup-io/dipdup:feat-substrate
 
 # COPY --chown=dipdup pyproject.toml README.md .

@@ -43,7 +43,7 @@ async def on_transfer(
     ctx: HandlerContext,
     event: SubstrateEvent[AssetsTransferredPayload],
 ) -> None:
-    amount = Decimal(event.payload.get('amount') or event.payload['value'])
+    amount = Decimal(event.payload['amount'])
     if not amount:
         return
 

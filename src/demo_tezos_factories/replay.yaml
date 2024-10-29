@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Example of spawning indexes in runtime
-  package: demo_tezos_factories
-  template: demo_tezos_factories

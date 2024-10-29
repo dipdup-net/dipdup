@@ -318,7 +318,7 @@ def render_project(
     _render(
         answers,
         template_path=Path(__file__).parent / 'templates' / 'replay.yaml.j2',
-        output_path=Path(answers['package']) / 'configs' / 'replay.yaml',
+        output_path=get_package_path(answers['package']) / 'configs' / 'replay.yaml',
         force=force,
     )
 
@@ -382,7 +382,7 @@ def _render_templates(
 
     # NOTE: If there are files without .j2 extension, just copy them
     for path in project_files:
-        if path.is_dir():
+        if path.is_dir() or path.name == 'replay.yaml':
             continue
         output_path = Path(
             get_package_path(answers['package']),

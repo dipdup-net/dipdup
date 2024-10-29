@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Etherlink smart rollup transactions
-  package: demo_tezos_etherlink
-  template: demo_tezos_etherlink

@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Processing head block metadata (realtime only)
-  package: demo_tezos_head
-  template: demo_tezos_head

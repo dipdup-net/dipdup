@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: DAO registry (Homebase DAO)
-  package: demo_tezos_dao
-  template: demo_tezos_dao

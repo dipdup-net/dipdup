@@ -22,7 +22,7 @@ EvmDatasource = EvmSubsquidDatasource | EvmNodeDatasource
 
 class EvmEventsIndex(
     EvmIndex[EvmEventsIndexConfig, QueueItem, EvmDatasource],
-    message_type=SubsquidMessageType.logs,
+    message_type=SubsquidMessageType.evm_logs,
 ):
 
     async def _synchronize_subsquid(self, sync_level: int) -> None:

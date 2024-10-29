@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: FA1.2 token contract operations
-  package: demo_tezos_token
-  template: demo_tezos_token

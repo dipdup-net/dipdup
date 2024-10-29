@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: NFT marketplace (hic at nunc)
-  package: demo_tezos_nft_marketplace
-  template: demo_tezos_nft_marketplace

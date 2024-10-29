@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Processing contract events
-  package: demo_tezos_events
-  template: demo_tezos_events

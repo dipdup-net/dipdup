@@ -76,7 +76,7 @@ class AbiEtherscanDatasource(AbiDatasource[AbiEtherscanDatasourceConfig]):
                 )
             ).text()
 
-        regex = r'id="js-copytextarea2(.*)>(\[.*?)\<\/pre'
+        regex = r'id=["\']js-copytextarea2(.*)>(\[.*?)\<\/pre'
         if (match := re.search(regex, html)) and (abi := match.group(2)):
             return cast(dict[str, Any], orjson.loads(abi))
         raise DatasourceError('Failed to get ABI', self.name)

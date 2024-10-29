@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: ERC-20 token transfers (from event logs)
-  package: demo_evm_events
-  template: demo_evm_events

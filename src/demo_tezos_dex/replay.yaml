@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: DEX balances and liquidity (Quipuswap)
-  package: demo_tezos_dex
-  template: demo_tezos_dex

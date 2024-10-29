@@ -1,5 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Process raw operations without filtering and typed payloads
-  package: demo_tezos_raw
-  template: demo_tezos_raw

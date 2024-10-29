@@ -11,6 +11,7 @@ import orjson
 from dipdup.config.substrate import SubstrateRuntimeConfig
 from dipdup.exceptions import FrameworkException
 from dipdup.package import DipDupPackage
+from dipdup.utils import sorted_glob
 
 if TYPE_CHECKING:
     from scalecodec.base import RuntimeConfigurationObject  # type: ignore[import-untyped]
@@ -59,7 +60,6 @@ class SubstrateSpecVersion:
             pallet, name = qualname.split('.')
             found = False
             for item in self._metadata:
-                # FIXME: double break
                 if found:
                     break
                 if item['name'] != pallet:
@@ -83,8 +83,12 @@ class SubstrateRuntime:
     ) -> None:
         self._config = config
         self._package = package
-        # TODO: unload by LRU?
+        # TODO: Unload not used
         self._spec_versions: dict[str, SubstrateSpecVersion] = {}
+
+    @property
+    def abi_path(self) -> Path:
+        return self._package.abi.joinpath(self._config.name)
 
     @cached_property
     def runtime_config(self) -> 'RuntimeConfigurationObject':
@@ -102,14 +106,15 @@ class SubstrateRuntime:
         if name not in self._spec_versions:
             _logger.info('loading spec version `%s`', name)
             try:
-                metadata = orjson.loads(self._package.abi.joinpath(self._config.name, f'v{name}.json').read_bytes())
+                metadata_path = self.abi_path.joinpath(f'v{name}.json')
+                metadata = orjson.loads(metadata_path.read_bytes())
                 self._spec_versions[name] = SubstrateSpecVersion(
                     name=f'v{name}',
                     metadata=metadata,
                 )
             except FileNotFoundError:
                 # FIXME: Using last known version to help with missing abis
-                last_known = tuple(self._package.abi.joinpath(self._config.name).glob('v*.json'))[-1].stem
+                last_known = sorted_glob(self.abi_path, 'v*.json')[-1].stem
                 _logger.info('using last known version `%s`', last_known)
                 self._spec_versions[name] = self.get_spec_version(last_known[1:])
 

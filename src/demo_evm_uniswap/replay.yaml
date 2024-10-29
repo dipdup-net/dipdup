@@ -1,7 +1,0 @@
-spec_version: 3.0
-replay:
-  description: Uniswap V3 pools, positions, etc. (advanced, uses TimescaleDB)
-  package: demo_evm_uniswap
-  template: demo_evm_uniswap
-  postgres_image: timescale/timescaledb-ha:pg15
-  postgres_data_path: /home/postgres/pgdata/data

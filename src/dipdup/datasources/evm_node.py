@@ -128,10 +128,10 @@ class EvmNodeDatasource(JsonRpcDatasource[EvmNodeDatasourceConfig]):
             # NOTE: Push rollback to all EVM indexes, but continue processing.
             if head.level <= known_level:
                 for type_ in (
-                    SubsquidMessageType.blocks,
-                    SubsquidMessageType.logs,
-                    SubsquidMessageType.traces,
-                    SubsquidMessageType.transactions,
+                    SubsquidMessageType.evm_blocks,
+                    SubsquidMessageType.evm_logs,
+                    SubsquidMessageType.evm_traces,
+                    SubsquidMessageType.evm_transactions,
                 ):
                     await self.emit_rollback(
                         type_,

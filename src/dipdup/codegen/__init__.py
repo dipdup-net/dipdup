@@ -169,6 +169,12 @@ class _BaseCodeGenerator(ABC):
         class_name = self.get_typeclass_name(schema_path)
         self._logger.info('Generating type `%s`', class_name)
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        # TODO: make it configurable
+        model_type = (
+            dmcg.DataModelType.TypingTypedDict
+            if 'substrate' in str(output_path)
+            else dmcg.DataModelType.PydanticV2BaseModel
+        )
         dmcg.generate(
             input_=schema_path,
             output=output_path,
@@ -178,11 +184,7 @@ class _BaseCodeGenerator(ABC):
             target_python_version=dmcg.PythonVersion.PY_312,
             custom_file_header=CODEGEN_HEADER,
             use_union_operator=True,
-            output_model_type=(
-                dmcg.DataModelType.TypingTypedDict
-                if self.kind == 'substrate'
-                else dmcg.DataModelType.PydanticV2BaseModel
-            ),
+            output_model_type=model_type,
             use_schema_description=True,
         )
 

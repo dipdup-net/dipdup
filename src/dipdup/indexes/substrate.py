@@ -8,7 +8,7 @@ from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subscan import SubstrateSubscanDatasource
 from dipdup.datasources.substrate_subsquid import SubstrateSubsquidDatasource
 from dipdup.index import IndexQueueItemT
-from dipdup.indexes.evm import EvmIndex
+from dipdup.indexes._subsquid import SubsquidIndex
 from dipdup.runtimes import SubstrateRuntime
 
 SubstrateDatasource = SubstrateSubsquidDatasource | SubstrateSubscanDatasource | SubstrateNodeDatasource
@@ -22,8 +22,7 @@ if TYPE_CHECKING:
 
 class SubstrateIndex(
     Generic[IndexConfigT, IndexQueueItemT, DatasourceT],
-    # FIXME: it's not
-    EvmIndex[IndexConfigT, IndexQueueItemT, DatasourceT],
+    SubsquidIndex[IndexConfigT, IndexQueueItemT, DatasourceT],
     ABC,
 ):
     def __init__(
@@ -33,6 +32,8 @@ class SubstrateIndex(
         datasources: tuple[DatasourceT, ...],
     ) -> None:
         super().__init__(ctx, config, datasources)
+        self.subsquid_datasources = tuple(d for d in datasources if isinstance(d, SubstrateSubsquidDatasource))
+        self.node_datasources = tuple(d for d in datasources if isinstance(d, SubstrateNodeDatasource))
         self.runtime = SubstrateRuntime(
             config=config.runtime,
             package=ctx.package,

@@ -8,8 +8,16 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ## [Unreleased]
 
+### Added
+
+- substrate.events: Added `subtrate.events` index kind to process Substrate events.
+- substrate.node: Added `subtrate.node` datasource to receive data from Substrate node.
+- substrate.subscan: Added `substrate.subscan` datasource to fetch ABIs from Subscan.
+- substrate.subsquid: Added `substrate.subsquid` datasource to fetch historical data from Squid Network.
+
 ### Fixed
 
+- cli: Don't wrap exceptions with `CallbackError` to avoid shadowing the original exception.
 - cli: Fixed `--template` option being ignored when `--quiet` flag is set.
 - config: Fixed setting default loglevels when `logging` is a dict.
 
