@@ -6,6 +6,7 @@ from dipdup.datasources import AbiDatasource
 
 
 class SubstrateSubscanDatasource(AbiDatasource[SubstrateSubscanDatasourceConfig]):
+    # FIXME: not used in codegen
     async def get_abi(self, address: str) -> dict[str, Any]:
         raise NotImplementedError
 

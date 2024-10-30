@@ -50,6 +50,7 @@ class SubstrateEvent(Generic[PayloadT]):
     data: SubstrateEventData
     runtime: SubstrateRuntime
 
+    # TODO: could be used in other models with typed payload
     @cached_property
     def payload(self) -> PayloadT:
         return cast(

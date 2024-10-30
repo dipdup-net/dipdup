@@ -58,7 +58,12 @@ ManyToManyField = ManyToManyFieldInstance
 _EnumFieldT = TypeVar('_EnumFieldT', bound=Enum)
 
 
-JSONField = partial(_JSONField, encoder=partial(json_dumps, option=None), decoder=orjson.loads)  # type: ignore
+# TODO: changelog
+JSONField = partial(
+    _JSONField,
+    encoder=partial(json_dumps, option=None),  # type: ignore[arg-type]
+    decoder=orjson.loads,
+)
 
 
 class EnumField(Field[_EnumFieldT]):

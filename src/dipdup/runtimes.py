@@ -19,7 +19,8 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-def extract_args_name(description: str) -> list[str]:
+@cache
+def extract_args_name(description: str) -> tuple[str, ...]:
     pattern = r'\((.*?)\)|\[(.*?)\]'
     match = re.search(pattern, description)
 
@@ -27,7 +28,7 @@ def extract_args_name(description: str) -> list[str]:
         raise ValueError('No valid bracket pairs found in the description')
 
     args_str = match.group(1) or match.group(2)
-    return [arg.strip('\\') for arg in args_str.split(', ')]
+    return tuple(arg.strip('\\') for arg in args_str.split(', '))
 
 
 @cache

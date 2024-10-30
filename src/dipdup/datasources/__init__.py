@@ -60,6 +60,7 @@ class AbiDatasource(Datasource[DatasourceConfigT], Generic[DatasourceConfigT]):
     async def get_abi(self, address: str) -> dict[str, Any]: ...
 
 
+# FIXME: inconsistent usage
 class IndexDatasource(Datasource[DatasourceConfigT], Generic[DatasourceConfigT]):
     def __init__(
         self,

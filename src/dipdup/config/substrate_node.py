@@ -32,5 +32,5 @@ class SubstrateNodeDatasourceConfig(DatasourceConfig):
 
     @property
     def rollback_depth(self) -> int:
-        # FIXME:
+        # FIXME: detect from node or/and document how to set it
         return 0

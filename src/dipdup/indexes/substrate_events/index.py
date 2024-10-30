@@ -5,6 +5,7 @@ from typing import Any
 
 from dipdup.config.substrate_events import SubstrateEventsHandlerConfig
 from dipdup.config.substrate_events import SubstrateEventsIndexConfig
+from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subsquid import SubstrateSubsquidDatasource
 from dipdup.indexes.substrate import SubstrateDatasource
 from dipdup.indexes.substrate import SubstrateIndex
@@ -34,8 +35,8 @@ class SubstrateEventsIndex(
     ) -> None:
         super().__init__(ctx, config, datasources)
         self._names = tuple(c.name for c in self._config.handlers)
-        # FIXME: it's not EVM index
         self.subsquid_datasources = tuple(d for d in datasources if isinstance(d, SubstrateSubsquidDatasource))
+        self.node_datasources = tuple(d for d in datasources if isinstance(d, SubstrateNodeDatasource))
 
     async def _synchronize_subsquid(self, sync_level: int) -> None:
         first_level = self.state.level + 1
