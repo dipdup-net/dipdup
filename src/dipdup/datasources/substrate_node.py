@@ -167,9 +167,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         # take type from runtime config
 
         # add runtime metadata using metadata kwarg
-        event = decoder.create_scale_object(
-            'Vec<frame_system:EventRecord>', data=ScaleBytes(event_data), runtime_config=decoder, metadata=spec.metadata
+        scale_object = runtime_config.create_scale_object(
+            'Vec<frame_system:EventRecord>', metadata=spec._metadata
         )
+        event_bytes = ScaleBytes(event_data)
+        event = scale_object.decode(event_bytes)
 
         async for line in block:
             block_data = orjson.loads(line)
