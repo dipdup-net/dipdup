@@ -9,6 +9,7 @@ from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subsquid import SubstrateSubsquidDatasource
 from dipdup.indexes.substrate import SubstrateDatasource
 from dipdup.indexes.substrate import SubstrateIndex
+from dipdup.indexes.substrate_events.fetcher import SubstrateNodeEventFetcher
 from dipdup.indexes.substrate_events.fetcher import SubstrateSubsquidEventFetcher
 from dipdup.models import RollbackMessage
 from dipdup.models._subsquid import SubsquidMessageType
@@ -47,16 +48,29 @@ class SubstrateEventsIndex(
             metrics._sqd_processor_last_block = int(_level)
 
     async def _synchronize_node(self, sync_level: int) -> None:
-        raise NotImplementedError
+        first_level = self.state.level + 1
+        fetcher = self._create_node_fetcher(first_level, sync_level)
+
+        async for _level, events in fetcher.fetch_by_level():
+            await self._process_level_data(events, sync_level)
+            metrics._sqd_processor_last_block = _level
 
     def _create_subsquid_fetcher(self, first_level: int, last_level: int) -> SubstrateSubsquidEventFetcher:
-
         return SubstrateSubsquidEventFetcher(
             name=self.name,
             datasources=self.subsquid_datasources,
             first_level=first_level,
             last_level=last_level,
             names=self._names,
+        )
+
+    def _create_node_fetcher(self, first_level: int, last_level: int) -> SubstrateNodeEventFetcher:
+        return SubstrateNodeEventFetcher(
+            name=self.name,
+            datasources=self.node_datasources,
+            runtime=self.runtime,
+            first_level=first_level,
+            last_level=last_level,
         )
 
     def _match_level_data(

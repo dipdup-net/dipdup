@@ -5,13 +5,24 @@ from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import TYPE_CHECKING
+from scalecodec.base import RuntimeConfigurationObject
+from scalecodec.base import ScaleBytes
 
 import orjson
+import pysignalr.exceptions
 
 from dipdup.config import HttpConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
 from dipdup.datasources import JsonRpcDatasource
+from dipdup.exceptions import DatasourceError
+from dipdup.models.substrate import SubstrateEventData
+from dipdup.models.substrate_node import SubstrateNodeSubscription
 from dipdup.pysignalr import Message
+from dipdup.runtimes import SubstrateRuntime
+
+if TYPE_CHECKING:
+    from scalecodec.base import ScaleDecoder
 
 _logger = logging.getLogger(__name__)
 
@@ -69,24 +80,63 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     )
 
     async def run(self) -> None:
-        pass
+        if self.realtime:
+            await asyncio.gather(
+                self._ws_loop(),
+                self._emitter_loop(),
+                self._watchdog.run(),
+            )
+        else:
+            while True:
+                level = await self.get_head_level()
+                self.set_sync_level(None, level)
+                await asyncio.sleep(self._http_config.polling_interval)
 
     async def initialize(self) -> None:
-        pass
+        level = await self.get_head_level()
+        self.set_sync_level(None, level)
+
+    async def _ws_loop(self) -> None:
+        # TODO: probably add to inheritance WebsocketSubscriptionDatasource, and move this method there
+        self._logger.info('Establishing realtime connection')
+        client = self._get_ws_client()
+        retry_sleep = self._http_config.retry_sleep
+
+        for _ in range(1, self._http_config.retry_count + 1):
+            try:
+                await client.run()
+            except pysignalr.exceptions.ConnectionError as e:
+                self._logger.error('Websocket connection error: %s', e)
+                await self.emit_disconnected()
+                await asyncio.sleep(retry_sleep)
+                retry_sleep *= self._http_config.retry_multiplier
+
+        raise DatasourceError('Websocket connection failed', self.name)
 
     async def subscribe(self) -> None:
-        pass
+        if not self.realtime:
+            return
+
+        # TODO: Ensure substrate subscriptions list made correctly
+        missing_subscriptions = self._subscriptions.missing_subscriptions
+        if not missing_subscriptions:
+            return
+
+        self._logger.info('Subscribing to %s channels', len(missing_subscriptions))
+        for subscription in missing_subscriptions:
+            if isinstance(subscription, SubstrateNodeSubscription):
+                await self._subscribe(subscription)
 
     async def _on_message(self, message: Message) -> None:
         raise NotImplementedError
 
-    async def get_height(self) -> int:
+    async def get_head_level(self) -> int:
         head = await self._jsonrpc_request('chain_getFinalizedHead', [])
         header = await self._jsonrpc_request('chain_getHeader', [head])
         return int(header['number'], 16)
 
     async def get_metadata_header(self, height: int) -> MetadataHeader:
-        block_hash = await self._jsonrpc_request('chain_getBlockHash', [height])
+        block_hash = await self.get_block_hash(height)
         rt = await self._jsonrpc_request('chain_getRuntimeVersion', [block_hash])
         return MetadataHeader(
             spec_name=rt['specName'],
@@ -94,6 +144,56 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             block_number=height,
             block_hash=block_hash,
         )
+    
+    async def get_full_block_by_level(self, height: int) -> dict:
+        block_hash = await self.get_block_hash(height)
+        return await self.get_full_block(block_hash)
+
+    async def get_events_storage(self, hash: str) -> dict:
+        return await self._jsonrpc_request('state_getStorageAt', [
+            '0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7',
+            hash
+        ])
+
+    async def get_events(self, height: int, decoder: SubstrateRuntime) -> tuple[SubstrateEventData]:
+        # TODO: get info for storage request for events
+        block_hash = await self.get_block_hash(height)
+        header = await self._jsonrpc_request('chain_getHeader', [block_hash])
+        #spec_version = header['specVersion']# for event decoding
+        event_data = await self.get_events_storage(block_hash)
+        runtime_config = decoder.runtime_config
+        spec = decoder.get_spec_version('v701')
+
+        # take type from runtime config
+
+        # add runtime metadata using metadata kwarg
+        event = decoder.create_scale_object(
+            'Vec<frame_system:EventRecord>', data=ScaleBytes(event_data), runtime_config=decoder, metadata=spec.metadata
+        )
+
+        async for line in block:
+            block_data = orjson.loads(line)
+            
+            # Extract events from onInitialize
+            for event in block_data.get('onInitialize', {}).get('events', []):
+                SubstrateEventData(method=event['method'], data=event['data'])
+            
+            # Extract events from extrinsics
+            for extrinsic in block_data.get('extrinsics', []):
+                for event in extrinsic.get('events', []):
+                    SubstrateEventData(method=event['method'], data=event['data'])
+            
+            # Extract events from onFinalize
+            for event in block_data.get('onFinalize', {}).get('events', []):
+                SubstrateEventData(method=event['method'], data=event['data'])
+        
+        return tuple()
+
+    async def get_block_hash(self, height: int) -> str:
+        return await self._jsonrpc_request('chain_getBlockHash', [height])
+    
+    async def get_full_block(self, hash: str) -> dict:
+        return await self._jsonrpc_request('chain_getBlock', [hash])
 
     async def get_metadata_header_batch(self, heights: list[int]) -> list[MetadataHeader]:
         return await asyncio.gather(*[self.get_metadata_header(h) for h in heights])
@@ -103,7 +203,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         from_block: int | None = None,
         to_block: int | None = None,
     ) -> list[MetadataHeader]:
-        height = await self.get_height()
+        height = await self.get_head_level()
 
         first_block = from_block or 0
         last_block = min(to_block, height) if to_block is not None else height
@@ -145,11 +245,14 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     async def get_dev_metadata_version(self) -> MetadataVersion | None:
         genesis = await self.get_metadata_header(0)
-        height = await self.get_height()
+        height = await self.get_head_level()
         last = await self.get_metadata_header(height)
         if genesis == last:
             return genesis
         return None
+    
+    async def _subscribe(self, subscription: SubstrateNodeSubscription) -> None:
+        ... # TODO: make subscription request to node using subscription.method
 
 
 # FIXME: Not used, should be a subscan replacement
