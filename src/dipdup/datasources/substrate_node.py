@@ -168,7 +168,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
         # add runtime metadata using metadata kwarg
         scale_object = runtime_config.create_scale_object(
-            'Vec<frame_system:EventRecord>', metadata=spec._metadata
+            'Vec<EventRecord>', metadata=spec._metadata
         )
         event_bytes = ScaleBytes(event_data)
         event = scale_object.decode(event_bytes)

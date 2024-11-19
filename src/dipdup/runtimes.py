@@ -98,6 +98,7 @@ class SubstrateRuntime:
         # FIXME: ss58_format
         runtime_config = RuntimeConfigurationObject(ss58_format=99)
         # FIXME: When to use 'legacy' instead?
+        runtime_config.update_type_registry(get_type_registry('legacy'))
         runtime_config.update_type_registry(get_type_registry('core'))
         runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
 
