@@ -6,11 +6,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import TYPE_CHECKING
-from scalecodec.base import RuntimeConfigurationObject
-from scalecodec.base import ScaleBytes
 
 import orjson
 import pysignalr.exceptions
+from scalecodec.base import ScaleBytes
 
 from dipdup.config import HttpConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
@@ -158,17 +157,18 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     async def get_events(self, height: int, decoder: SubstrateRuntime) -> tuple[SubstrateEventData]:
         # TODO: get info for storage request for events
         block_hash = await self.get_block_hash(height)
-        header = await self._jsonrpc_request('chain_getHeader', [block_hash])
-        #spec_version = header['specVersion']# for event decoding
         event_data = await self.get_events_storage(block_hash)
         runtime_config = decoder.runtime_config
-        spec = decoder.get_spec_version('v701')
 
-        # take type from runtime config
+        metadata_bin: str = await self.get_raw_metadata(block_hash)
+        metadata = runtime_config.create_scale_object(
+            'MetadataVersioned', data=ScaleBytes(metadata_bin)
+        )
+        metadata.decode()
 
         # add runtime metadata using metadata kwarg
         scale_object = runtime_config.create_scale_object(
-            'Vec<EventRecord>', metadata=spec._metadata
+            'Vec<EventRecord>', metadata=metadata
         )
         event_bytes = ScaleBytes(event_data)
         event = scale_object.decode(event_bytes)
