@@ -1,5 +1,5 @@
 import logging
-from collections import deque
+from collections import deque, OrderedDict
 from collections.abc import Iterable
 from typing import Any
 
@@ -69,15 +69,18 @@ def prepare_event_handler_args(
         name=snake_to_pascal(handler_config.name) + 'Payload',
     )
 
-    serializer = package._cairo_abis.get_event_abi(
+    event_abi = package._cairo_abis.get_event_abi(
         typename=typename,
         name=handler_config.name,
-    )['serializer']
-    data = [int(s, 16) for s in matched_event.data]
+    )
+
+    # Skipping first key which is the event selector
+    # Note that some fields might be encoded with more than one felt (complex types)
+    raw_data = [int(x, 16) for x in matched_event.keys[1:] + matched_event.data]
 
     # holding context for error building
-    with DeserializationContext.create(data) as context:
-        data_dict = deserialize_to_dict(serializer.serializers, context)
+    with DeserializationContext.create(raw_data) as context:
+        data_dict = deserialize_to_dict(event_abi['sorted_serializers'], context)
 
     typed_payload = parse_object(type_=type_, data=data_dict)
     return StarknetEvent(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import OrderedDict
 from functools import cache
 from typing import TYPE_CHECKING
 from typing import Any
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     from starknet_py.abi.v2 import Abi  # type: ignore[import-untyped]
     from starknet_py.cairo.data_types import CairoType  # type: ignore[import-untyped]
     from starknet_py.cairo.data_types import EventType
-    from starknet_py.serialization import PayloadSerializer  # type: ignore[import-untyped]
+    from starknet_py.serialization import CairoDataSerializer  # type: ignore[import-untyped]
 
     from dipdup.package import DipDupPackage
 
@@ -25,7 +26,7 @@ class CairoEventAbi(TypedDict):
     name: str
     event_identifier: str
     members: dict[str, CairoType]
-    serializer: PayloadSerializer
+    sorted_serializers: OrderedDict[str, CairoDataSerializer]
 
 
 class CairoAbi(TypedDict):
@@ -93,12 +94,25 @@ def convert_abi(package: DipDupPackage) -> dict[str, CairoAbi]:
         for name, event_type in parsed_abi.events.items():
             if name in converted_abi['events']:
                 raise NotImplementedError('Multiple events with the same name are not supported')
+            
+            serializers = serializer_for_event(event_type).serializers
+            
+            # Event payload is returned from RPC in two arrays: keys (including event selector) and data.
+            # Since any event field can be marked as key, the original ordering might be broken.
+            #
+            # We need to reorder deserializers so that the keys remain in the beginning and
+            # the rest of the fields are moved towards the end (preserving their inner ordering).
+            #
+            # That way we can apply the deserializers to the concatenation of keys (without first element) + data.
+            sorted_members = event_type.keys + [name for name in serializers if name not in event_type.keys]
+            sorted_serializers = OrderedDict((name, serializers[name]) for name in sorted_members)
+
             converted_abi['events'].append(
                 CairoEventAbi(
                     name=name,
                     event_identifier=sn_keccak(name),
                     members=event_type.types,
-                    serializer=serializer_for_event(event_type),
+                    sorted_serializers=sorted_serializers,
                 )
             )
         abi_by_typename[contract_typename] = converted_abi
