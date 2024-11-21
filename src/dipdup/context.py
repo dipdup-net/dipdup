@@ -27,7 +27,7 @@ from dipdup.config.evm import EvmContractConfig
 from dipdup.config.evm import EvmIndexConfig
 from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_transactions import EvmTransactionsIndexConfig
-from dipdup.config.starknet import StarknetIndexConfig
+from dipdup.config.starknet import StarknetIndexConfig, StarknetContractConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
 from dipdup.config.tezos import TezosContractConfig
 from dipdup.config.tezos import TezosIndexConfig
@@ -239,7 +239,7 @@ class DipDupContext:
 
     async def add_contract(
         self,
-        kind: Literal['tezos'] | Literal['evm'],
+        kind: Literal['tezos'] | Literal['evm'] | Literal['starknet'],
         name: str,
         address: str | None = None,
         typename: str | None = None,
@@ -247,7 +247,7 @@ class DipDupContext:
     ) -> None:
         """Adds contract to the inventory.
 
-        :param kind: Either 'tezos' or 'evm' allowed
+        :param kind: Either 'tezos' or 'evm' or 'starknet' allowed
         :param name: Contract name
         :param address: Contract address
         :param typename: Alias for the contract script
@@ -270,6 +270,14 @@ class DipDupContext:
             if address is None:
                 raise ConfigurationError('EVM contract address is required')
             contract_config = EvmContractConfig(
+                kind=kind,
+                address=address,
+                typename=typename,
+            )
+        elif kind == 'starknet':
+            if address is None:
+                raise ConfigurationError('Starknet contract address is required')
+            contract_config = StarknetContractConfig(
                 kind=kind,
                 address=address,
                 typename=typename,
