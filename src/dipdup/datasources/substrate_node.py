@@ -81,7 +81,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     )
 
     def __init__(self, config: SubstrateDatasourceConfigU) -> None:
-        from substrate_interface.base import SubstrateInterface
+        from substrateinterface.base import SubstrateInterface
         super().__init__(config)
         self._interface = SubstrateInterface(config.url)
 
