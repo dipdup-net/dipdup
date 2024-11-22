@@ -12,8 +12,9 @@ from dipdup.config import IndexConfig
 from dipdup.config import RuntimeConfig
 from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
 from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
+from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
 
-SubstrateDatasourceConfigU: TypeAlias = SubstrateSubsquidDatasourceConfig | SubstrateSubscanDatasourceConfig
+SubstrateDatasourceConfigU: TypeAlias = SubstrateSubsquidDatasourceConfig | SubstrateSubscanDatasourceConfig | SubstrateNodeDatasourceConfig
 
 
 @dataclass(config=ConfigDict(extra='forbid'), kw_only=True)

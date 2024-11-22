@@ -69,7 +69,8 @@ dependencies = [
     "python-dotenv~=1.0",
     "python-json-logger~=2.0",
     "ruamel.yaml~=0.18.6",
-    "scalecodec~=1.2",
+    # "substrate-interface",
+    "substrate-interface @ git+https://github.com/dipdup-io/py-substrate-interface-async.git@dipdup",
     "sentry-sdk~=2.16",
     "sqlparse~=0.5",
     "starknet-py==0.24.0",
@@ -86,9 +87,6 @@ dependencies = [
 migrations = [
     "aerich~=0.7.2",
 ]
-[tool.pdm.resolution]
-# NOTE: Introduced by starknetpy 0.24; depends on half of the PyPI
-excludes = ["bip-utils", "ledgerwallet"]
 
 [project.urls]
 Homepage = "https://dipdup.io/"
@@ -97,35 +95,6 @@ Repository = "https://github.com/dipdup-io/dipdup"
 
 [project.scripts]
 dipdup = "dipdup.cli:cli"
-
-[tool.pdm.dev-dependencies]
-lint = [
-    "black",
-    "mypy",
-    "ruff",
-    "types-pytz",
-    "types-tabulate",
-]
-test = [
-    "docker",
-    "pytest",
-    "pytest-aiohttp",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-xdist",
-]
-docs = [
-    "Sphinx",
-    "sphinx-click",
-    "sphinx-markdown-builder",
-    "watchdog",
-]
-perf = [
-    "scalene",
-]
-
-[tool.pdm.build]
-includes = ["src/dipdup"]
 
 [tool.black]
 line-length = 120
@@ -180,6 +149,69 @@ exclude_lines = [
     "if env.DEBUG:",
 ]
 
+
+[tool.pdm.resolution]
+# NOTE: Introduced by starknetpy 0.24; depends on half of the PyPI
+excludes = ["bip-utils", "ledgerwallet"]
+
+[tool.pdm.dev-dependencies]
+lint = [
+    "black",
+    "mypy",
+    "ruff",
+    "types-pytz",
+    "types-tabulate",
+]
+test = [
+    "docker",
+    "pytest",
+    "pytest-aiohttp",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-xdist",
+]
+docs = [
+    "Sphinx",
+    "sphinx-click",
+    "sphinx-markdown-builder",
+    "watchdog",
+]
+perf = [
+    "scalene",
+]
+dev = [
+    "-e file:///${PROJECT_ROOT}/../py-substrate-interface#egg=substrate-interface",
+]
+
+[tool.pdm.build]
+includes = ["src/dipdup"]
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[dependency-groups]
+lint = [
+    "black",
+    "mypy",
+    "ruff",
+    "types-pytz",
+    "types-tabulate",
+]
+test = [
+    "docker",
+    "pytest",
+    "pytest-aiohttp",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-xdist",
+]
+docs = [
+    "Sphinx",
+    "sphinx-click",
+    "sphinx-markdown-builder",
+    "watchdog",
+]
+perf = [
+    "scalene",
+]

@@ -13,6 +13,8 @@ from scalecodec.base import ScaleBytes
 
 from dipdup.config import HttpConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
+from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
+from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.models.substrate import SubstrateEventData
@@ -78,6 +80,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         batch_size=20,
     )
 
+    def __init__(self, config: SubstrateDatasourceConfigU) -> None:
+        from substrate_interface.base import SubstrateInterface
+        super().__init__(config)
+        self._interface = SubstrateInterface(config.url)
+
     async def run(self) -> None:
         if self.realtime:
             await asyncio.gather(
@@ -94,6 +101,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     async def initialize(self) -> None:
         level = await self.get_head_level()
         self.set_sync_level(None, level)
+
+        # NOTE: Prepare substrate_interface
+        await self._interface.init_props()
+        self._interface.reload_type_registry()
+
 
     async def _ws_loop(self) -> None:
         # TODO: probably add to inheritance WebsocketSubscriptionDatasource, and move this method there
@@ -160,11 +172,13 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         event_data = await self.get_events_storage(block_hash)
         runtime_config = decoder.runtime_config
 
-        metadata_bin: str = await self.get_raw_metadata(block_hash)
-        metadata = runtime_config.create_scale_object(
-            'MetadataVersioned', data=ScaleBytes(metadata_bin)
-        )
-        metadata.decode()
+        events = await self._interface.get_events(block_hash)
+
+        # metadata_bin: str = await self.get_raw_metadata(block_hash)
+        # metadata = await self._interface.create_scale_object(
+        #     'MetadataVersioned', data=ScaleBytes(metadata_bin)
+        # )
+        # metadata.decode()
 
         # add runtime metadata using metadata kwarg
         scale_object = runtime_config.create_scale_object(
