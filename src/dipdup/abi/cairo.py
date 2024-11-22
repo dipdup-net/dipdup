@@ -57,7 +57,7 @@ def sn_keccak(x: str) -> str:
 
     # NOTE: Create keccak256 hash in bytes and return hex representation of the first 250 bits.
     keccak_hash = keccak.new(data=x.encode('ascii'), digest_bits=256).digest()
-    return f'0x{int.from_bytes(keccak_hash, "big") & (1 << 248) - 1:x}'
+    return f'0x{int.from_bytes(keccak_hash, "big") & (1 << 250) - 1:x}'
 
 
 @cache
