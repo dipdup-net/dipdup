@@ -2,6 +2,7 @@ import os
 from contextlib import AsyncExitStack
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 
 import orjson as json
 import pytest
@@ -64,7 +65,7 @@ async def test_unsupported_versions(hasura_version: str, aiohttp_client: Aiohttp
     fake_api = web.Application()
     fake_api.router.add_get('/healthz', healthcheck_response)
     fake_api.router.add_get('/v1/version', version_response)
-    fake_client: TestClient = await aiohttp_client(fake_api)
+    fake_client: TestClient[Any, Any] = await aiohttp_client(fake_api)
 
     fake_client_url = f'http://{fake_client.server.host}:{fake_client.server.port}'
     hasura_config = HasuraConfig(url=fake_client_url)
