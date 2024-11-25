@@ -40,7 +40,6 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
         self,
         name: str,
         datasources: tuple[SubstrateNodeDatasource, ...],
-        runtime: SubstrateRuntime,
         first_level: int,
         last_level: int,
     ) -> None:
@@ -50,15 +49,15 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
             first_level=first_level,
             last_level=last_level,
         )
-        # FIXME: ensure decoder is set for correct runtime scope
-        self.decoder = runtime
 
     async def fetch_by_level(self) -> AsyncIterator[tuple[int, tuple[SubstrateEventData, ...]]]:
-        # TODO: add event type from runtime to fetchevent
         async for level, event in self.readahead_by_level(self.fetch_events()):
-            # TODO: convert block to event data
             yield level, event
 
-    async def fetch_events(self) -> AsyncIterator[tuple[int, tuple[SubstrateEventData, ...]]]:
+    async def fetch_events(self) -> AsyncIterator[tuple[tuple[SubstrateEventData, ...]]]:
         for level in range(self._first_level, self._last_level):
-            yield level, await self.get_random_node().get_events(level, self.decoder)
+            block_hash = await self.get_random_node().get_block_hash(level)
+            event_dicts = await self.get_random_node().get_events(block_hash)
+            block_header = await self.get_random_node().get_block_header(block_hash)
+            yield tuple(SubstrateEventData(**event_dict, header=block_header)
+                        for event_dict in event_dicts)

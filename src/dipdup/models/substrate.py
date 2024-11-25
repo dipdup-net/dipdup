@@ -28,13 +28,25 @@ class BlockHeader(TypedDict):
     specVersion: str
 
 
-@dataclass(frozen=True)
-class SubstrateEventData(HasLevel):
+class SubstrateEventDataDict(TypedDict):
     name: str
     index: int
     extrinsicIndex: int
     callAddress: list[str]
     args: list[Any]
+
+
+@dataclass(frozen=True)
+class SubstrateEventData(HasLevel):
+    # TODO: there are more fields in event data: phase, topics
+    name: str
+    index: int
+    extrinsicIndex: int
+    callAddress: list[str] | None
+    # TODO: ensure logic is straightforward
+    # we receive decoded args from node datasource and encoded from subsquid datasource
+    args: list[Any] | None
+    decoded_args: dict[str, Any] | None
     header: BlockHeader
 
     @property
@@ -53,7 +65,7 @@ class SubstrateEvent(Generic[PayloadT]):
     # TODO: could be used in other models with typed payload
     @cached_property
     def payload(self) -> PayloadT:
-        return cast(
+        return self.data.decoded_args or cast(
             PayloadT,
             self.runtime.decode_event_args(
                 name=self.name,

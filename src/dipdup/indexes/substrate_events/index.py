@@ -68,7 +68,6 @@ class SubstrateEventsIndex(
         return SubstrateNodeEventFetcher(
             name=self.name,
             datasources=self.node_datasources,
-            runtime=self.runtime,
             first_level=first_level,
             last_level=last_level,
         )

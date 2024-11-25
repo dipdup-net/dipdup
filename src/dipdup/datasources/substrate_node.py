@@ -5,25 +5,18 @@ from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import orjson
 import pysignalr.exceptions
-from scalecodec.base import ScaleBytes
 
 from dipdup.config import HttpConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
-from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
-from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
-from dipdup.models.substrate import SubstrateEventData
+from dipdup.models.substrate import BlockHeader
+from dipdup.models.substrate import SubstrateEventDataDict
 from dipdup.models.substrate_node import SubstrateNodeSubscription
 from dipdup.pysignalr import Message
-from dipdup.runtimes import SubstrateRuntime
-
-if TYPE_CHECKING:
-    from scalecodec.base import ScaleDecoder
 
 _logger = logging.getLogger(__name__)
 
@@ -146,6 +139,15 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         header = await self._jsonrpc_request('chain_getHeader', [head])
         return int(header['number'], 16)
 
+    async def get_block_hash(self, height: int) -> str:
+        return await self._jsonrpc_request('chain_getBlockHash', [height])
+
+    async def get_block_header(self, hash: str) -> BlockHeader:
+        response = await self._jsonrpc_request('chain_getHeader', [hash])
+        return {'hash': hash, 
+                'number': int(response['number'], 16), 
+                'prevRoot': response['parentHash']}
+
     async def get_metadata_header(self, height: int) -> MetadataHeader:
         block_hash = await self.get_block_hash(height)
         rt = await self._jsonrpc_request('chain_getRuntimeVersion', [block_hash])
@@ -155,64 +157,29 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             block_number=height,
             block_hash=block_hash,
         )
-    
-    async def get_full_block_by_level(self, height: int) -> dict:
-        block_hash = await self.get_block_hash(height)
-        return await self.get_full_block(block_hash)
-
-    async def get_events_storage(self, hash: str) -> dict:
-        return await self._jsonrpc_request('state_getStorageAt', [
-            '0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7',
-            hash
-        ])
-
-    async def get_events(self, height: int, decoder: SubstrateRuntime) -> tuple[SubstrateEventData]:
-        # TODO: get info for storage request for events
-        block_hash = await self.get_block_hash(height)
-        event_data = await self.get_events_storage(block_hash)
-        runtime_config = decoder.runtime_config
-
-        events = await self._interface.get_events(block_hash)
-
-        # metadata_bin: str = await self.get_raw_metadata(block_hash)
-        # metadata = await self._interface.create_scale_object(
-        #     'MetadataVersioned', data=ScaleBytes(metadata_bin)
-        # )
-        # metadata.decode()
-
-        # add runtime metadata using metadata kwarg
-        scale_object = runtime_config.create_scale_object(
-            'Vec<EventRecord>', metadata=metadata
-        )
-        event_bytes = ScaleBytes(event_data)
-        event = scale_object.decode(event_bytes)
-
-        async for line in block:
-            block_data = orjson.loads(line)
-            
-            # Extract events from onInitialize
-            for event in block_data.get('onInitialize', {}).get('events', []):
-                SubstrateEventData(method=event['method'], data=event['data'])
-            
-            # Extract events from extrinsics
-            for extrinsic in block_data.get('extrinsics', []):
-                for event in extrinsic.get('events', []):
-                    SubstrateEventData(method=event['method'], data=event['data'])
-            
-            # Extract events from onFinalize
-            for event in block_data.get('onFinalize', {}).get('events', []):
-                SubstrateEventData(method=event['method'], data=event['data'])
-        
-        return tuple()
-
-    async def get_block_hash(self, height: int) -> str:
-        return await self._jsonrpc_request('chain_getBlockHash', [height])
-    
-    async def get_full_block(self, hash: str) -> dict:
-        return await self._jsonrpc_request('chain_getBlock', [hash])
 
     async def get_metadata_header_batch(self, heights: list[int]) -> list[MetadataHeader]:
         return await asyncio.gather(*[self.get_metadata_header(h) for h in heights])
+
+    async def get_full_block(self, hash: str) -> dict:
+        return await self._jsonrpc_request('chain_getBlock', [hash])
+
+    async def get_events(self, block_hash: str) -> tuple[SubstrateEventDataDict, ...]:
+        events = await self._interface.get_events(block_hash)
+
+        res_events: list[SubstrateEventDataDict] = []
+        for event in events:
+            event: dict = event.decode()
+            res_events.append({
+                'name': f'{event['module_id']}.{event['event_id']}',
+                'index': event['event_index'],
+                'extrinsicIndex': event['extrinsic_idx'],
+                'callAddress': None,
+                'args': None,
+                'decoded_args': event['attributes'],
+            })
+
+        return tuple(res_events)
 
     async def find_metadata_versions(
         self,
