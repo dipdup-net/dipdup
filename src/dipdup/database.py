@@ -352,7 +352,7 @@ async def _pg_drop_schema(conn: AsyncpgClient, name: str) -> None:
 
 async def _pg_move_table(conn: AsyncpgClient, name: str, schema: str, new_schema: str) -> None:
     """Move table from one schema to another"""
-    await conn.execute_script(f'ALTER TABLE {schema}.{name} SET SCHEMA {new_schema}')
+    await conn.execute_script(f'ALTER TABLE IF EXISTS {schema}.{name} SET SCHEMA {new_schema}')
 
 
 def prepare_models(package: str | None) -> None:
