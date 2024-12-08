@@ -51,6 +51,7 @@ classifiers = [
 dependencies = [
     "aiohttp~=3.10",
     "aiolimiter~=1.1",
+    "aiosubstrate>=0.1.0",
     "anyio~=4.4",
     "appdirs~=1.4",
     "APScheduler~=3.10",
@@ -79,7 +80,6 @@ dependencies = [
     "tortoise-orm==0.21.7",
     "uvloop~=0.20",
     "web3~=7.2",
-    "aiosubstrate @ git+https://github.com/dipdup-io/aiosubstrate.git",
 ]
 
 [project.optional-dependencies]

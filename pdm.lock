@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:e9a0776caad1e7696079d9a96f76809bb129675236e15f5060c544a672f8564f"
+content_hash = "sha256:76f28c52acab430dd49091e134ec693ec0663f78e009aaaaf09cb94d164e1910"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.13"
@@ -98,9 +98,7 @@ files = [
 [[package]]
 name = "aiosubstrate"
 version = "0.1.0"
-requires_python = ">=3.10,<3.13"
-git = "https://github.com/dipdup-io/aiosubstrate.git"
-revision = "e50fc13858cd893f4fcdeffeb3fdce8550d4a810"
+requires_python = "<3.13,>=3.10"
 summary = "A library for interacting with Substrate node (py-substrate-interface fork)"
 groups = ["default"]
 dependencies = [
@@ -109,6 +107,10 @@ dependencies = [
     "scalecodec>=1.2.11",
     "websocket-client>=1.8.0",
     "xxhash>=3.5.0",
+]
+files = [
+    {file = "aiosubstrate-0.1.0-py3-none-any.whl", hash = "sha256:ae9b80b0ae49684a39f60ea82488d691c2f4be219ae4306e67f4d18a1be62797"},
+    {file = "aiosubstrate-0.1.0.tar.gz", hash = "sha256:364ecbad23bd71c9cb1ef6a82cfd700c0a98ab141eeb328cab5052d5f032875e"},
 ]
 
 [[package]]
