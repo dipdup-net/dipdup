@@ -1,9 +1,9 @@
 import asyncio
+import logging
+import math
 from asyncio import Queue
 from collections.abc import Awaitable
 from collections.abc import Callable
-import logging
-import math
 from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
@@ -18,7 +18,8 @@ from dipdup.config.substrate import SubstrateDatasourceConfigU
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
-from dipdup.models.substrate import BlockHeader, SubstrateEventData
+from dipdup.models.substrate import BlockHeader
+from dipdup.models.substrate import SubstrateEventData
 from dipdup.models.substrate import SubstrateEventDataDict
 from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
 from dipdup.models.substrate_node import SubstrateNodeSubscription
