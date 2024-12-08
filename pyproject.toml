@@ -140,7 +140,7 @@ target-version = "py312"
 ignore = [
     "E402",   # module level import not at top of file
     "E501",   # line too long
-    "TCH001", # breaks our runtime Pydantic magic
+    "TC001",  # breaks our runtime Pydantic magic
     "UP040",  # PEP 695 type aliases are not yet supported by mypy
 ]
 extend-select = ["B", "C4", "FA", "G", "I", "PTH", "Q", "RET", "RUF", "TCH", "UP"]
