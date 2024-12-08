@@ -1,10 +1,14 @@
 import asyncio
+from asyncio import Queue
+from collections.abc import Awaitable
+from collections.abc import Callable
 import logging
 import math
 from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import Any
 
 import orjson
 import pysignalr.exceptions
@@ -13,12 +17,21 @@ from dipdup.config import HttpConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
-from dipdup.models.substrate import BlockHeader
+from dipdup.exceptions import FrameworkException
+from dipdup.models.substrate import BlockHeader, SubstrateEventData
 from dipdup.models.substrate import SubstrateEventDataDict
+from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
 from dipdup.models.substrate_node import SubstrateNodeSubscription
 from dipdup.pysignalr import Message
+from dipdup.pysignalr import WebsocketMessage
+from dipdup.utils import Watchdog
 
 _logger = logging.getLogger(__name__)
+
+
+# TODO: think about return type of callback, for now i'm not sure where data should be ingested after the head update
+HeadCallback = Callable[['SubstrateNodeDatasource', dict], Awaitable[None]]
+EventCallback = Callable[['SubstrateNodeDatasource', tuple[SubstrateEventData, ...]], Awaitable[None]]
 
 
 @dataclass
@@ -76,7 +89,16 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     def __init__(self, config: SubstrateDatasourceConfigU) -> None:
         from substrateinterface.base import SubstrateInterface
         super().__init__(config)
+        self._pending_subscription = None
+        self._subscription_ids: dict[str, SubstrateNodeSubscription] = {}
         self._interface = SubstrateInterface(config.url)
+
+        self._emitter_queue: Queue[dict] = Queue()
+
+        self._watchdog: Watchdog = Watchdog(self._http_config.connection_timeout)
+
+        self._on_head_callbacks: set[HeadCallback] = set()
+        self._on_event_callbacks: set[EventCallback] = set()
 
     async def run(self) -> None:
         if self.realtime:
@@ -99,7 +121,6 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         await self._interface.init_props()
         self._interface.reload_type_registry()
 
-
     async def _ws_loop(self) -> None:
         # TODO: probably add to inheritance WebsocketSubscriptionDatasource, and move this method there
         self._logger.info('Establishing realtime connection')
@@ -117,6 +138,10 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
         raise DatasourceError('Websocket connection failed', self.name)
 
+    @property
+    def realtime(self) -> bool:
+        return self._config.ws_url is not None
+
     async def subscribe(self) -> None:
         if not self.realtime:
             return
@@ -131,8 +156,50 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             if isinstance(subscription, SubstrateNodeSubscription):
                 await self._subscribe(subscription)
 
+    # TODO: fix typing
+    async def emit_head(self, head: dict) -> None:
+        for fn in self._on_head_callbacks:
+            await fn(self, head)
+
+    async def emit_events(self, events: tuple[SubstrateEventData, ...]) -> None:
+        for fn in self._on_event_callbacks:
+            await fn(self, events)
+
+    def call_on_head(self, fn: HeadCallback) -> None:
+        self._on_head_callbacks.add(fn)
+
+    def call_on_events(self, fn: EventCallback) -> None:
+        self._on_event_callbacks.add(fn)
+
     async def _on_message(self, message: Message) -> None:
-        raise NotImplementedError
+        # TODO: since only head subscription available we need to load target objects(i.e. events) separately
+        # to schedule those requests we need to get information about index type from subscription
+
+        if not isinstance(message, WebsocketMessage):
+            raise FrameworkException(f'Unknown message type: {type(message)}')
+
+        data = message.data
+
+        if 'id' in data:
+
+            # NOTE: Save subscription id
+            if self._pending_subscription:
+                self._subscription_ids[data['result']] = self._pending_subscription
+
+                # NOTE: Possibly unreliable logic from evm_node, and possibly too time consuming for message handling
+                level = await self.get_head_level()
+                self._subscriptions.set_sync_level(self._pending_subscription, level)
+
+                # NOTE: Set None to identify possible subscriptions conflicts
+                self._pending_subscription = None
+        elif 'method' in data and data['method'].startswith('chain_'):
+            subscription_id = data['params']['subscription']
+            if subscription_id not in self._subscription_ids:
+                raise FrameworkException(f'{self.name}: Unknown subscription ID: {subscription_id}')
+            subscription = self._subscription_ids[subscription_id]
+            await self._handle_subscription(subscription, data['params']['result'])
+        else:
+            raise DatasourceError(f'Unknown message: {data}', self.name)
 
     async def get_head_level(self) -> int:
         head = await self._jsonrpc_request('chain_getFinalizedHead', [])
@@ -233,9 +300,38 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         if genesis == last:
             return genesis
         return None
-    
+
     async def _subscribe(self, subscription: SubstrateNodeSubscription) -> None:
-        ... # TODO: make subscription request to node using subscription.method
+        self._logger.debug('Subscribing to %s', subscription)
+        self._pending_subscription = subscription
+        response = await self._jsonrpc_request(subscription.method, params=[],  ws=True)
+        raise RuntimeError('Subscription answered with %s', response)
+
+    async def _handle_subscription(self, subscription: SubstrateNodeSubscription, data: Any) -> None:
+        if isinstance(subscription, SubstrateNodeHeadSubscription):
+            # TODO: reimplement for universal message instead of head
+            self._emitter_queue.put_nowait(data)
+        else:
+            raise NotImplementedError
+
+    async def _emitter_loop(self) -> None:
+        while True:
+            level_data = await self._emitter_queue.get()
+            # NOTE: for now level_data is always head dict
+
+            # TODO: emit head
+            # self._logger.info('New head: %s -> %s', known_level, head.level)
+            # await self.emit_head(head)
+
+            # NOTE: subscribing to finalized head, no rollback required
+
+            # TODO: when there will be indexes other then events made it subscription conditional
+            # block_hash = await self.get_block_hash(level)
+            # event_dicts = await self.get_events(block_hash)
+            # block_header = await self.get_block_header(block_hash)
+            # events = tuple(SubstrateEventData(**event_dict, header=block_header)
+            #                for event_dict in event_dicts)
+            # await self.emit_events(events)
 
 
 # FIXME: Not used, should be a subscan replacement

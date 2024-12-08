@@ -45,6 +45,7 @@ from dipdup.datasources import Datasource
 from dipdup.datasources import IndexDatasource
 from dipdup.datasources import create_datasource
 from dipdup.datasources.evm_node import EvmNodeDatasource
+from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.tezos_tzkt import TezosTzktDatasource
 from dipdup.datasources.tezos_tzkt import late_tzkt_initialization
 from dipdup.exceptions import ConfigInitializationException
@@ -52,6 +53,7 @@ from dipdup.exceptions import FrameworkException
 from dipdup.hasura import HasuraGateway
 from dipdup.indexes.evm_events.index import EvmEventsIndex
 from dipdup.indexes.evm_transactions.index import EvmTransactionsIndex
+from dipdup.indexes.substrate_events.index import SubstrateEventsIndex
 from dipdup.indexes.tezos_big_maps.index import TezosBigMapsIndex
 from dipdup.indexes.tezos_events.index import TezosEventsIndex
 from dipdup.indexes.tezos_head.index import TezosHeadIndex
@@ -450,6 +452,9 @@ class IndexDispatcher:
                 datasource.call_on_events(self._on_evm_node_events)
                 datasource.call_on_transactions(self._on_evm_node_transactions)
                 datasource.call_on_syncing(self._on_evm_node_syncing)
+            elif isinstance(datasource, SubstrateNodeDatasource):
+                datasource.call_on_head(self._on_substrate_head)
+                datasource.call_on_events(self._on_substrate_events)
 
     async def _on_tzkt_head(self, datasource: TezosTzktDatasource, head: TezosHeadBlockData) -> None:
         # NOTE: Do not await query results, it may block Websocket loop. We do not use Head anyway.
@@ -544,6 +549,17 @@ class IndexDispatcher:
     async def _on_tzkt_events(self, datasource: TezosTzktDatasource, events: tuple[TezosEventData, ...]) -> None:
         for index in self._indexes.values():
             if isinstance(index, TezosEventsIndex) and datasource in index.datasources:
+                index.push_realtime_message(events)
+
+    # TODO: fix data typing
+    async def _on_substrate_head(self, datasource: SubstrateNodeDatasource, head: dict) -> None:
+        # TODO: any head updates here?
+        pass
+
+    # TODO: fix data typing
+    async def _on_substrate_events(self, datasource: SubstrateNodeDatasource, events: tuple[dict, ...]) -> None:
+        for index in self._indexes.values():
+            if isinstance(index, SubstrateEventsIndex) and datasource in index.datasources:
                 index.push_realtime_message(events)
 
     async def _on_rollback(

@@ -69,8 +69,6 @@ dependencies = [
     "python-dotenv~=1.0",
     "python-json-logger~=2.0",
     "ruamel.yaml~=0.18.6",
-    # "substrate-interface",
-    "substrate-interface @ git+https://github.com/dipdup-io/py-substrate-interface-async.git@dipdup",
     "sentry-sdk~=2.16",
     "sqlparse~=0.5",
     "starknet-py==0.24.0",
@@ -81,6 +79,7 @@ dependencies = [
     "tortoise-orm==0.21.7",
     "uvloop~=0.20",
     "web3~=7.2",
+    "aiosubstrate @ git+https://github.com/dipdup-io/aiosubstrate.git",
 ]
 
 [project.optional-dependencies]
@@ -178,9 +177,6 @@ docs = [
 ]
 perf = [
     "scalene",
-]
-dev = [
-    "-e file:///${PROJECT_ROOT}/../py-substrate-interface#egg=substrate-interface",
 ]
 
 [tool.pdm.build]

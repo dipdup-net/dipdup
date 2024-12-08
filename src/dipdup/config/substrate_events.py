@@ -12,18 +12,14 @@ from dipdup.config import HandlerConfig
 from dipdup.config.substrate import SubstrateDatasourceConfigU
 from dipdup.config.substrate import SubstrateIndexConfig
 from dipdup.config.substrate import SubstrateRuntimeConfig
+from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
 from dipdup.utils import pascal_to_snake
 from dipdup.utils import snake_to_pascal
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-from dipdup.subscriptions import Subscription
-
-
-@dataclass(frozen=True)
-class DummySubscription(Subscription):
-    pass
+    from dipdup.subscriptions import Subscription
 
 
 @dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
@@ -75,5 +71,4 @@ class SubstrateEventsIndexConfig(SubstrateIndexConfig):
     last_level: int = 0
 
     def get_subscriptions(self) -> set[Subscription]:
-        # FIXME: or get_sync_level fails
-        return {DummySubscription()}
+        return {SubstrateNodeHeadSubscription(fetch_events=True)}
