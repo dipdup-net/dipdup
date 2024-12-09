@@ -35,6 +35,13 @@ HeadCallback = Callable[['SubstrateNodeDatasource', dict], Awaitable[None]]
 EventCallback = Callable[['SubstrateNodeDatasource', tuple[SubstrateEventData, ...]], Awaitable[None]]
 
 
+# NOTE: Renamed entity class LevelData from evm_node
+@dataclass
+class SubscriptionMessage:
+    head: dict[str, Any]
+    fetch_events: bool = False
+
+
 @dataclass
 class MetadataVersion:
     spec_name: str
@@ -94,7 +101,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         self._subscription_ids: dict[str, SubstrateNodeSubscription] = {}
         self._interface = SubstrateInterface(config.url)
 
-        self._emitter_queue: Queue[dict] = Queue()
+        self._emitter_queue: Queue[SubscriptionMessage] = Queue()
 
         self._watchdog: Watchdog = Watchdog(self._http_config.connection_timeout)
 
@@ -212,8 +219,8 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     async def get_block_header(self, hash: str) -> BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
-        return {'hash': hash, 
-                'number': int(response['number'], 16), 
+        return {'hash': hash,
+                'number': int(response['number'], 16),
                 'prevRoot': response['parentHash']}
 
     async def get_metadata_header(self, height: int) -> MetadataHeader:
@@ -310,29 +317,27 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     async def _handle_subscription(self, subscription: SubstrateNodeSubscription, data: Any) -> None:
         if isinstance(subscription, SubstrateNodeHeadSubscription):
-            # TODO: reimplement for universal message instead of head
-            self._emitter_queue.put_nowait(data)
+            self._emitter_queue.put_nowait(SubscriptionMessage(head=data, fetch_events=True))
         else:
             raise NotImplementedError
 
     async def _emitter_loop(self) -> None:
         while True:
-            level_data = await self._emitter_queue.get()
-            # NOTE: for now level_data is always head dict
+            level_data: SubscriptionMessage = await self._emitter_queue.get()
 
-            # TODO: emit head
-            # self._logger.info('New head: %s -> %s', known_level, head.level)
-            # await self.emit_head(head)
+            level = int(level_data.head['number'], 16)
+            self._logger.info('New head: %s', level)
+            await self.emit_head(level_data)
 
             # NOTE: subscribing to finalized head, no rollback required
 
-            # TODO: when there will be indexes other then events made it subscription conditional
-            # block_hash = await self.get_block_hash(level)
-            # event_dicts = await self.get_events(block_hash)
-            # block_header = await self.get_block_header(block_hash)
-            # events = tuple(SubstrateEventData(**event_dict, header=block_header)
-            #                for event_dict in event_dicts)
-            # await self.emit_events(events)
+            if level_data.fetch_events:
+                block_hash = await self.get_block_hash(level)
+                event_dicts = await self.get_events(block_hash)
+                block_header = await self.get_block_header(block_hash)
+                events = tuple(SubstrateEventData(**event_dict, header=block_header)
+                               for event_dict in event_dicts)
+                await self.emit_events(events)
 
 
 # FIXME: Not used, should be a subscan replacement
