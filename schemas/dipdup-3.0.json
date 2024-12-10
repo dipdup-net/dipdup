@@ -16,19 +16,6 @@
           "type": "string",
           "description": "API URL"
         },
-        "http": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/HttpConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "http",
-          "description": "HTTP client configuration"
-        },
         "api_key": {
           "anyOf": [
             {
@@ -41,6 +28,19 @@
           "default": null,
           "title": "api_key",
           "description": "API key"
+        },
+        "http": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "http",
+          "description": "HTTP client configuration"
         }
       },
       "required": [
@@ -56,16 +56,6 @@
         "reindex": {
           "additionalProperties": {
             "$ref": "#/$defs/ReindexingAction"
-          },
-          "propertyNames": {
-            "description": "Reason that caused reindexing\n\n:param manual: Manual reindexing.\n:param migration: Migration of the database schema.\n:param rollback: Rollback that couldn't be handled automatically.\n:param config_modified: Index config was modified.\n:param schema_modified: Project models or database schema were modified.",
-            "enum": [
-              "manual",
-              "migration",
-              "rollback",
-              "config_modified",
-              "schema_modified"
-            ]
           },
           "title": "reindex",
           "type": "object",
@@ -168,19 +158,6 @@
           "type": "string",
           "description": "always 'coinbase'"
         },
-        "http": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/HttpConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "http",
-          "description": "HTTP client configuration"
-        },
         "api_key": {
           "anyOf": [
             {
@@ -219,6 +196,19 @@
           "default": null,
           "title": "passphrase",
           "description": "API passphrase"
+        },
+        "http": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "http",
+          "description": "HTTP client configuration"
         }
       },
       "required": [
@@ -239,19 +229,6 @@
           "title": "kind",
           "type": "string",
           "description": "Always `evm`"
-        },
-        "typename": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "typename",
-          "description": "Alias for the contract script"
         },
         "address": {
           "anyOf": [
@@ -284,6 +261,19 @@
           "default": null,
           "title": "abi",
           "description": "Contract ABI"
+        },
+        "typename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "typename",
+          "description": "Alias for the contract script"
         }
       },
       "required": [
@@ -402,19 +392,6 @@
           "title": "url",
           "description": "EVM node URL"
         },
-        "http": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/HttpConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "http",
-          "description": "HTTP client configuration"
-        },
         "ws_url": {
           "anyOf": [
             {
@@ -427,6 +404,19 @@
           "default": null,
           "title": "ws_url",
           "description": "EVM node WebSocket URL"
+        },
+        "http": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "http",
+          "description": "HTTP client configuration"
         },
         "rollback_depth": {
           "default": 32,
@@ -1324,19 +1314,6 @@
           "type": "string",
           "description": "Always `starknet`"
         },
-        "typename": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "typename",
-          "description": "Alias for the contract script"
-        },
         "address": {
           "anyOf": [
             {
@@ -1368,6 +1345,19 @@
           "default": null,
           "title": "abi",
           "description": "Contract ABI"
+        },
+        "typename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "typename",
+          "description": "Alias for the contract script"
         }
       },
       "required": [
@@ -1483,19 +1473,6 @@
           "title": "url",
           "description": "Starknet node URL"
         },
-        "http": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/HttpConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "http",
-          "description": "HTTP client configuration"
-        },
         "ws_url": {
           "anyOf": [
             {
@@ -1508,6 +1485,19 @@
           "default": null,
           "title": "ws_url",
           "description": "Starknet node WebSocket URL"
+        },
+        "http": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "http",
+          "description": "HTTP client configuration"
         },
         "rollback_depth": {
           "default": 32,
@@ -1667,19 +1657,6 @@
           "type": "string",
           "description": "Always `tezos`"
         },
-        "typename": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "typename",
-          "description": "Alias for the contract script"
-        },
         "address": {
           "anyOf": [
             {
@@ -1708,6 +1685,19 @@
           "default": null,
           "title": "code_hash",
           "description": "Contract code hash or address to fetch it from"
+        },
+        "typename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "typename",
+          "description": "Alias for the contract script"
         }
       },
       "required": [
@@ -1944,6 +1934,9 @@
         "source": {
           "anyOf": [
             {
+              "type": "string"
+            },
+            {
               "$ref": "#/$defs/TezosContractConfig"
             },
             {
@@ -1956,6 +1949,9 @@
         },
         "originated_contract": {
           "anyOf": [
+            {
+              "type": "string"
+            },
             {
               "$ref": "#/$defs/TezosContractConfig"
             },
@@ -2010,6 +2006,9 @@
         "source": {
           "anyOf": [
             {
+              "type": "string"
+            },
+            {
               "$ref": "#/$defs/TezosContractConfig"
             },
             {
@@ -2022,6 +2021,9 @@
         },
         "destination": {
           "anyOf": [
+            {
+              "type": "string"
+            },
             {
               "$ref": "#/$defs/TezosContractConfig"
             },
@@ -2070,6 +2072,9 @@
         "source": {
           "anyOf": [
             {
+              "type": "string"
+            },
+            {
               "$ref": "#/$defs/TezosContractConfig"
             },
             {
@@ -2082,6 +2087,9 @@
         },
         "destination": {
           "anyOf": [
+            {
+              "type": "string"
+            },
             {
               "$ref": "#/$defs/TezosContractConfig"
             },
@@ -2130,6 +2138,9 @@
         "source": {
           "anyOf": [
             {
+              "type": "string"
+            },
+            {
               "$ref": "#/$defs/TezosContractConfig"
             },
             {
@@ -2142,6 +2153,9 @@
         },
         "destination": {
           "anyOf": [
+            {
+              "type": "string"
+            },
             {
               "$ref": "#/$defs/TezosContractConfig"
             },
@@ -2635,6 +2649,11 @@
           "type": "string",
           "description": "always 'tzip_metadata'"
         },
+        "network": {
+          "$ref": "#/$defs/TzipMetadataNetwork",
+          "title": "network",
+          "description": "Network name, e.g. mainnet, ghostnet, etc."
+        },
         "url": {
           "default": "https://metadata.dipdup.net",
           "title": "url",
@@ -2653,11 +2672,6 @@
           "default": null,
           "title": "http",
           "description": "HTTP client configuration"
-        },
-        "network": {
-          "$ref": "#/$defs/TzipMetadataNetwork",
-          "title": "network",
-          "description": "Network name, e.g. mainnet, ghostnet, etc."
         }
       },
       "required": [
@@ -2668,13 +2682,14 @@
       "type": "object"
     },
     "TzipMetadataNetwork": {
-      "description": "Tezos network enum for TZIP-16 metadata.\n\n:param mainnet: mainnet\n:param ghostnet: ghostnet\n:param nairobinet: nairobinet\n:param oxfordnet: oxfordnet\n:param parisnet: parisnet",
+      "description": "Tezos network enum for TZIP-16 metadata.\n\n:param mainnet: mainnet\n:param ghostnet: ghostnet\n:param nairobinet: nairobinet\n:param oxfordnet: oxfordnet\n:param parisnet: parisnet\n:param quebecnet: quebecnet",
       "enum": [
         "mainnet",
         "ghostnet",
         "nairobinet",
         "oxfordnet",
-        "parisnet"
+        "parisnet",
+        "quebecnet"
       ],
       "title": "TzipMetadataNetwork",
       "type": "string"

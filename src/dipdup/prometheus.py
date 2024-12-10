@@ -33,7 +33,7 @@ class Metric(MetricWrapperBase):
         Raises:
             TypeError: If one of the values is a parent metric.
         """
-        if self._is_parent() or isinstance(other, Metric) and other._is_parent():
+        if self._is_parent() or (isinstance(other, Metric) and other._is_parent()):
             raise TypeError('Cannot perform arithmetic operations between parent metrics')
 
         return float(self) + float(other)
@@ -44,7 +44,7 @@ class Metric(MetricWrapperBase):
         Raises:
             TypeError: If one of the values is a parent metric.
         """
-        if self._is_parent() or isinstance(other, Metric) and other._is_parent():
+        if self._is_parent() or (isinstance(other, Metric) and other._is_parent()):
             raise TypeError('Cannot perform arithmetic operations between parent metrics')
 
         return float(self) - float(other)

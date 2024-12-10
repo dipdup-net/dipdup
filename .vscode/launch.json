@@ -13,8 +13,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_blank",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -29,8 +31,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_blank",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -45,8 +49,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -61,8 +67,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -77,8 +85,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_transactions",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -93,8 +103,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_transactions",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -109,8 +121,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_uniswap",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -125,8 +139,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_evm_uniswap",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -141,8 +157,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_starknet_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -157,8 +175,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_starknet_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -173,8 +193,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_auction",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -189,8 +211,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_auction",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -205,8 +229,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_dao",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -221,8 +247,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_dao",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -237,8 +265,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_dex",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -253,8 +283,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_dex",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -269,8 +301,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_domains",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -285,8 +319,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_domains",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -301,8 +337,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_etherlink",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -317,8 +355,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_etherlink",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -333,8 +373,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -349,8 +391,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_events",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -365,8 +409,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_factories",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -381,8 +427,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_factories",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -397,8 +445,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_head",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -413,8 +463,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_head",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -429,8 +481,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_nft_marketplace",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -445,8 +499,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_nft_marketplace",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -461,8 +517,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_raw",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -477,8 +535,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_raw",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -493,8 +553,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -509,8 +571,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -525,8 +589,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token_balances",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -541,8 +607,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token_balances",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -557,8 +625,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token_transfers",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     },
     {
@@ -573,8 +643,10 @@
       ],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/src/demo_tezos_token_transfers",
+      "justMyCode": false,
       "env": {
-        "DIPDUP_DEBUG": "1"
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
       }
     }
   ]

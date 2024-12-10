@@ -764,8 +764,10 @@ def dump_demos() -> None:
                     'args': ('-e', '.env', *args),
                     'console': 'integratedTerminal',
                     'cwd': '${workspaceFolder}/src/' + name,
+                    'justMyCode': False,
                     'env': {
                         'DIPDUP_DEBUG': '1',
+                        'DIPDUP_NO_SYMLINK': '1',
                     },
                 }
             )

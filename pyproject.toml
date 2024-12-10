@@ -1,7 +1,7 @@
 [project]
 name = "dipdup"
 description = "Modular framework for creating selective indexers and featureful backends for dapps"
-version = "8.1.1"
+version = "8.1.2"
 license = { text = "MIT" }
 authors = [
     { name = "Lev Gorodetskii", email = "dipdup@drsr.io" },
@@ -63,7 +63,8 @@ dependencies = [
     "orjson~=3.10",
     "prometheus-client~=0.20",
     "pycryptodome~=3.20",
-    "pydantic~=2.9",
+    # FIXME:
+    "pydantic~=2.9.2",
     "pyhumps~=3.8",
     "pysignalr~=1.0",
     "python-dotenv~=1.0",
@@ -139,7 +140,7 @@ target-version = "py312"
 ignore = [
     "E402",   # module level import not at top of file
     "E501",   # line too long
-    "TCH001", # breaks our runtime Pydantic magic
+    "TC001",  # breaks our runtime Pydantic magic
     "UP040",  # PEP 695 type aliases are not yet supported by mypy
 ]
 extend-select = ["B", "C4", "FA", "G", "I", "PTH", "Q", "RET", "RUF", "TCH", "UP"]

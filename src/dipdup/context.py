@@ -27,7 +27,8 @@ from dipdup.config.evm import EvmContractConfig
 from dipdup.config.evm import EvmIndexConfig
 from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_transactions import EvmTransactionsIndexConfig
-from dipdup.config.starknet import StarknetIndexConfig, StarknetContractConfig
+from dipdup.config.starknet import StarknetContractConfig
+from dipdup.config.starknet import StarknetIndexConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
 from dipdup.config.tezos import TezosContractConfig
 from dipdup.config.tezos import TezosIndexConfig
