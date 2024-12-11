@@ -8,8 +8,7 @@ from typing import TypeVar
 
 if TYPE_CHECKING:
     from dipdup.context import DipDupContext
-from dipdup.datasources.evm_node import NODE_LAST_MILE
-from dipdup.datasources.evm_node import EvmNodeDatasource
+from dipdup.datasources import JsonRpcDatasource
 from dipdup.index import Index
 from dipdup.index import IndexQueueItemT
 from dipdup.performance import metrics
@@ -40,7 +39,7 @@ class SubsquidIndex(
         self,
         subsquid_level: int,
         index_level: int,
-        node: EvmNodeDatasource | None = None,
+        node: JsonRpcDatasource | None = None,
     ) -> int | None:
         if not self.node_datasources:
             return None
@@ -50,7 +49,7 @@ class SubsquidIndex(
         subsquid_lag = abs(node_sync_level - subsquid_level)
         subsquid_available = subsquid_level - index_level
         self._logger.info('Subsquid is %s levels behind; %s available', subsquid_lag, subsquid_available)
-        if subsquid_available < NODE_LAST_MILE:
+        if subsquid_available < node.NODE_LAST_MILE:
             return node_sync_level
         return None
 

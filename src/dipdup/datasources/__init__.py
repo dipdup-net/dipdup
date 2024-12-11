@@ -164,6 +164,8 @@ class WebsocketDatasource(IndexDatasource[DatasourceConfigT]):
 
 # FIXME: Not necessary a WS datasource
 class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
+    NODE_LAST_MILE = 0
+
     def __init__(self, config: DatasourceConfigT) -> None:
         super().__init__(config)
         self._requests: dict[str, tuple[asyncio.Event, Any]] = {}
@@ -218,6 +220,10 @@ class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
         if 'error' in data:
             raise DatasourceError(data['error']['message'], self.name)
         return data['result']
+
+    # TODO: probably should be defined higher
+    @abstractmethod
+    async def get_head_level() -> int: ...
 
 
 def create_datasource(config: DatasourceConfig) -> Datasource[Any]:

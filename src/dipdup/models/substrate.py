@@ -54,6 +54,14 @@ class SubstrateEventData(HasLevel):
         return self.header['number']
 
 
+class HeadBlock(TypedDict):
+    parentHash: str
+    number: str
+    stateRoot: str
+    extrinsicsRoot: str
+    digest: dict[str, Any]
+
+
 PayloadT = TypeVar('PayloadT')
 
 

@@ -19,6 +19,7 @@ from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
 from dipdup.models.substrate import BlockHeader
+from dipdup.models.substrate import HeadBlock
 from dipdup.models.substrate import SubstrateEventData
 from dipdup.models.substrate import SubstrateEventDataDict
 from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
@@ -30,15 +31,14 @@ from dipdup.utils import Watchdog
 _logger = logging.getLogger(__name__)
 
 
-# TODO: think about return type of callback, for now i'm not sure where data should be ingested after the head update
-HeadCallback = Callable[['SubstrateNodeDatasource', dict], Awaitable[None]]
+HeadCallback = Callable[['SubstrateNodeDatasource', HeadBlock], Awaitable[None]]
 EventCallback = Callable[['SubstrateNodeDatasource', tuple[SubstrateEventData, ...]], Awaitable[None]]
 
 
 # NOTE: Renamed entity class LevelData from evm_node
 @dataclass
 class SubscriptionMessage:
-    head: dict[str, Any]
+    head: HeadBlock
     fetch_events: bool = False
 
 
@@ -154,7 +154,6 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         if not self.realtime:
             return
 
-        # TODO: Ensure substrate subscriptions list made correctly
         missing_subscriptions = self._subscriptions.missing_subscriptions
         if not missing_subscriptions:
             return
@@ -164,8 +163,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             if isinstance(subscription, SubstrateNodeSubscription):
                 await self._subscribe(subscription)
 
-    # TODO: fix typing
-    async def emit_head(self, head: dict) -> None:
+    async def emit_head(self, head: HeadBlock) -> None:
         for fn in self._on_head_callbacks:
             await fn(self, head)
 
@@ -180,9 +178,6 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         self._on_event_callbacks.add(fn)
 
     async def _on_message(self, message: Message) -> None:
-        # TODO: since only head subscription available we need to load target objects(i.e. events) separately
-        # to schedule those requests we need to get information about index type from subscription
-
         if not isinstance(message, WebsocketMessage):
             raise FrameworkException(f'Unknown message type: {type(message)}')
 
@@ -327,7 +322,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
             level = int(level_data.head['number'], 16)
             self._logger.info('New head: %s', level)
-            await self.emit_head(level_data)
+            await self.emit_head(level_data.head)
 
             # NOTE: subscribing to finalized head, no rollback required
 

@@ -64,5 +64,4 @@ class StarknetEventsIndexConfig(StarknetIndexConfig):
     handlers: tuple[StarknetEventsHandlerConfig, ...]
 
     def get_subscriptions(self) -> set[Subscription]:
-        # TODO: return custom subscription class
         return {StarknetSubscription()}

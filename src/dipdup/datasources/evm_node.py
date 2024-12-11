@@ -38,7 +38,6 @@ if TYPE_CHECKING:
 
 
 NODE_LEVEL_TIMEOUT = 0.1
-NODE_LAST_MILE = 128
 
 
 HeadCallback = Callable[['EvmNodeDatasource', EvmNodeHeadData], Awaitable[None]]
@@ -68,6 +67,8 @@ class LevelData:
 
 
 class EvmNodeDatasource(JsonRpcDatasource[EvmNodeDatasourceConfig]):
+    NODE_LAST_MILE = 128
+
     _default_http_config = HttpConfig(
         batch_size=10,
         ratelimit_sleep=1,
