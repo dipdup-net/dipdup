@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class NameMixin:
     def __post_init__(self) -> None:
         self._name: str | None = None
@@ -33,7 +33,7 @@ class NameMixin:
         return self._name
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class CodegenMixin(ABC):
     """Base for pattern config classes containing methods required for codegen"""
 
@@ -70,7 +70,7 @@ class CodegenMixin(ABC):
 ParentT = TypeVar('ParentT')
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class ParentMixin(Generic[ParentT]):
     """`parent` field for index and template configs"""
 
@@ -88,7 +88,7 @@ class ParentMixin(Generic[ParentT]):
         self._parent = value
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class CallbackMixin(CodegenMixin):
     """Mixin for callback configs
 
@@ -102,7 +102,7 @@ class CallbackMixin(CodegenMixin):
             raise ConfigurationError('`callback` field must be a valid Python module name')
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SubgroupIndexMixin:
     """`subgroup_index` field to track index of operation in group
 

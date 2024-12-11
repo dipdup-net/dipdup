@@ -90,7 +90,7 @@ type WsUrl = Annotated[str, BeforeValidator(lambda v: _valid_url(v, ws=True))]
 _logger = logging.getLogger(__name__)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SqliteDatabaseConfig:
     """
     SQLite connection config
@@ -124,7 +124,7 @@ class SqliteDatabaseConfig:
         return 1
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class PostgresDatabaseConfig:
     """Postgres database connection config
 
@@ -176,7 +176,7 @@ class PostgresDatabaseConfig:
         }
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HttpConfig:
     """Advanced configuration of HTTP client
 
@@ -210,7 +210,7 @@ class HttpConfig:
     alias: str | None = None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class ResolvedHttpConfig:
     __doc__ = HttpConfig.__doc__
 
@@ -289,7 +289,7 @@ class IndexDatasourceConfig(DatasourceConfig):
     ...
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HandlerConfig(CallbackMixin, ParentMixin['IndexConfig']):
     """Base class for index handlers
 
@@ -301,7 +301,7 @@ class HandlerConfig(CallbackMixin, ParentMixin['IndexConfig']):
         ParentMixin.__post_init__(self)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class IndexTemplateConfig(NameMixin):
     """Index template config
 
@@ -320,7 +320,7 @@ class IndexTemplateConfig(NameMixin):
     last_level: int = 0
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class IndexConfig(ABC, NameMixin, ParentMixin['ResolvedIndexConfigU']):
     """Index config
 
@@ -361,7 +361,7 @@ class IndexConfig(ABC, NameMixin, ParentMixin['ResolvedIndexConfigU']):
             datasource.pop('buffer_size', None)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HasuraConfig:
     """Config for the Hasura integration.
 
@@ -400,7 +400,7 @@ class HasuraConfig:
         return {}
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class JobConfig(NameMixin):
     """Job schedule config
 
@@ -427,7 +427,7 @@ class JobConfig(NameMixin):
         NameMixin.__post_init__(self)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SentryConfig:
     """Config for Sentry integration.
 
@@ -447,7 +447,7 @@ class SentryConfig:
     debug: bool = False
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class PrometheusConfig:
     """Config for Prometheus integration.
 
@@ -461,7 +461,7 @@ class PrometheusConfig:
     update_interval: float = 1.0
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HookConfig(CallbackMixin):
     """Hook config
 
@@ -486,7 +486,7 @@ class HookConfig(CallbackMixin):
                 yield package, obj
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SystemHookConfig(HookConfig):
     __doc__ = HookConfig.__doc__
 
@@ -520,7 +520,7 @@ SYSTEM_HOOKS = {
 }
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class ApiConfig:
     """Management API config
 
@@ -533,7 +533,7 @@ class ApiConfig:
 
 
 # NOTE: Should be the only place where extras are allowed
-@dataclass(config=ConfigDict(extra='allow'), kw_only=True)
+@dataclass(config=ConfigDict(extra='allow', defer_build=True), kw_only=True)
 class AdvancedConfig:
     """This section allows users to tune some system-wide options, either experimental or unsuitable for generic configurations.
 
@@ -557,7 +557,7 @@ class AdvancedConfig:
     alt_operation_matcher: bool = False
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class DipDupConfig:
     """DipDup project configuration file
 
@@ -634,6 +634,9 @@ class DipDupConfig:
         )
 
         try:
+            # from pydantic.dataclasses import rebuild_dataclass
+            # rebuild_dataclass(cls, force=True)
+
             config = TypeAdapter(cls).validate_python(config_json)
         except ConfigurationError:
             raise
@@ -1157,15 +1160,6 @@ ResolvedIndexConfigU = TezosIndexConfigU | EvmIndexConfigU | StarknetIndexConfig
 IndexConfigU = ResolvedIndexConfigU | IndexTemplateConfig
 
 
-def _reload_dataclass(cls: type[Any]) -> type[Any]:
-    """Reload dataclass to apply new annotations"""
-    try:
-        return dataclass(cls, config=cls.__pydantic_config__, kw_only=True)
-    # NOTE: The first attempt fails with "dictionary changed size" due to how deeply fucked up this hack is.
-    except RuntimeError:
-        return dataclass(cls, config=cls.__pydantic_config__, kw_only=True)
-
-
 def _patch_annotations() -> None:
     """Patch dataclass annotations in runtime to allow using aliases in config files.
 
@@ -1181,7 +1175,7 @@ def _patch_annotations() -> None:
         (self.__name__, self),
     )
 
-    for name, submodule in submodules:
+    for _, submodule in submodules:
         if not submodule.__name__.startswith('dipdup.config'):
             continue
 
@@ -1203,17 +1197,10 @@ def _patch_annotations() -> None:
                     body, after = body.split(']', 1)
                     unwrapped = f'{before}str | {body}{after}'
 
-                if annotation != unwrapped:
+                if unwrapped != annotation:
                     value.__annotations__[name] = unwrapped
-
-            setattr(
-                submodule,
-                attr,
-                _reload_dataclass(value),
-            )
-
-    # NOTE: Finally, reload the root config itself.
-    self.DipDupConfig = _reload_dataclass(DipDupConfig)  # type: ignore[attr-defined]
+                    value.__pydantic_fields__[name].annotation = unwrapped  # type: ignore[assignment]
+                    value.__dataclass_fields__[name].type = unwrapped
 
 
 _patch_annotations()

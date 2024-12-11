@@ -49,7 +49,7 @@ def _validate_tezos_address(v: str) -> str:
 type TezosAddress = Annotated[str, AfterValidator(_validate_tezos_address)]
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosContractConfig(ContractConfig):
     """Tezos contract config.
 
@@ -76,7 +76,7 @@ class TezosContractConfig(ContractConfig):
         return self.code_hash
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosIndexConfig(IndexConfig):
     """TzKT index config
 

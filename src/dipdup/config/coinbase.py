@@ -10,7 +10,7 @@ from dipdup.config import DatasourceConfig
 from dipdup.config import HttpConfig
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class CoinbaseDatasourceConfig(DatasourceConfig):
     """Coinbase datasource config
 

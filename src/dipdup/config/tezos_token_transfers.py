@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from dipdup.subscriptions import Subscription
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosTokenTransfersHandlerConfig(HandlerConfig):
     """Token transfer handler config
 
@@ -47,7 +47,7 @@ class TezosTokenTransfersHandlerConfig(HandlerConfig):
         yield 'token_transfer', 'TezosTokenTransferData'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosTokenTransfersIndexConfig(TezosIndexConfig):
     """Token transfer index config
 

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from dipdup.subscriptions import Subscription
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosTokenBalancesHandlerConfig(HandlerConfig):
     """Token balance handler config
 
@@ -44,7 +44,7 @@ class TezosTokenBalancesHandlerConfig(HandlerConfig):
         yield 'token_balance', 'TezosTokenBalanceData'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosTokenBalancesIndexConfig(TezosIndexConfig):
     """Token balance index config
 

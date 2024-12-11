@@ -45,7 +45,7 @@ def _validate_starknet_address(v: str) -> str:
 type StarknetAddress = Annotated[Hex, AfterValidator(_validate_starknet_address)]
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class StarknetContractConfig(ContractConfig):
     """Starknet contract config
 
@@ -66,7 +66,7 @@ class StarknetContractConfig(ContractConfig):
         return self.address
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class StarknetIndexConfig(IndexConfig, ABC):
     """Starknet index that use Subsquid Network as a datasource
 
