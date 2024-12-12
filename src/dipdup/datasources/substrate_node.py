@@ -188,6 +188,8 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             # NOTE: Save subscription id
             if self._pending_subscription:
                 self._subscription_ids[data['result']] = self._pending_subscription
+                self._requests[data['id']] = (self._requests[data['id']][0], data)
+                self._requests[data['id']][0].set()
 
                 # NOTE: Possibly unreliable logic from evm_node, and possibly too time consuming for message handling
                 level = await self.get_head_level()
@@ -307,8 +309,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     async def _subscribe(self, subscription: SubstrateNodeSubscription) -> None:
         self._logger.debug('Subscribing to %s', subscription)
         self._pending_subscription = subscription
-        response = await self._jsonrpc_request(subscription.method, params=[],  ws=True)
-        raise RuntimeError('Subscription answered with %s', response)
+        await self._jsonrpc_request(subscription.method, params=[],  ws=True)
 
     async def _handle_subscription(self, subscription: SubstrateNodeSubscription, data: Any) -> None:
         if isinstance(subscription, SubstrateNodeHeadSubscription):
