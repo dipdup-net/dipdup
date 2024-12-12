@@ -21,6 +21,14 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - cli: Fixed `--template` option being ignored when `--quiet` flag is set.
 - config: Fixed setting default loglevels when `logging` is a dict.
 
+## [8.1.2] - 2024-12-10
+
+### Fixed
+
+- context: Allow to add Starknet contracts in runtime.
+- database: Ignore non-existent immutable table on schema wipe.
+- starknet.events: Fixed event ID calculation.
+
 ## [8.1.1] - 2024-10-17
 
 ### Fixed
@@ -553,7 +561,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.1...HEAD
+[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.2...HEAD
+[8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.0.1...8.1.2
 [8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.0.0...8.1.1
 [8.1.0]: https://github.com/dipdup-io/dipdup/compare/8.0.0...8.1.0
 [8.0.0]: https://github.com/dipdup-io/dipdup/compare/8.0.0b5...8.0.0
