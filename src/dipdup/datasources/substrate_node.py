@@ -95,7 +95,8 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     )
 
     def __init__(self, config: SubstrateDatasourceConfigU) -> None:
-        from substrateinterface.base import SubstrateInterface
+        from aiosubstrate.base import SubstrateInterface
+
         super().__init__(config)
         self._pending_subscription = None
         self._subscription_ids: dict[str, SubstrateNodeSubscription] = {}
@@ -113,7 +114,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             await asyncio.gather(
                 self._ws_loop(),
                 self._emitter_loop(),
-                self._watchdog.run(),
+                # self._watchdog.run(),
             )
         else:
             while True:
@@ -188,6 +189,9 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
             # NOTE: Save subscription id
             if self._pending_subscription:
                 self._subscription_ids[data['result']] = self._pending_subscription
+                self._requests[data['id']] = (self._requests[data['id']][0], data)
+                self._requests[data['id']][0].set()
+
                 self._requests[data['id']] = (self._requests[data['id']][0], data)
                 self._requests[data['id']][0].set()
 
@@ -309,7 +313,8 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     async def _subscribe(self, subscription: SubstrateNodeSubscription) -> None:
         self._logger.debug('Subscribing to %s', subscription)
         self._pending_subscription = subscription
-        await self._jsonrpc_request(subscription.method, params=[],  ws=True)
+        response = await self._jsonrpc_request(subscription.method, params=[], ws=True)
+        self._subscription_ids[response] = subscription
 
     async def _handle_subscription(self, subscription: SubstrateNodeSubscription, data: Any) -> None:
         if isinstance(subscription, SubstrateNodeHeadSubscription):
@@ -331,8 +336,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
                 block_hash = await self.get_block_hash(level)
                 event_dicts = await self.get_events(block_hash)
                 block_header = await self.get_block_header(block_hash)
-                events = tuple(SubstrateEventData(**event_dict, header=block_header)
-                               for event_dict in event_dicts)
+                events = tuple(SubstrateEventData(**event_dict, header=block_header) for event_dict in event_dicts)
                 await self.emit_events(events)
 
 
