@@ -1,6 +1,6 @@
 [![Twitter](https://badgen.net/badge/icon/dipdup_io?icon=twitter&label=)](https://twitter.com/dipdup_io)
 [![Monthly downloads](https://static.pepy.tech/badge/dipdup/month)](https://pepy.tech/project/dipdup)
-[![GitHub stars](https://img.shields.io/github/stars/dipdup-io/dipdup?color=2c2c2c&style=plain)](https://github.com/dipdup-io/dipdup)
+[![GitHub stars](https://img.shields.io/github/stars/dipdup-io/dipdup?color=2c2c2c&style=plain)](https://github.com/dipdup-io/dipdup/stargazers)
 [![Python Version](https://img.shields.io/pypi/pyversions/dipdup?color=2c2c2c)](https://www.python.org)
 [![License: MIT](https://img.shields.io/github/license/dipdup-io/dipdup?color=2c2c2c)](https://github.com/dipdup-io/dipdup/blob/next/LICENSE)
 <br>
@@ -19,7 +19,7 @@ DipDup is a Python framework for building smart contract indexers. It helps deve
 
 - **Want to participate?** Vote for [open issues](https://github.com/dipdup-io/dipdup/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc), join [discussions](https://github.com/dipdup-io/dipdup/discussions) or [become a sponsor](https://github.com/sponsors/dipdup-io).
 
-- **Have a question?** Join our [Discord](https://discord.gg/aG8XKuwsQd) or tag @dipdup_io on [Twitter](https://twitter.com/dipdup_io).
+- **Have a question?** Join our [Discord](https://discord.gg/aG8XKuwsQd) or tag @dipdup_io on [X (formerly Twitter)](https://x.com/dipdup_io).
 
 This project is maintained by the [Baking Bad](https://bakingbad.dev/) team.
 <br>
