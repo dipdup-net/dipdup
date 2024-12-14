@@ -223,7 +223,7 @@ class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
 
     # TODO: probably should be defined higher
     @abstractmethod
-    async def get_head_level() -> int: ...
+    async def get_head_level(self) -> int: ...
 
 
 def create_datasource(config: DatasourceConfig) -> Datasource[Any]:

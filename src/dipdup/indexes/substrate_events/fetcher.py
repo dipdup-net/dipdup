@@ -5,7 +5,6 @@ from dipdup.datasources.substrate_subsquid import SubstrateSubsquidDatasource
 from dipdup.indexes.substrate_node import SubstrateNodeFetcher
 from dipdup.indexes.substrate_subsquid import SubstrateSubsquidFetcher
 from dipdup.models.substrate import SubstrateEventData
-from dipdup.runtimes import SubstrateRuntime
 
 
 class SubstrateSubsquidEventFetcher(SubstrateSubsquidFetcher[SubstrateEventData]):
@@ -59,5 +58,4 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
             block_hash = await self.get_random_node().get_block_hash(level)
             event_dicts = await self.get_random_node().get_events(block_hash)
             block_header = await self.get_random_node().get_block_header(block_hash)
-            yield tuple(SubstrateEventData(**event_dict, header=block_header)
-                        for event_dict in event_dicts)
+            yield tuple(SubstrateEventData(**event_dict, header=block_header) for event_dict in event_dicts)

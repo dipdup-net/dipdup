@@ -558,7 +558,9 @@ class IndexDispatcher:
         pass
 
     # TODO: fix data typing
-    async def _on_substrate_events(self, datasource: SubstrateNodeDatasource, events: tuple[dict, ...]) -> None:
+    async def _on_substrate_events(
+        self, datasource: SubstrateNodeDatasource, events: tuple[dict[str, Any], ...]
+    ) -> None:
         for index in self._indexes.values():
             if isinstance(index, SubstrateEventsIndex) and datasource in index.datasources:
                 index.push_realtime_message(events)

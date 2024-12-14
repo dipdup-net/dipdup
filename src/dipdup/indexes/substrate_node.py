@@ -1,19 +1,12 @@
-from dipdup.datasources.substrate_node import SubstrateNodeDatasource
-import asyncio
 import logging
 import random
-from collections.abc import AsyncIterator
 from abc import ABC
-from collections import defaultdict
-from collections import deque
-from typing import Any
 from typing import Generic
 
+from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.exceptions import FrameworkException
 from dipdup.fetcher import BufferT
 from dipdup.fetcher import DataFetcher
-from dipdup.models.substrate import SubstrateEventData
-
 
 SUBSTRATE_NODE_READAHEAD_LIMIT = 2500
 

@@ -7,6 +7,7 @@ from collections.abc import Callable
 from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -96,6 +97,9 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     def __init__(self, config: SubstrateDatasourceConfigU) -> None:
         from aiosubstrate.base import SubstrateInterface
+
+        # NOTE: Use our aiohttp session and limiters
+        SubstrateInterface.http_request = partial(self._jsonrpc_request, raw=True)  # type: ignore[method-assign]
 
         super().__init__(config)
         self._pending_subscription = None
@@ -219,9 +223,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     async def get_block_header(self, hash: str) -> BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
-        return {'hash': hash,
-                'number': int(response['number'], 16),
-                'prevRoot': response['parentHash']}
+        return {
+            'hash': hash,
+            'number': int(response['number'], 16),
+            'prevRoot': response['parentHash'],
+        }
 
     async def get_metadata_header(self, height: int) -> MetadataHeader:
         block_hash = await self.get_block_hash(height)
@@ -245,14 +251,16 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         res_events: list[SubstrateEventDataDict] = []
         for event in events:
             event: dict = event.decode()
-            res_events.append({
-                'name': f'{event['module_id']}.{event['event_id']}',
-                'index': event['event_index'],
-                'extrinsicIndex': event['extrinsic_idx'],
-                'callAddress': None,
-                'args': None,
-                'decoded_args': event['attributes'],
-            })
+            res_events.append(
+                {
+                    'name': f'{event['module_id']}.{event['event_id']}',
+                    'index': event['event_index'],
+                    'extrinsicIndex': event['extrinsic_idx'],
+                    'callAddress': None,
+                    'args': None,
+                    'decoded_args': event['attributes'],
+                }
+            )
 
         return tuple(res_events)
 
