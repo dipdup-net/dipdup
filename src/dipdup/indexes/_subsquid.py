@@ -49,7 +49,7 @@ class SubsquidIndex(
         subsquid_lag = abs(node_sync_level - subsquid_level)
         subsquid_available = subsquid_level - index_level
         self._logger.info('Subsquid is %s levels behind; %s available', subsquid_lag, subsquid_available)
-        if subsquid_available < node.NODE_LAST_MILE:
+        if subsquid_available <= node.NODE_LAST_MILE:
             return node_sync_level
         return None
 
