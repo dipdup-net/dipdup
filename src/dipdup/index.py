@@ -265,8 +265,6 @@ class Index(ABC, Generic[IndexConfigT, IndexQueueItemT, IndexDatasourceT]):
             with metrics._index_total_sync_duration.time():
                 await self._synchronize(sync_level)
                 return True
-        else:
-            await self._exit_sync_state(index_level)
 
         if self.queue:
             with metrics._index_total_realtime_duration.time():
