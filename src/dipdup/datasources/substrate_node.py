@@ -192,15 +192,14 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
                 self._requests[data['id']] = (self._requests[data['id']][0], data)
                 self._requests[data['id']][0].set()
 
-                self._requests[data['id']] = (self._requests[data['id']][0], data)
-                self._requests[data['id']][0].set()
-
                 # NOTE: Possibly unreliable logic from evm_node, and possibly too time consuming for message handling
                 level = await self.get_head_level()
                 self._subscriptions.set_sync_level(self._pending_subscription, level)
 
                 # NOTE: Set None to identify possible subscriptions conflicts
                 self._pending_subscription = None
+            else:
+                raise Exception
         elif 'method' in data and data['method'].startswith('chain_'):
             subscription_id = data['params']['subscription']
             if subscription_id not in self._subscription_ids:
