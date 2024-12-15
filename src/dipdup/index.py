@@ -142,6 +142,7 @@ class Index(ABC, Generic[IndexConfigT, IndexQueueItemT, IndexDatasourceT]):
         # NOTE: We still need to bump index level but don't care if it will be done in existing transaction
         if not matched_handlers:
             await self._update_state(level=batch_level)
+            metrics.objects_indexed += len(level_data)
             return
 
         started_at = time.time()
