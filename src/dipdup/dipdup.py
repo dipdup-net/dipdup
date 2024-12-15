@@ -328,13 +328,15 @@ class IndexDispatcher:
             _logger.info(msg)
             return
 
-        levels_speed, objects_speed = int(metrics.levels_nonempty_speed), int(metrics.objects_speed)
+        levels_speed, objects_speed = float(metrics.levels_nonempty_speed), float(metrics.objects_speed)
         msg = 'last mile' if metrics.synchronized_at else 'indexing'
         msg += f': {progress:5.1f}% done, {left} levels left'
 
         # NOTE: Resulting message is about 80 chars with the current logging format
         msg += ' ' * (48 - len(msg))
-        msg += f' {levels_speed:5} L {objects_speed:5} O'
+        def fmt(speed):
+            return '    0' if speed < 0.1 else f'{speed:5.{0 if speed >= 1 else 1}f}'
+        msg += f' {fmt(levels_speed)} L {fmt(objects_speed)} O'
         _logger.info(msg)
 
     async def _apply_filters(self, index: TezosOperationsIndex) -> None:
