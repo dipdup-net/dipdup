@@ -37,4 +37,5 @@ class SubstrateIndex(
         self.runtime = SubstrateRuntime(
             config=config.runtime,
             package=ctx.package,
+            interface=self.node_datasources[0]._interface if self.node_datasources else None,
         )

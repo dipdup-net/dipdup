@@ -36,7 +36,7 @@ class SubstrateEventDataDict(TypedDict):
     args: list[Any]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class SubstrateEventData(HasLevel):
     # TODO: there are more fields in event data: phase, topics
     name: str
@@ -45,8 +45,8 @@ class SubstrateEventData(HasLevel):
     callAddress: list[str] | None
     # TODO: ensure logic is straightforward
     # we receive decoded args from node datasource and encoded from subsquid datasource
-    args: list[Any] | None
-    decoded_args: dict[str, Any] | None
+    args: list[Any] | None = None
+    decoded_args: dict[str, Any] | None = None
     header: BlockHeader
 
     @property

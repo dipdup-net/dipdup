@@ -14,6 +14,7 @@ from dipdup.package import DipDupPackage
 from dipdup.utils import sorted_glob
 
 if TYPE_CHECKING:
+    from aiosubstrate import SubstrateInterface
     from scalecodec.base import RuntimeConfigurationObject  # type: ignore[import-untyped]
 
 _logger = logging.getLogger(__name__)
@@ -81,9 +82,11 @@ class SubstrateRuntime:
         self,
         config: SubstrateRuntimeConfig,
         package: DipDupPackage,
+        interface: 'SubstrateInterface | None',
     ) -> None:
         self._config = config
         self._package = package
+        self._interface = interface
         # TODO: Unload not used
         self._spec_versions: dict[str, SubstrateSpecVersion] = {}
 
@@ -93,11 +96,13 @@ class SubstrateRuntime:
 
     @cached_property
     def runtime_config(self) -> 'RuntimeConfigurationObject':
+        if self._interface:
+            return self._interface.runtime_config
+
         from scalecodec.base import RuntimeConfigurationObject
 
-        # FIXME: ss58_format
+        # FIXME: Generic configuration for cases when node datasources are not available
         runtime_config = RuntimeConfigurationObject(ss58_format=99)
-        # FIXME: When to use 'legacy' instead?
         runtime_config.update_type_registry(get_type_registry('legacy'))
         runtime_config.update_type_registry(get_type_registry('core'))
         runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
