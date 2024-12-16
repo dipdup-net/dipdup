@@ -61,7 +61,7 @@ mypy:           ## Lint with mypy
 docs_build: docs
 docs:           ## Build docs
 	python scripts/docs.py check-links --source docs
-	python scripts/docs.py dump-references || true
+	python scripts/docs.py dump-references
 	python scripts/docs.py dump-demos
 	python scripts/docs.py dump-metrics
 	python scripts/docs.py dump-jsonschema
