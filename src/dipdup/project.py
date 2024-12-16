@@ -114,7 +114,7 @@ def get_package_answers(package: str | None = None) -> Answers | None:
     return answers_from_replay(replay_path)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class ReplayConfig:
     spec_version: ToStr
     replay: Answers

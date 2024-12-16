@@ -63,8 +63,7 @@ dependencies = [
     "orjson~=3.10",
     "prometheus-client~=0.20",
     "pycryptodome~=3.20",
-    # FIXME:
-    "pydantic~=2.9.2",
+    "pydantic~=2.10.3",
     "pyhumps~=3.8",
     "pysignalr~=1.0",
     "python-dotenv~=1.0",

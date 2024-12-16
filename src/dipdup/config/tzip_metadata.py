@@ -12,7 +12,7 @@ from dipdup.models.tzip_metadata import TzipMetadataNetwork
 DEFAULT_TZIP_METADATA_URL = 'https://metadata.dipdup.net'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TzipMetadataDatasourceConfig(DatasourceConfig):
     """DipDup Metadata datasource config
 

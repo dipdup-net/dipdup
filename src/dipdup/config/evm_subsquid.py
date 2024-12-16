@@ -10,7 +10,7 @@ from dipdup.config import IndexDatasourceConfig
 from dipdup.config import Url
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmSubsquidDatasourceConfig(IndexDatasourceConfig):
     """Subsquid datasource config
 

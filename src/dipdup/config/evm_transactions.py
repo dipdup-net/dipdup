@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmTransactionsHandlerConfig(HandlerConfig, CodegenMixin):
     """Subsquid transaction handler
 
@@ -82,7 +82,7 @@ class EvmTransactionsHandlerConfig(HandlerConfig, CodegenMixin):
         return None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmTransactionsIndexConfig(EvmIndexConfig):
     """Index that uses Subsquid Network as a datasource for transactions
 

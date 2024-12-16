@@ -110,7 +110,7 @@ class TezosOperationsPatternConfig(CodegenMixin):
         return arg_name, 'TezosOperationData'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsHandlerTransactionPatternConfig(TezosOperationsPatternConfig, SubgroupIndexMixin):
     """Transaction handler pattern config
 
@@ -170,7 +170,7 @@ class TezosOperationsHandlerTransactionPatternConfig(TezosOperationsPatternConfi
         return None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsHandlerOriginationPatternConfig(TezosOperationsPatternConfig, SubgroupIndexMixin):
     """Origination handler pattern config
 
@@ -219,7 +219,7 @@ class TezosOperationsHandlerOriginationPatternConfig(TezosOperationsPatternConfi
         return None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsHandlerSmartRollupExecutePatternConfig(TezosOperationsPatternConfig, SubgroupIndexMixin):
     """Operation handler pattern config
 
@@ -256,7 +256,7 @@ class TezosOperationsHandlerSmartRollupExecutePatternConfig(TezosOperationsPatte
         return None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsHandlerSmartRollupCementPatternConfig(TezosOperationsPatternConfig, SubgroupIndexMixin):
     """Operation handler pattern config
 
@@ -293,7 +293,7 @@ class TezosOperationsHandlerSmartRollupCementPatternConfig(TezosOperationsPatter
         return None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsIndexConfig(TezosIndexConfig):
     """Operation index config
 
@@ -368,7 +368,7 @@ TezosOperationsHandlerPatternConfigU = (
 )
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsHandlerConfig(HandlerConfig):
     """Operation handler config
 
@@ -401,7 +401,7 @@ class TezosOperationsHandlerConfig(HandlerConfig):
             yield arg, arg_type
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsUnfilteredHandlerConfig(HandlerConfig):
     """Handler of unfiltered operation index
 
@@ -418,7 +418,7 @@ class TezosOperationsUnfilteredHandlerConfig(HandlerConfig):
         yield 'operation', 'TezosOperationData'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosOperationsUnfilteredIndexConfig(TezosIndexConfig):
     """Operation index config
 

@@ -45,7 +45,7 @@ def _validate_evm_address(v: str) -> str:
 type EvmAddress = Annotated[Hex, AfterValidator(_validate_evm_address)]
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmContractConfig(ContractConfig):
     """EVM contract config
 
@@ -69,7 +69,7 @@ class EvmContractConfig(ContractConfig):
         return self.address
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmIndexConfig(IndexConfig, ABC):
     """EVM index that use Subsquid Network as a datasource
 

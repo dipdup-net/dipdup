@@ -493,7 +493,7 @@ def dump_jsonschema() -> None:
 
     schema_dict = DipDupConfig.json_schema()
     schema_path = Path(__file__).parent.parent / 'schemas' / 'dipdup-3.0.json'
-    schema_path.write_bytes(orjson.dumps(schema_dict, option=orjson.OPT_INDENT_2))
+    schema_path.write_bytes(orjson.dumps(schema_dict, option=orjson.OPT_INDENT_2 | orjson.OPT_SORT_KEYS))
 
 
 @main.command('dump-references', help='Dump Sphinx references to ugly Markdown files')

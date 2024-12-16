@@ -11,7 +11,7 @@ from dipdup.config import HttpConfig
 DEFAULT_IPFS_URL = 'https://ipfs.io/ipfs'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class IpfsDatasourceConfig(DatasourceConfig):
     """IPFS datasource config
 
