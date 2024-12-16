@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from dipdup.subscriptions import Subscription
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmEventsHandlerConfig(HandlerConfig):
     """Subsquid event handler
 
@@ -50,7 +50,7 @@ class EvmEventsHandlerConfig(HandlerConfig):
         yield 'event', f'EvmEvent[{event_cls}]'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class EvmEventsIndexConfig(EvmIndexConfig):
     """Subsquid datasource config
 

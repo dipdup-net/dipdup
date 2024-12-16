@@ -21,6 +21,12 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - cli: Fixed `--template` option being ignored when `--quiet` flag is set.
 - config: Fixed setting default loglevels when `logging` is a dict.
 
+## [Unreleased]
+
+### Fixed
+
+- config: Fixed parsing config files after updating to pydantic 2.10.3.
+
 ## [8.1.2] - 2024-12-10
 
 ### Fixed

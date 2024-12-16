@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class StarknetEventsHandlerConfig(HandlerConfig):
     """Subsquid event handler
 
@@ -47,7 +47,7 @@ class StarknetEventsHandlerConfig(HandlerConfig):
         yield 'event', f'StarknetEvent[{event_cls}]'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class StarknetEventsIndexConfig(StarknetIndexConfig):
     """Starknet events index config
 

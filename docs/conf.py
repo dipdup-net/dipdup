@@ -58,3 +58,9 @@ html_static_path = ['_static']
 # NOTE: Nice dataclasses
 autodoc_typehints = 'description'
 autodoc_typehints_format = 'short'
+
+# NOTE: The code below is required because of `defer_build=True` in dataclass definitions
+
+from dipdup.config import DipDupConfig
+from pydantic.dataclasses import rebuild_dataclass
+rebuild_dataclass(DipDupConfig)

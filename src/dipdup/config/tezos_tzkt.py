@@ -22,7 +22,7 @@ DEFAULT_TZKT_URL = next(iter(TZKT_API_URLS.keys()))
 MAX_BATCH_SIZE = 10000
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosTzktDatasourceConfig(DatasourceConfig):
     """TzKT datasource config
 

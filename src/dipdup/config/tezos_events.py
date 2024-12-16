@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from dipdup.subscriptions import Subscription
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosEventsHandlerConfig(HandlerConfig):
     """Event handler config
 
@@ -49,7 +49,7 @@ class TezosEventsHandlerConfig(HandlerConfig):
         yield 'event', f'TezosEvent[{event_cls}]'
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosEventsUnknownEventHandlerConfig(HandlerConfig):
     """Unknown event handler config
 
@@ -72,7 +72,7 @@ class TezosEventsUnknownEventHandlerConfig(HandlerConfig):
 TezosEventsHandlerConfigU = TezosEventsHandlerConfig | TezosEventsUnknownEventHandlerConfig
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosEventsIndexConfig(TezosIndexConfig):
     """Event index config
 

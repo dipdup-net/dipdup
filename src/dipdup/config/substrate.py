@@ -19,7 +19,7 @@ SubstrateDatasourceConfigU: TypeAlias = (
 )
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SubstrateRuntimeConfig(RuntimeConfig):
     """Substrate runtime config
 
@@ -31,7 +31,7 @@ class SubstrateRuntimeConfig(RuntimeConfig):
     type_registry: str | None = None
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class SubstrateIndexConfig(IndexConfig, ABC):
     """EVM index that use Subsquid Network as a datasource
 

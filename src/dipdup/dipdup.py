@@ -334,8 +334,10 @@ class IndexDispatcher:
 
         # NOTE: Resulting message is about 80 chars with the current logging format
         msg += ' ' * (48 - len(msg))
+
         def fmt(speed):
             return '    0' if speed < 0.1 else f'{speed:5.{0 if speed >= 1 else 1}f}'
+
         msg += f' {fmt(levels_speed)} L {fmt(objects_speed)} O'
         _logger.info(msg)
 

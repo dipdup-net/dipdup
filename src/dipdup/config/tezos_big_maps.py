@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from dipdup.subscriptions import Subscription
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosBigMapsHandlerConfig(HandlerConfig):
     """Big map handler config
 
@@ -67,7 +67,7 @@ class TezosBigMapsHandlerConfig(HandlerConfig):
         yield self.format_big_map_diff_argument(self.path)
 
 
-@dataclass(config=ConfigDict(extra='forbid'), kw_only=True)
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class TezosBigMapsIndexConfig(TezosIndexConfig):
     """Big map index config
 

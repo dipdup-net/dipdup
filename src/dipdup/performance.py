@@ -341,7 +341,11 @@ class _MetricManager:
                 return round(value, 2)
             return value
 
-        return {k: _round(getattr(self, k)) for k in dir(self) if not k.startswith('_') and isinstance(getattr(self, k), Metric)}
+        return {
+            k: _round(getattr(self, k))
+            for k in dir(self)
+            if not k.startswith('_') and isinstance(getattr(self, k), Metric)
+        }
 
 
 caches = _CacheManager()
