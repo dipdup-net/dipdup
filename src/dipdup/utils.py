@@ -228,6 +228,10 @@ def json_dumps(obj: Any | str, option: int | None = orjson.OPT_INDENT_2) -> byte
     )
 
 
+def json_dumps_plain(obj: Any | str) -> str:
+    return json_dumps(obj, None).decode()
+
+
 class Watchdog:
     def __init__(self, timeout: int) -> None:
         self._watchdog = asyncio.Event()

@@ -84,7 +84,7 @@ def preprocess_storage_jsonschema(schema: dict[str, Any]) -> dict[str, Any]:
 class TezosCodeGenerator(CodeGenerator):
     """Generates package based on config, invoked from `init` CLI command"""
 
-    kind = 'substrate'
+    kind = 'tezos'
 
     def __init__(
         self,
