@@ -2,6 +2,7 @@ import asyncio
 import importlib
 import logging
 import pkgutil
+import re
 import types
 from collections import defaultdict
 from collections.abc import Callable
@@ -218,14 +219,6 @@ def _default_for_decimals(obj: Any) -> Any:
     raise TypeError
 
 
-def json_dumps_plain(obj: Any | str) -> str:
-    """Smarter json.dumps"""
-    return orjson.dumps(
-        obj,
-        default=_default_for_decimals,
-    ).decode()
-
-
 def json_dumps(obj: Any | str, option: int | None = orjson.OPT_INDENT_2) -> bytes:
     """Smarter json.dumps"""
     return orjson.dumps(
@@ -233,6 +226,10 @@ def json_dumps(obj: Any | str, option: int | None = orjson.OPT_INDENT_2) -> byte
         default=_default_for_decimals,
         option=option,
     )
+
+
+def json_dumps_plain(obj: Any | str) -> str:
+    return json_dumps(obj, None).decode()
 
 
 class Watchdog:
@@ -255,3 +252,15 @@ class Watchdog:
             except TimeoutError as e:
                 msg = f'Watchdog timeout; no messages received in {self._timeout} seconds'
                 raise FrameworkException(msg) from e
+
+
+def sorted_glob(path: Path, pattern: str) -> list[Path]:
+    def natural_sort_key(item: Path) -> Any:
+        def split_parts(text: str) -> list[int | str]:
+            parts = re.split(r'(\d+)', text)
+            return [int(part) if part.isdigit() else part.lower() for part in parts]
+
+        # Sort by parent directories first, then by filename
+        return [split_parts(part) for part in item.parent.parts], split_parts(item.name)
+
+    return sorted(path.glob(pattern), key=natural_sort_key)

@@ -7,8 +7,8 @@ from typing import cast
 
 from dipdup.config import HttpConfig
 from dipdup.datasources import Datasource
+from dipdup.datasources import DatasourceConfigT
 from dipdup.datasources import IndexDatasource
-from dipdup.datasources import IndexDatasourceConfigT
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
 from dipdup.http import safe_exceptions
@@ -34,8 +34,8 @@ class AbstractSubsquidWorker(Datasource[Any], Generic[QueryT]):
 
 
 class AbstractSubsquidDatasource(
-    IndexDatasource[IndexDatasourceConfigT],
-    Generic[IndexDatasourceConfigT, QueryT],
+    IndexDatasource[DatasourceConfigT],
+    Generic[DatasourceConfigT, QueryT],
 ):
     _default_http_config = HttpConfig(
         polling_interval=1.0,
@@ -108,7 +108,7 @@ class AbstractSubsquidDatasource(
         response = await self.request('get', 'height')
         return int(response)
 
-    async def _fetch_worker(self, level: int) -> IndexDatasourceConfigT:
+    async def _fetch_worker(self, level: int) -> DatasourceConfigT:
         worker_url = (
             await self._http.request(
                 'get',
@@ -116,7 +116,7 @@ class AbstractSubsquidDatasource(
             )
         ).decode()
 
-        worker_config: IndexDatasourceConfigT = copy(self._config)
+        worker_config: DatasourceConfigT = copy(self._config)
         worker_config.url = worker_url
         if not worker_config.http:
             worker_config.http = self._default_http_config

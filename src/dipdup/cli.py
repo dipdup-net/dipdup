@@ -3,6 +3,7 @@ import asyncio
 import atexit
 import logging
 import sys
+import traceback
 from collections.abc import Callable
 from collections.abc import Coroutine
 from contextlib import AsyncExitStack
@@ -21,6 +22,7 @@ import uvloop
 from dipdup import __version__
 from dipdup import env
 from dipdup._version import check_version
+from dipdup.exceptions import CallbackError
 from dipdup.install import EPILOG
 from dipdup.install import WELCOME_ASCII
 from dipdup.sys import set_up_process
@@ -46,6 +48,7 @@ AERICH_CMDS = {
     'upgrade',
     'downgrade',
 }
+ALWAYS_IMMUNE_TABLES = {'dipdup_meta', 'aerich'}
 
 _logger = logging.getLogger(__name__)
 _click_wrap_text = click.formatting.wrap_text
@@ -134,10 +137,20 @@ def _print_help_atexit(error: Exception, report_id: str) -> None:
     from dipdup.exceptions import Error
 
     def _print() -> None:
+        nonlocal error
+
         if isinstance(error, Error):
             echo(error.help(), err=True)
         else:
-            echo(Error.default_help(), err=True)
+            # NOTE: check the traceback  to find out if it's from a callback
+            tb = traceback.extract_tb(error.__traceback__)
+            for frame in tb:
+                if frame.name == 'fire_handler':
+                    module = next(f.filename for f in tb if '/handlers/' in f.filename or '/hooks/' in f.filename)
+                    echo(CallbackError(module=Path(module).stem, exc=error).help(), err=True)
+                    break
+            else:
+                echo(Error.default_help(), err=True)
 
         echo(f'Report saved; run `dipdup report show {report_id}` to view it', err=True)
 
@@ -673,14 +686,12 @@ async def schema_wipe(ctx: click.Context, immune: bool, force: bool) -> None:
     if isinstance(config.database, SqliteDatabaseConfig):
         message = 'Support for immune tables in SQLite is experimental and requires `advanced.unsafe_sqlite` flag set'
         if config.advanced.unsafe_sqlite:
-            # FIXME: Define a global constant or config option for "always immune tables"
-            immune_tables = immune_tables | {'dipdup_meta', 'aerich'}
+            immune_tables = immune_tables | ALWAYS_IMMUNE_TABLES
             _logger.warning(message)
         elif immune_tables:
             raise ConfigurationError(message)
     else:
-        # FIXME: Define a global constant or config option for "always immune tables"
-        immune_tables = immune_tables | {'dipdup_meta', 'aerich'}
+        immune_tables = immune_tables | ALWAYS_IMMUNE_TABLES
 
     if not force:
         try:
@@ -833,8 +844,12 @@ async def new(
 
     if quiet:
         answers = get_default_answers()
+        if template:
+            answers['template'] = template
     elif replay:
         answers = answers_from_replay(replay)
+        if template:
+            answers['template'] = template
     else:
         try:
             answers = answers_from_terminal(template)

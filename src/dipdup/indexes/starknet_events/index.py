@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 class StarknetEventsIndex(
     StarknetIndex[StarknetEventsIndexConfig, QueueItem, StarknetDatasource],
-    message_type=SubsquidMessageType.logs,
+    message_type=SubsquidMessageType.starknet_events,
 ):
     def __init__(
         self,

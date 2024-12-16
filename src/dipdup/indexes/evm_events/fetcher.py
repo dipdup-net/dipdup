@@ -37,7 +37,6 @@ class EvmSubsquidEventFetcher(EvmSubsquidFetcher[EvmEventData]):
 
 
 class EvmNodeEventFetcher(EvmNodeFetcher[EvmEventData]):
-    _datasource: EvmNodeDatasource
 
     def __init__(
         self,

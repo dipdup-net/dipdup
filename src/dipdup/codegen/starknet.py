@@ -7,6 +7,8 @@ from dipdup.utils import snake_to_pascal
 
 
 class StarknetCodeGenerator(CodeGenerator):
+    kind = 'starknet'
+
     # NOTE: For now ABIs need to be provided manually
     async def generate_abis(self) -> None: ...
 

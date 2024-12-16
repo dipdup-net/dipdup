@@ -4,7 +4,6 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
-from dipdup.datasources import EvmHistoryProvider
 from dipdup.datasources._subsquid import AbstractSubsquidDatasource
 from dipdup.datasources._subsquid import AbstractSubsquidWorker
 from dipdup.models.evm import EvmEventData
@@ -64,7 +63,7 @@ class _EvmSubsquidWorker(AbstractSubsquidWorker[Query]):
     pass
 
 
-class EvmSubsquidDatasource(AbstractSubsquidDatasource[EvmSubsquidDatasourceConfig, Query], EvmHistoryProvider):
+class EvmSubsquidDatasource(AbstractSubsquidDatasource[EvmSubsquidDatasourceConfig, Query]):
 
     def __init__(self, config: EvmSubsquidDatasourceConfig) -> None:
         super().__init__(config)

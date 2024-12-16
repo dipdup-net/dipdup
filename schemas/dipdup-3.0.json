@@ -37,14 +37,14 @@
           "type": "string"
         },
         "url": {
-          "default": "https://api.etherscan.io/api",
           "description": "API URL",
           "title": "url",
           "type": "string"
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "url"
       ],
       "title": "AbiEtherscanDatasourceConfig",
       "type": "object"
@@ -844,9 +844,26 @@
           "description": "Sleep time between requests when rate limit is reached",
           "title": "ratelimit_sleep"
         },
+        "replay": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Use cached HTTP responses instead of making real requests (dev only)",
+          "title": "replay"
+        },
         "replay_path": {
           "anyOf": [
             {
+              "type": "string"
+            },
+            {
+              "format": "path",
               "type": "string"
             },
             {

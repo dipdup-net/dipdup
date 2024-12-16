@@ -116,7 +116,7 @@ def abi_to_jsonschemas(
                 continue
 
             schema = _jsonschema_from_event(parsed_abi.events[event_name])
-            schema_path = package.schemas / contract_typename / 'starknet_events' / f'{event_name}.json'
+            schema_path = package.schemas / 'starknet' / contract_typename / 'starknet_events' / f'{event_name}.json'
             touch(schema_path)
             schema_path.write_bytes(json_dumps(schema))
 
