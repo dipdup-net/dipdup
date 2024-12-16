@@ -13,6 +13,7 @@ from dipdup.config.substrate import SubstrateIndexConfig
 from dipdup.config.substrate_events import SubstrateEventsIndexConfig
 from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
 from dipdup.datasources import Datasource
+from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subscan import SubstrateSubscanDatasource
 from dipdup.package import DipDupPackage
 from dipdup.runtimes import SubstrateRuntime
@@ -251,5 +252,8 @@ class SubstrateCodeGenerator(CodeGenerator):
             self._runtimes[name] = SubstrateRuntime(
                 config=self._config.runtimes[name],
                 package=self._package,
+                interface=next(
+                    d for d in self._datasources.values() if isinstance(d, SubstrateNodeDatasource)
+                )._interface,
             )
         return self._runtimes[name]

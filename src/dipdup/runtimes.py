@@ -102,7 +102,7 @@ class SubstrateRuntime:
         from scalecodec.base import RuntimeConfigurationObject
 
         # FIXME: Generic configuration for cases when node datasources are not available
-        runtime_config = RuntimeConfigurationObject(ss58_format=99)
+        runtime_config = RuntimeConfigurationObject()
         runtime_config.update_type_registry(get_type_registry('legacy'))
         runtime_config.update_type_registry(get_type_registry('core'))
         runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))

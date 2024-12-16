@@ -1,5 +1,5 @@
 spec_version: 3.0
 replay:
-  description: Substrate balance transfers [PREVIEW]
+  description: Substrate balance transfers
   package: demo_substrate_events
   template: demo_substrate_events

@@ -155,7 +155,7 @@ def template_from_terminal() -> tuple[str | None, DipDupSurveyConfig | None]:
         comments=(
             'EVM-compatible blockchains',
             'Starknet',
-            'Substrate [PREVIEW]',
+            'Substrate',
             'Tezos',
         ),
         default=0,

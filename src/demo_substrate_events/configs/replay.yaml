@@ -7,7 +7,7 @@ replay:
   template: demo_substrate_events
   package: demo_substrate_events
   version: 0.0.1
-  description: Substrate balance transfers [PREVIEW]
+  description: Substrate balance transfers
   license: MIT
   name: John Doe
   email: john_doe@example.com

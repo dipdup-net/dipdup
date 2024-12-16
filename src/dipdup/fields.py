@@ -46,7 +46,7 @@ from tortoise.fields.relational import OneToOneRelation as OneToOneRelation
 from tortoise.fields.relational import ReverseRelation as ReverseRelation
 
 from dipdup.exceptions import FrameworkException
-from dipdup.utils import json_dumps
+from dipdup.utils import json_dumps_plain
 
 if TYPE_CHECKING:
     from tortoise.models import Model as _TortoiseModel
@@ -58,10 +58,9 @@ ManyToManyField = ManyToManyFieldInstance
 _EnumFieldT = TypeVar('_EnumFieldT', bound=Enum)
 
 
-# TODO: changelog
 JSONField = partial(
     _JSONField,
-    encoder=partial(json_dumps, option=None),  # type: ignore[arg-type]
+    encoder=json_dumps_plain,
     decoder=orjson.loads,
 )
 

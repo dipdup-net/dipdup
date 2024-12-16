@@ -1,6 +1,6 @@
 # demo_substrate_events
 
-Substrate balance transfers [PREVIEW]
+Substrate balance transfers
 
 ## Installation
 
