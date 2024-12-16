@@ -7,7 +7,7 @@ from dipdup.config import StarknetIndexConfigU
 from dipdup.datasources.starknet_node import StarknetNodeDatasource
 from dipdup.datasources.starknet_subsquid import StarknetSubsquidDatasource
 from dipdup.index import IndexQueueItemT
-from dipdup.indexes.evm import EvmIndex
+from dipdup.indexes._subsquid import SubsquidIndex
 
 StarknetDatasource = StarknetSubsquidDatasource | StarknetNodeDatasource
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 class StarknetIndex(
     Generic[IndexConfigT, IndexQueueItemT, DatasourceT],
-    EvmIndex[IndexConfigT, IndexQueueItemT, DatasourceT],
+    SubsquidIndex[IndexConfigT, IndexQueueItemT, DatasourceT],
     ABC,
 ):
     def __init__(

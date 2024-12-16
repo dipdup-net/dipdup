@@ -29,9 +29,6 @@ from dipdup.config.tezos_tzkt import TZKT_API_URLS
 from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
 from dipdup.datasources import Datasource
 from dipdup.datasources import IndexDatasource
-from dipdup.datasources import TezosAbiProvider
-from dipdup.datasources import TezosHistoryProvider
-from dipdup.datasources import TezosRealtimeProvider
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
 from dipdup.models import Head
@@ -234,9 +231,7 @@ class ContractHashes:
         return self._hashes_to_address[(code_hash, type_hash)]
 
 
-class TezosTzktDatasource(
-    IndexDatasource[TezosTzktDatasourceConfig], TezosHistoryProvider, TezosRealtimeProvider, TezosAbiProvider
-):
+class TezosTzktDatasource(IndexDatasource[TezosTzktDatasourceConfig]):
     _default_http_config = HttpConfig(
         retry_sleep=1,
         retry_multiplier=1.1,

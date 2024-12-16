@@ -5,8 +5,8 @@ from typing import Literal
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
+from dipdup.config import DatasourceConfig
 from dipdup.config import HttpConfig
-from dipdup.config import IndexDatasourceConfig
 from dipdup.config import Url
 from dipdup.exceptions import ConfigurationError
 
@@ -23,7 +23,7 @@ MAX_BATCH_SIZE = 10000
 
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
-class TezosTzktDatasourceConfig(IndexDatasourceConfig):
+class TezosTzktDatasourceConfig(DatasourceConfig):
     """TzKT datasource config
 
     :param kind: always 'tezos.tzkt'

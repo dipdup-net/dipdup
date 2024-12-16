@@ -5,14 +5,14 @@ from typing import Literal
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
+from dipdup.config import DatasourceConfig
 from dipdup.config import HttpConfig
-from dipdup.config import IndexDatasourceConfig
 from dipdup.config import Url
 from dipdup.config import WsUrl
 
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
-class EvmNodeDatasourceConfig(IndexDatasourceConfig):
+class EvmNodeDatasourceConfig(DatasourceConfig):
     """EVM node datasource config
 
     :param kind: Always 'evm.node'

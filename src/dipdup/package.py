@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from typing import cast
 
+import appdirs  # type: ignore[import-untyped]
 from pydantic import BaseModel
 
 from dipdup import env
@@ -72,13 +73,14 @@ class DipDupPackage:
         self.models = root / 'models'
         self.sql = root / 'sql'
         self.types = root / 'types'
-
-        # NOTE: optional sections
+        # NOTE: Optional, created if aerich is installed
         self.migrations = root / 'migrations'
 
         # NOTE: Shared directories; not a part of package
-        self._xdg_shared_dir = Path.home() / '.local' / 'share' / 'dipdup'
+        self._xdg_shared_dir = Path(appdirs.user_data_dir('dipdup'))
         self.schemas = self._xdg_shared_dir / 'schemas' / self.name
+        # NOTE: ABIs required for codegen, but not in runtime
+        self.abi_local = self._xdg_shared_dir / 'abi' / self.name
 
         # NOTE: Finally, internal in-memory stuff
         self._replay: Answers | None = None
@@ -149,7 +151,6 @@ class DipDupPackage:
                 touch(path / KEEP_MARKER)
             else:
                 touch(self.root / path)
-        self.schemas.mkdir(parents=True, exist_ok=True)
 
         self._post_init()
 

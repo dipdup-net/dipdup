@@ -26,6 +26,7 @@ from dipdup.project import CODEGEN_HEADER
 from dipdup.project import render_base
 from dipdup.utils import load_template
 from dipdup.utils import pascal_to_snake
+from dipdup.utils import sorted_glob
 from dipdup.utils import touch
 from dipdup.utils import write
 from dipdup.yaml import DipDupYAMLConfig
@@ -64,6 +65,12 @@ class _BaseCodeGenerator(ABC):
         self._datasources = datasources
         self._include = include or set()
         self._logger = _logger
+
+    kind: str
+
+    @property
+    def schemas_dir(self) -> Path:
+        return self._package.schemas / self.kind
 
     @abstractmethod
     async def generate_abis(self) -> None: ...
@@ -136,11 +143,11 @@ class _BaseCodeGenerator(ABC):
 
     async def _generate_types(self, force: bool = False) -> None:
         """Generate typeclasses from fetched JSONSchemas: contract's storage, parameters, big maps and events."""
-        for path in self._package.schemas.glob('**/*.json'):
+        for path in sorted_glob(self.schemas_dir, '**/*.json'):
             await self._generate_type(path, force)
 
     async def _generate_type(self, schema_path: Path, force: bool) -> None:
-        rel_path = schema_path.relative_to(self._package.schemas)
+        rel_path = schema_path.relative_to(self.schemas_dir)
         type_pkg_path = self._package.types / rel_path
 
         if schema_path.is_dir():
@@ -162,6 +169,12 @@ class _BaseCodeGenerator(ABC):
         class_name = self.get_typeclass_name(schema_path)
         self._logger.info('Generating type `%s`', class_name)
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        # TODO: make it configurable
+        model_type = (
+            dmcg.DataModelType.TypingTypedDict
+            if 'substrate' in str(output_path)
+            else dmcg.DataModelType.PydanticV2BaseModel
+        )
         dmcg.generate(
             input_=schema_path,
             output=output_path,
@@ -171,7 +184,8 @@ class _BaseCodeGenerator(ABC):
             target_python_version=dmcg.PythonVersion.PY_312,
             custom_file_header=CODEGEN_HEADER,
             use_union_operator=True,
-            output_model_type=dmcg.DataModelType.PydanticV2BaseModel,
+            output_model_type=model_type,
+            use_schema_description=True,
         )
 
     async def _generate_callback(
@@ -203,7 +217,7 @@ class _BaseCodeGenerator(ABC):
 
         code_deque: deque[str] = deque(code)
         if sql:
-            code_deque.append(f"await ctx.execute_sql('{original_callback}')")
+            code_deque.append(f"await ctx.execute_sql_script('{original_callback}')")
             # FIXME: move me
             if callback == 'on_index_rollback':
                 code_deque.append('await ctx.rollback(')
@@ -251,11 +265,12 @@ class _BaseCodeGenerator(ABC):
         write(path, content_path.read_text())
 
     def _cleanup_schemas(self) -> None:
-        rmtree(self._package.schemas)
-        self._package.schemas.mkdir(parents=True, exist_ok=True)
+        rmtree(self.schemas_dir, ignore_errors=True)
 
 
 class CommonCodeGenerator(_BaseCodeGenerator):
+    kind = 'common'
+
     async def generate_abis(self) -> None:
         pass
 
@@ -273,7 +288,8 @@ class CodeGenerator(_BaseCodeGenerator):
     async def _generate_models(self) -> None:
         pass
 
-    async def generate_hooks(self) -> None: ...
+    async def generate_hooks(self) -> None:
+        pass
 
     async def generate_system_hooks(self) -> None:
         pass

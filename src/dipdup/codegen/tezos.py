@@ -84,6 +84,8 @@ def preprocess_storage_jsonschema(schema: dict[str, Any]) -> dict[str, Any]:
 class TezosCodeGenerator(CodeGenerator):
     """Generates package based on config, invoked from `init` CLI command"""
 
+    kind = 'tezos'
+
     def __init__(
         self,
         config: DipDupConfig,
@@ -249,7 +251,7 @@ class TezosCodeGenerator(CodeGenerator):
             return
 
         contract_schemas = await self._get_schema(datasource_config, contract_config)
-        contract_schemas_path = self._package.schemas / contract_config.module_name
+        contract_schemas_path = self.schemas_dir / contract_config.module_name
 
         # NOTE: It's a rollup: entrypoint is always 'default', no storage
         if 'storageSchema' not in contract_schemas:
@@ -304,7 +306,7 @@ class TezosCodeGenerator(CodeGenerator):
 
             contract_schemas = await self._get_schema(index_config.datasources[0], contract_config)
 
-            contract_schemas_path = self._package.schemas / contract_config.module_name
+            contract_schemas_path = self.schemas_dir / contract_config.module_name
             big_map_schemas_path = contract_schemas_path / 'tezos_big_maps'
 
             try:
@@ -337,7 +339,7 @@ class TezosCodeGenerator(CodeGenerator):
                 index_config.random_datasource,
                 contract_config,
             )
-            contract_schemas_path = self._package.schemas / contract_config.module_name
+            contract_schemas_path = self.schemas_dir / contract_config.module_name
             event_schemas_path = contract_schemas_path / 'tezos_events'
 
             try:

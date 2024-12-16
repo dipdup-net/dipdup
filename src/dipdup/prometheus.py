@@ -85,6 +85,9 @@ class Metric(MetricWrapperBase):
 
         raise TypeError('Cannot convert a parent metric to an integer')
 
+    def __str__(self) -> str:
+        return str(self.value)
+
 
 class Counter(Metric, PrometheusCounter):
     """Custom Counter metric, extending Prometheus' Counter.

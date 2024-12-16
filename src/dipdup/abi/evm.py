@@ -148,13 +148,13 @@ def abi_to_jsonschemas(
                     method_count[name] += 1
 
                 schema = jsonschema_from_abi(abi_item)
-                schema_path = package.schemas / abi_path.parent.stem / 'evm_transactions' / f'{name}.json'
+                schema_path = package.schemas / 'evm' / abi_path.parent.stem / 'evm_transactions' / f'{name}.json'
             elif abi_item['type'] == 'event':
                 name = abi_item['name']
                 if name not in events:
                     continue
                 schema = jsonschema_from_abi(abi_item)
-                schema_path = package.schemas / abi_path.parent.stem / 'evm_events' / f'{name}.json'
+                schema_path = package.schemas / 'evm' / abi_path.parent.stem / 'evm_events' / f'{name}.json'
             else:
                 continue
 

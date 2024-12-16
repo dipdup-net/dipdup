@@ -6,10 +6,11 @@ from dipdup.models import MessageType
 
 
 class SubsquidMessageType(MessageType, Enum):
-    blocks = 'blocks'
-    logs = 'logs'
-    traces = 'traces'
-    transactions = 'transactions'
+    evm_blocks = 'evm_blocks'
+    evm_logs = 'evm_logs'
+    evm_traces = 'evm_traces'
+    evm_transactions = 'evm_transactions'
+    starknet_events = 'starknet_events'
 
 
 FieldSelection = dict[str, dict[str, bool]]

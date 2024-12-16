@@ -22,6 +22,8 @@ from dipdup.utils import touch
 
 
 class EvmCodeGenerator(CodeGenerator):
+    kind = 'evm'
+
     async def generate_abis(self) -> None:
         for index_config in self._config.indexes.values():
             if isinstance(index_config, EvmIndexConfig):

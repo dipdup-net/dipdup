@@ -10,7 +10,11 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
+- cli: Don't wrap exceptions with `CallbackError` to avoid shadowing the original exception.
+- cli: Fixed `--template` option being ignored when `--quiet` flag is set.
+- config: Fixed setting default loglevels when `logging` is a dict.
 - config: Fixed parsing config files after updating to pydantic 2.10.3.
+- metrics: Fixed indexed objects counter.
 
 ## [8.1.2] - 2024-12-10
 

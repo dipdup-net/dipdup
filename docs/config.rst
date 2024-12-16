@@ -23,7 +23,7 @@
 .. autoclass:: dipdup.config.HttpConfig
 .. autoclass:: dipdup.config.http.HttpDatasourceConfig
 .. autoclass:: dipdup.config.IndexConfig
-.. autoclass:: dipdup.config.IndexDatasourceConfig
+.. autoclass:: dipdup.config.DatasourceConfig
 .. autoclass:: dipdup.config.IndexTemplateConfig
 .. autoclass:: dipdup.config.ipfs.IpfsDatasourceConfig
 .. autoclass:: dipdup.config.JobConfig

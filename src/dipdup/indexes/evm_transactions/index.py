@@ -21,7 +21,7 @@ EvmDatasource = EvmSubsquidDatasource | EvmNodeDatasource
 
 class EvmTransactionsIndex(
     EvmIndex[EvmTransactionsIndexConfig, QueueItem, EvmDatasource],
-    message_type=SubsquidMessageType.transactions,
+    message_type=SubsquidMessageType.evm_transactions,
 ):
     def _match_level_data(self, handlers: Any, level_data: Any) -> deque[Any]:
         return match_transactions(

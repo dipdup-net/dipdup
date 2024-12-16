@@ -20,9 +20,9 @@ from dipdup.config import HttpConfig
 from dipdup.config import PostgresDatabaseConfig
 from dipdup.config import ResolvedHttpConfig
 from dipdup.database import AsyncpgClient
-from dipdup.database import _pg_get_views
 from dipdup.database import get_connection
 from dipdup.database import iter_models
+from dipdup.database import pg_get_views
 from dipdup.exceptions import ConfigurationError
 from dipdup.exceptions import FrameworkException
 from dipdup.exceptions import HasuraError
@@ -112,6 +112,7 @@ class HasuraGateway(HTTPGateway):
         retry_multiplier=1.1,
         retry_count=3,
         alias='hasura',
+        replay=False,
     )
 
     def __init__(
@@ -335,7 +336,7 @@ class HasuraGateway(HTTPGateway):
         conn = get_connection()
         if not isinstance(conn, AsyncpgClient):
             raise HasuraError('Hasura integration requires `postgres` database client')
-        return await _pg_get_views(conn, self._database_config.schema_name)
+        return await pg_get_views(conn, self._database_config.schema_name)
 
     def _iterate_graphql_queries(self) -> Iterator[tuple[str, str]]:
         graphql_path = env.get_package_path(self._package) / 'graphql'

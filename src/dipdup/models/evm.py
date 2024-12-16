@@ -1,4 +1,3 @@
-from abc import ABC
 from dataclasses import dataclass
 from typing import Any
 from typing import Generic
@@ -59,7 +58,7 @@ class EvmEventData(HasLevel):
 
 
 @dataclass(frozen=True)
-class EvmTransactionData(HasLevel, ABC):
+class EvmTransactionData(HasLevel):
     access_list: tuple[dict[str, Any], ...] | None
     block_hash: str
     chain_id: int | None
