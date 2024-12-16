@@ -39,7 +39,7 @@ class SubsquidIndex(
         self,
         subsquid_level: int,
         index_level: int,
-        node: JsonRpcDatasource | None = None,
+        node: JsonRpcDatasource[Any] | None = None,
     ) -> int | None:
         if not self.node_datasources:
             return None

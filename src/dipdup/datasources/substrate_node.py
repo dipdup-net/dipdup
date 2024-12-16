@@ -223,6 +223,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
 
     async def get_block_header(self, hash: str) -> BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
+        # FIXME: missing fields
         return {
             'hash': hash,
             'number': int(response['number'], 16),
@@ -242,16 +243,16 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
     async def get_metadata_header_batch(self, heights: list[int]) -> list[MetadataHeader]:
         return await asyncio.gather(*[self.get_metadata_header(h) for h in heights])
 
-    async def get_full_block(self, hash: str) -> dict:
+    async def get_full_block(self, hash: str) -> dict[str, Any]:
         return await self._jsonrpc_request('chain_getBlock', [hash])
 
     async def get_events(self, block_hash: str) -> tuple[SubstrateEventDataDict, ...]:
         events = await self._interface.get_events(block_hash)
 
-        res_events: list[SubstrateEventDataDict] = []
-        for event in events:
-            event: dict = event.decode()
-            res_events.append(
+        result: list[SubstrateEventDataDict] = []
+        for raw_event in events:
+            event: dict[str, Any] = raw_event.decode()
+            result.append(
                 {
                     'name': f'{event['module_id']}.{event['event_id']}',
                     'index': event['event_index'],
@@ -262,7 +263,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
                 }
             )
 
-        return tuple(res_events)
+        return tuple(result)
 
     async def find_metadata_versions(
         self,

@@ -335,7 +335,7 @@ class IndexDispatcher:
         # NOTE: Resulting message is about 80 chars with the current logging format
         msg += ' ' * (48 - len(msg))
 
-        def fmt(speed):
+        def fmt(speed: float) -> str:
             return '    0' if speed < 0.1 else f'{speed:5.{0 if speed >= 1 else 1}f}'
 
         msg += f' {fmt(levels_speed)} L {fmt(objects_speed)} O'
@@ -557,13 +557,19 @@ class IndexDispatcher:
                 index.push_realtime_message(events)
 
     # TODO: fix data typing
-    async def _on_substrate_head(self, datasource: SubstrateNodeDatasource, head: HeadBlock) -> None:
+    async def _on_substrate_head(
+        self,
+        datasource: SubstrateNodeDatasource,
+        head: HeadBlock,
+    ) -> None:
         # TODO: any head updates here?
         pass
 
     # TODO: fix data typing
     async def _on_substrate_events(
-        self, datasource: SubstrateNodeDatasource, events: tuple[dict[str, Any], ...]
+        self,
+        datasource: SubstrateNodeDatasource,
+        events: tuple[dict[str, Any], ...],
     ) -> None:
         for index in self._indexes.values():
             if isinstance(index, SubstrateEventsIndex) and datasource in index.datasources:

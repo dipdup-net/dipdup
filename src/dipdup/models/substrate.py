@@ -33,7 +33,8 @@ class SubstrateEventDataDict(TypedDict):
     index: int
     extrinsicIndex: int
     callAddress: list[str]
-    args: list[Any]
+    args: list[Any] | None
+    decoded_args: dict[str, Any] | None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -73,7 +74,11 @@ class SubstrateEvent(Generic[PayloadT]):
     # TODO: could be used in other models with typed payload
     @cached_property
     def payload(self) -> PayloadT:
-        return self.data.decoded_args or cast(
+        if self.data.decoded_args is not None:
+            return self.data.decoded_args
+
+        assert self.data.args is not None
+        return cast(
             PayloadT,
             self.runtime.decode_event_args(
                 name=self.name,
