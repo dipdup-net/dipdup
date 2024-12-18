@@ -32,23 +32,32 @@ class CairoAbi(TypedDict):
     events: list[CairoEventAbi]
 
 
-def _convert_type(type_: CairoType) -> str:
+def _convert_type(type_: CairoType) -> dict[str, Any]:
     # TODO: Support all types
-    return {
+    if type_.__class__.__name__ in {'EventType', 'StructType'}:
+        return {
+            'type': 'object',
+            'properties': {
+                key: _convert_type(value)
+                for key, value in type_.types.items()
+            },
+            'required': tuple(type_.types.keys()),
+            'additionalProperties': False,
+        }
+
+    property_type = {
         'FeltType': 'integer',
         'UintType': 'integer',
         'BoolType': 'boolean',
     }[type_.__class__.__name__]
+    return {'type': property_type}
 
 
 def _jsonschema_from_event(event: EventType) -> dict[str, Any]:
     # TODO: Unpack nested types (starknet.py could do that)
     return {
         '$schema': 'http://json-schema.org/draft/2019-09/schema#',
-        'type': 'object',
-        'properties': {key: {'type': _convert_type(value)} for key, value in event.types.items()},
-        'required': tuple(event.types.keys()),
-        'additionalProperties': False,
+        **_convert_type(event)
     }
 
 
