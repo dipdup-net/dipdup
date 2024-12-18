@@ -44,6 +44,12 @@ def _convert_type(type_: CairoType) -> dict[str, Any]:
             'required': tuple(type_.types.keys()),
             'additionalProperties': False,
         }
+    
+    if type_.__class__.__name__ in {'ArrayType'}:
+        return {
+            'type': 'array',
+            'items': _convert_type(type_.inner_type),
+        }
 
     property_type = {
         'FeltType': 'integer',
