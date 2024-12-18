@@ -2,7 +2,7 @@
 FROM python:3.12-slim-bookworm AS compile-image
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt update && \
-    apt install -y build-essential && \
+    apt install -y build-essential git && \
     python -m venv --without-pip --system-site-packages /opt/dipdup && \
     mkdir -p /opt/dipdup/src/dipdup/ && \
     touch /opt/dipdup/src/dipdup/__init__.py && \
