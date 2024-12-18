@@ -45,18 +45,18 @@ def _convert_type(type_: CairoType) -> dict[str, Any]:
             'additionalProperties': False,
         }
     
-    if type_.__class__.__name__ in {'ArrayType'}:
+    if type_.__class__.__name__ == 'ArrayType':
         return {
             'type': 'array',
             'items': _convert_type(type_.inner_type),
         }
 
-    property_type = {
+    simple_type = {
         'FeltType': 'integer',
         'UintType': 'integer',
         'BoolType': 'boolean',
     }[type_.__class__.__name__]
-    return {'type': property_type}
+    return {'type': simple_type}
 
 
 def _jsonschema_from_event(event: EventType) -> dict[str, Any]:
