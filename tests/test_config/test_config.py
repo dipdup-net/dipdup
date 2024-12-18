@@ -1,7 +1,9 @@
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+from _pytest.fixtures import SubRequest
 from pydantic import ValidationError
 
 from dipdup.config import DipDupConfig
@@ -19,9 +21,16 @@ from dipdup.models.tezos_tzkt import OriginationSubscription
 from dipdup.models.tezos_tzkt import TransactionSubscription
 from dipdup.yaml import DipDupYAMLConfig
 
+TEST_CONFIGS = Path(__file__).parent.parent / 'configs'
+
+
+@pytest.fixture(params=list(Path.glob(TEST_CONFIGS, 'demo_*.yml')))
+def demo_dipdup_config(request: SubRequest) -> Generator[Path, None, None]:
+    yield request.param
+
 
 def create_config(merge_subs: bool = False, origs: bool = False) -> DipDupConfig:
-    path = Path(__file__).parent.parent / 'configs' / 'dipdup.yaml'
+    path = TEST_CONFIGS / 'dipdup.yaml'
     config = DipDupConfig.load([path])
     if origs:
         config.indexes['hen_mainnet'].types += (TezosOperationType.origination,)  # type: ignore
@@ -88,12 +97,10 @@ async def test_reserved_keywords() -> None:
     )
 
     # FIXME: Can't use `from_` field alias in dataclasses
-    raw_config, _ = DipDupYAMLConfig.load(
-        paths=[Path(__file__).parent.parent / 'configs' / 'demo_tezos_token_transfers_4.yml']
-    )
+    raw_config, _ = DipDupYAMLConfig.load(paths=[TEST_CONFIGS / 'demo_tezos_token_transfers_4.yml'])
     assert raw_config['indexes']['tzbtc_holders_mainnet']['handlers'][1]['from_'] == 'tzbtc_mainnet'
 
-    config = DipDupConfig.load([Path(__file__).parent.parent / 'configs' / 'demo_tezos_token_transfers_4.yml'])
+    config = DipDupConfig.load([TEST_CONFIGS / 'demo_tezos_token_transfers_4.yml'])
     assert config.indexes['tzbtc_holders_mainnet'].handlers[1].from_ == 'tzbtc_mainnet'  # type: ignore[misc,union-attr]
 
 
@@ -148,5 +155,5 @@ async def test_http_config() -> None:
     )
 
 
-# async def test_evm() -> None:
-#     DipDupConfig.load([Path(__file__).parent.parent / 'configs' / 'evm_subsquid.yml'])
+async def test_load_demo_config(demo_dipdup_config: Path) -> None:
+    DipDupConfig.load([demo_dipdup_config])
