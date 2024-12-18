@@ -35,6 +35,10 @@ class CairoAbi(TypedDict):
 def _convert_type(type_: CairoType) -> dict[str, Any]:
     # TODO: Support all types
     if type_.__class__.__name__ in {'EventType', 'StructType'}:
+        if type_.name == 'Uint256':
+            return {'type': 'integer'}
+        if type_.name == 'core::byte_array::ByteArray':
+            return {'type': 'string'}
         return {
             'type': 'object',
             'properties': {
