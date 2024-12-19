@@ -32,23 +32,42 @@ class CairoAbi(TypedDict):
     events: list[CairoEventAbi]
 
 
-def _convert_type(type_: CairoType) -> str:
+def _convert_type(type_: CairoType) -> dict[str, Any]:
     # TODO: Support all types
-    return {
+    if type_.__class__.__name__ in {'EventType', 'StructType'}:
+        if type_.name == 'Uint256':
+            return {'type': 'integer'}
+        if type_.name == 'core::byte_array::ByteArray':
+            return {'type': 'string'}
+        return {
+            'type': 'object',
+            'properties': {
+                key: _convert_type(value)
+                for key, value in type_.types.items()
+            },
+            'required': tuple(type_.types.keys()),
+            'additionalProperties': False,
+        }
+    
+    if type_.__class__.__name__ == 'ArrayType':
+        return {
+            'type': 'array',
+            'items': _convert_type(type_.inner_type),
+        }
+
+    simple_type = {
         'FeltType': 'integer',
         'UintType': 'integer',
         'BoolType': 'boolean',
     }[type_.__class__.__name__]
+    return {'type': simple_type}
 
 
 def _jsonschema_from_event(event: EventType) -> dict[str, Any]:
     # TODO: Unpack nested types (starknet.py could do that)
     return {
         '$schema': 'http://json-schema.org/draft/2019-09/schema#',
-        'type': 'object',
-        'properties': {key: {'type': _convert_type(value)} for key, value in event.types.items()},
-        'required': tuple(event.types.keys()),
-        'additionalProperties': False,
+        **_convert_type(event)
     }
 
 

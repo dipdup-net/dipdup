@@ -4,6 +4,7 @@ import re
 from abc import ABC
 from typing import Annotated
 from typing import Literal
+from typing import TypeAlias
 
 from pydantic import AfterValidator
 from pydantic import ConfigDict
@@ -17,7 +18,7 @@ from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.config.starknet_subsquid import StarknetSubsquidDatasourceConfig
 from dipdup.exceptions import ConfigurationError
 
-StarknetDatasourceConfigU = StarknetSubsquidDatasourceConfig | StarknetNodeDatasourceConfig
+StarknetDatasourceConfigU: TypeAlias = StarknetSubsquidDatasourceConfig | StarknetNodeDatasourceConfig
 
 _HEX_ADDRESS_REGEXP = re.compile(r'(0x)?[0-9a-f]{1,64}', re.IGNORECASE | re.ASCII)
 
