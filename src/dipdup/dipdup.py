@@ -230,11 +230,11 @@ class IndexDispatcher:
         active, synced, realtime = 0, 0, 0
         levels_indexed, levels_total, levels_interval = 0, 0, 0
         for index in self._indexes.values():
-            # FIXME: We don't remove disabled indexes from dispatcher anymore
-            active += 1
-            if index.synchronized:
+            if index.is_active:
+                active += 1
+            if index.is_synchronized:
                 synced += 1
-            if index.realtime:
+            if index.is_realtime:
                 realtime += 1
 
             try:

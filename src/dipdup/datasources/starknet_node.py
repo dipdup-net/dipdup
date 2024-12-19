@@ -33,7 +33,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         self.set_sync_level(None, level)
 
     async def run(self) -> None:
-        if self.realtime:
+        if self.ws_available:
             raise NotImplementedError('Realtime mode is not supported yet; remove `ws_url` from datasource config')
 
         while True:
@@ -42,11 +42,11 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             await asyncio.sleep(self._http_config.polling_interval)
 
     @property
-    def realtime(self) -> bool:
+    def ws_available(self) -> bool:
         return self._config.ws_url is not None
 
     async def subscribe(self) -> None:
-        if self.realtime:
+        if self.ws_available:
             raise NotImplementedError('Realtime mode is not supported yet; remove `ws_url` from datasource config')
 
     async def get_head_level(self) -> int:

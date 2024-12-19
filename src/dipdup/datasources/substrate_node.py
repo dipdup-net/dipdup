@@ -114,7 +114,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
         self._on_event_callbacks: set[EventCallback] = set()
 
     async def run(self) -> None:
-        if self.realtime:
+        if self.ws_available:
             await asyncio.gather(
                 self._ws_loop(),
                 self._emitter_loop(),
@@ -152,11 +152,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
         raise DatasourceError('Websocket connection failed', self.name)
 
     @property
-    def realtime(self) -> bool:
+    def ws_available(self) -> bool:
         return self._config.ws_url is not None
 
     async def subscribe(self) -> None:
-        if not self.realtime:
+        if not self.ws_available:
             return
 
         missing_subscriptions = self._subscriptions.missing_subscriptions
