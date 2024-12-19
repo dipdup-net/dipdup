@@ -6,7 +6,8 @@ from pydantic.dataclasses import dataclass
 from dipdup.subscriptions import Subscription
 
 
-class SubstrateNodeSubscription(ABC, Subscription): ...
+class SubstrateNodeSubscription(ABC, Subscription):
+    method: str
 
 
 @dataclass(frozen=True)

@@ -25,13 +25,16 @@ class SubstrateSubsquidEventFetcher(SubstrateSubsquidFetcher[SubstrateEventData]
         self._names = names
 
     async def fetch_by_level(self) -> AsyncIterator[tuple[int, tuple[SubstrateEventData, ...]]]:
-        event_iter = self.random_datasource.iter_events(
+        async for level, events in self.readahead_by_level(self.fetch_events()):
+            yield level, events
+
+    async def fetch_events(self) -> AsyncIterator[tuple[SubstrateEventData, ...]]:
+        async for events in self.random_datasource.iter_events(
             first_level=self._first_level,
             last_level=self._last_level,
             names=self._names,
-        )
-        async for level, batch in self.readahead_by_level(event_iter):
-            yield level, batch
+        ):
+            yield tuple(SubstrateEventData.from_subsquid(event) for event in events)
 
 
 class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
@@ -50,12 +53,12 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
         )
 
     async def fetch_by_level(self) -> AsyncIterator[tuple[int, tuple[SubstrateEventData, ...]]]:
-        async for level, event in self.readahead_by_level(self.fetch_events()):
-            yield level, event
+        async for level, events in self.readahead_by_level(self.fetch_events()):
+            yield level, events
 
-    async def fetch_events(self) -> AsyncIterator[tuple[tuple[SubstrateEventData, ...]]]:
+    async def fetch_events(self) -> AsyncIterator[tuple[SubstrateEventData, ...]]:
         for level in range(self._first_level, self._last_level):
             block_hash = await self.get_random_node().get_block_hash(level)
             event_dicts = await self.get_random_node().get_events(block_hash)
             block_header = await self.get_random_node().get_block_header(block_hash)
-            yield tuple(SubstrateEventData(**event_dict, header=block_header) for event_dict in event_dicts)
+            yield tuple(SubstrateEventData.from_node(event_dict, block_header) for event_dict in event_dicts)

@@ -75,6 +75,7 @@ from dipdup.models.evm import EvmTransactionData
 from dipdup.models.evm_node import EvmNodeHeadData
 from dipdup.models.evm_node import EvmNodeSyncingData
 from dipdup.models.substrate import HeadBlock
+from dipdup.models.substrate import SubstrateEventData
 from dipdup.models.tezos import TezosBigMapData
 from dipdup.models.tezos import TezosEventData
 from dipdup.models.tezos import TezosHeadBlockData
@@ -556,7 +557,6 @@ class IndexDispatcher:
             if isinstance(index, TezosEventsIndex) and datasource in index.datasources:
                 index.push_realtime_message(events)
 
-    # TODO: fix data typing
     async def _on_substrate_head(
         self,
         datasource: SubstrateNodeDatasource,
@@ -565,11 +565,10 @@ class IndexDispatcher:
         # TODO: any head updates here?
         pass
 
-    # TODO: fix data typing
     async def _on_substrate_events(
         self,
         datasource: SubstrateNodeDatasource,
-        events: tuple[dict[str, Any], ...],
+        events: tuple[SubstrateEventData, ...],
     ) -> None:
         for index in self._indexes.values():
             if isinstance(index, SubstrateEventsIndex) and datasource in index.datasources:

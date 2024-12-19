@@ -15,7 +15,7 @@ import orjson
 import pysignalr.exceptions
 
 from dipdup.config import HttpConfig
-from dipdup.config.substrate import SubstrateDatasourceConfigU
+from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
@@ -90,21 +90,21 @@ class MetadataStorage:
             raise ValueError(f'Unsupported file type: {self.path}')
 
 
-class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
+class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
     _default_http_config = HttpConfig(
         batch_size=20,
     )
 
-    def __init__(self, config: SubstrateDatasourceConfigU) -> None:
+    def __init__(self, config: SubstrateNodeDatasourceConfig) -> None:
         from aiosubstrate.base import SubstrateInterface
 
         # NOTE: Use our aiohttp session and limiters
         SubstrateInterface.http_request = partial(self._jsonrpc_request, raw=True)  # type: ignore[method-assign]
 
         super().__init__(config)
-        self._pending_subscription = None
+        self._pending_subscription: SubstrateNodeSubscription | None = None
         self._subscription_ids: dict[str, SubstrateNodeSubscription] = {}
-        self._interface = SubstrateInterface(config.url)
+        self._interface = SubstrateInterface(config.url)  # type: ignore[no-untyped-call]
 
         self._emitter_queue: Queue[SubscriptionMessage] = Queue()
 
@@ -131,7 +131,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         self.set_sync_level(None, level)
 
         # NOTE: Prepare substrate_interface
-        await self._interface.init_props()
+        await self._interface.init_props()  # type: ignore[no-untyped-call]
         self._interface.reload_type_registry()
 
     async def _ws_loop(self) -> None:
@@ -219,7 +219,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         return int(header['number'], 16)
 
     async def get_block_hash(self, height: int) -> str:
-        return await self._jsonrpc_request('chain_getBlockHash', [height])
+        return await self._jsonrpc_request('chain_getBlockHash', [height])  # type: ignore[no-any-return]
 
     async def get_block_header(self, hash: str) -> BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
@@ -227,7 +227,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         return {
             'hash': hash,
             'number': int(response['number'], 16),
-            'prevRoot': response['parentHash'],
+            'prev_root': response['parentHash'],
         }
 
     async def get_metadata_header(self, height: int) -> MetadataHeader:
@@ -244,7 +244,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
         return await asyncio.gather(*[self.get_metadata_header(h) for h in heights])
 
     async def get_full_block(self, hash: str) -> dict[str, Any]:
-        return await self._jsonrpc_request('chain_getBlock', [hash])
+        return await self._jsonrpc_request('chain_getBlock', [hash])  # type: ignore[no-any-return]
 
     async def get_events(self, block_hash: str) -> tuple[SubstrateEventDataDict, ...]:
         events = await self._interface.get_events(block_hash)
@@ -256,9 +256,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
                 {
                     'name': f'{event['module_id']}.{event['event_id']}',
                     'index': event['event_index'],
-                    'extrinsicIndex': event['extrinsic_idx'],
-                    'callAddress': None,
-                    'args': None,
+                    'extrinsic_index': event['extrinsic_idx'],
                     'decoded_args': event['attributes'],
                 }
             )
@@ -344,7 +342,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateDatasourceConfigU]):
                 block_hash = await self.get_block_hash(level)
                 event_dicts = await self.get_events(block_hash)
                 block_header = await self.get_block_header(block_hash)
-                events = tuple(SubstrateEventData(**event_dict, header=block_header) for event_dict in event_dicts)
+                events = tuple(SubstrateEventData.from_node(event_dict, block_header) for event_dict in event_dicts)
                 await self.emit_events(events)
 
 

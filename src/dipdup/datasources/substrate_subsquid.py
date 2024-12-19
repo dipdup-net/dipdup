@@ -3,7 +3,7 @@ from collections.abc import AsyncIterator
 from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
 from dipdup.datasources._subsquid import AbstractSubsquidDatasource
 from dipdup.models._subsquid import AbstractSubsquidQuery
-from dipdup.models.substrate import SubstrateEventData
+from dipdup.models.substrate import SubstrateEventDataSubsquid
 
 Query = AbstractSubsquidQuery
 
@@ -14,7 +14,7 @@ class SubstrateSubsquidDatasource(AbstractSubsquidDatasource[SubstrateSubsquidDa
         first_level: int,
         last_level: int,
         names: tuple[str, ...],
-    ) -> AsyncIterator[tuple[SubstrateEventData, ...]]:
+    ) -> AsyncIterator[tuple[SubstrateEventDataSubsquid, ...]]:
         current_level = first_level
 
         while current_level <= last_level:
@@ -50,5 +50,7 @@ class SubstrateSubsquidDatasource(AbstractSubsquidDatasource[SubstrateSubsquidDa
             response = await self.query_worker(query, current_level)
 
             for level_item in response:
-                yield tuple(SubstrateEventData(**e, header=level_item['header']) for e in level_item['events'])
+                for event_item in level_item['events']:
+                    event_item['header'] = level_item['header']
+                yield tuple(level_item['events'])
                 current_level = level_item['header']['number'] + 1
