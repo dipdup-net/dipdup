@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - '8.*.*'
+      - 'docs'
       - 'docs-next'
     branches:
       - '**'
@@ -18,7 +19,7 @@ on:
       - '.github/workflows/installer.yml'
 
 env:
-  FRONTEND_BRANCH: dev
+  FRONTEND_BRANCH: ${{ github.ref == 'refs/heads/docs-next' && 'dev' || 'master' }}
   GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
 
 jobs:
