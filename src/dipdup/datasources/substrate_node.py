@@ -19,10 +19,10 @@ from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
 from dipdup.datasources import JsonRpcDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
-from dipdup.models.substrate import BlockHeader
-from dipdup.models.substrate import HeadBlock
 from dipdup.models.substrate import SubstrateEventData
-from dipdup.models.substrate import SubstrateEventDataDict
+from dipdup.models.substrate import SubstrateHeadBlockData
+from dipdup.models.substrate import _BlockHeader
+from dipdup.models.substrate import _SubstrateNodeEventResponse
 from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
 from dipdup.models.substrate_node import SubstrateNodeSubscription
 from dipdup.pysignalr import Message
@@ -32,14 +32,14 @@ from dipdup.utils import Watchdog
 _logger = logging.getLogger(__name__)
 
 
-HeadCallback = Callable[['SubstrateNodeDatasource', HeadBlock], Awaitable[None]]
+HeadCallback = Callable[['SubstrateNodeDatasource', SubstrateHeadBlockData], Awaitable[None]]
 EventCallback = Callable[['SubstrateNodeDatasource', tuple[SubstrateEventData, ...]], Awaitable[None]]
 
 
 # NOTE: Renamed entity class LevelData from evm_node
 @dataclass
 class SubscriptionMessage:
-    head: HeadBlock
+    head: SubstrateHeadBlockData
     fetch_events: bool = False
 
 
@@ -168,7 +168,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
             if isinstance(subscription, SubstrateNodeSubscription):
                 await self._subscribe(subscription)
 
-    async def emit_head(self, head: HeadBlock) -> None:
+    async def emit_head(self, head: SubstrateHeadBlockData) -> None:
         for fn in self._on_head_callbacks:
             await fn(self, head)
 
@@ -221,7 +221,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
     async def get_block_hash(self, height: int) -> str:
         return await self._jsonrpc_request('chain_getBlockHash', [height])  # type: ignore[no-any-return]
 
-    async def get_block_header(self, hash: str) -> BlockHeader:
+    async def get_block_header(self, hash: str) -> _BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
         # FIXME: missing fields
         return {
@@ -246,10 +246,10 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
     async def get_full_block(self, hash: str) -> dict[str, Any]:
         return await self._jsonrpc_request('chain_getBlock', [hash])  # type: ignore[no-any-return]
 
-    async def get_events(self, block_hash: str) -> tuple[SubstrateEventDataDict, ...]:
+    async def get_events(self, block_hash: str) -> tuple[_SubstrateNodeEventResponse, ...]:
         events = await self._interface.get_events(block_hash)
 
-        result: list[SubstrateEventDataDict] = []
+        result: list[_SubstrateNodeEventResponse] = []
         for raw_event in events:
             event: dict[str, Any] = raw_event.decode()
             result.append(

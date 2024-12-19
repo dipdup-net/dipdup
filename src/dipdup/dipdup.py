@@ -74,8 +74,8 @@ from dipdup.models.evm import EvmEventData
 from dipdup.models.evm import EvmTransactionData
 from dipdup.models.evm_node import EvmNodeHeadData
 from dipdup.models.evm_node import EvmNodeSyncingData
-from dipdup.models.substrate import HeadBlock
 from dipdup.models.substrate import SubstrateEventData
+from dipdup.models.substrate import SubstrateHeadBlockData
 from dipdup.models.tezos import TezosBigMapData
 from dipdup.models.tezos import TezosEventData
 from dipdup.models.tezos import TezosHeadBlockData
@@ -560,10 +560,10 @@ class IndexDispatcher:
     async def _on_substrate_head(
         self,
         datasource: SubstrateNodeDatasource,
-        head: HeadBlock,
+        head: SubstrateHeadBlockData,
     ) -> None:
-        # TODO: any head updates here?
-        pass
+        # TODO: update Head. Does fire_and_forget work atm?
+        metrics._datasource_head_updated[datasource.name] = time.time()
 
     async def _on_substrate_events(
         self,

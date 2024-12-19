@@ -143,8 +143,7 @@ class WebsocketDatasource(IndexDatasource[DatasourceConfigT]):
 
         self._logger.debug('Creating Websocket client')
 
-        # FIXME: correct config class
-        url = self._config.ws_url  # type: ignore
+        url = self._config.ws_url
         if not url:
             raise FrameworkException('Spawning node datasource, but `ws_url` is not set')
         self._ws_client = WebsocketTransport(

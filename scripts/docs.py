@@ -145,7 +145,6 @@ IGNORED_MODEL_CLASSES = {
     'dipdup.models.QuerySet',
     'dipdup.models.RollbackMessage',
     'dipdup.models.substrate.HeadBlock',
-    'dipdup.models.substrate.SubstrateEventDataDict',
     'dipdup.models.substrate_node.SubstrateNodeHeadSubscription',
     'dipdup.models.subsquid.AbstractSubsquidQuery',
     'dipdup.models.subsquid.SubsquidMessageType',
@@ -517,7 +516,7 @@ def dump_references() -> None:
                 else:
                     package_path_str = '.' + package_path.with_suffix('').as_posix().replace('/', '.')
                 # NOTE: Skip private modules and classes
-                if '._' in package_path_str or 'ABC' in match.group(2):
+                if '._' in package_path_str or 'ABC' in match.group(2) or match.group(1)[0] == '_':
                     continue
                 classes_in_package.add(f'dipdup.{ref}{package_path_str}.{match.group(1)}')
 

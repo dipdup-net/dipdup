@@ -55,7 +55,7 @@ Substrate
 
 .. autoclass:: dipdup.models.substrate.SubstrateEvent
 .. autoclass:: dipdup.models.substrate.SubstrateEventData
-.. autoclass:: dipdup.models.substrate.BlockHeader
+.. autoclass:: dipdup.models.substrate.SubstrateHeadBlockData
 
 -------------------------------------------------------------------------------
 Tezos

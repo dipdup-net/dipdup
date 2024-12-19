@@ -11,7 +11,7 @@ from dipdup.fetcher import HasLevel
 from dipdup.runtimes import SubstrateRuntime
 
 
-class BlockHeaderSubsquid(TypedDict):
+class _BlockHeaderExtra(TypedDict):
     number: int
     hash: str
     parentHash: str
@@ -26,22 +26,22 @@ class BlockHeaderSubsquid(TypedDict):
     validator: str
 
 
-class SubstrateEventDataSubsquid(TypedDict):
+class _SubstrateSubsquidEventResponse(TypedDict):
     name: str
     index: int
     extrinsicIndex: int
     callAddress: list[str]
     args: list[Any]
-    header: BlockHeaderSubsquid
+    header: _BlockHeaderExtra
 
 
-class BlockHeader(TypedDict):
+class _BlockHeader(TypedDict):
     hash: str
     number: int
     prev_root: str
 
 
-class SubstrateEventDataDict(TypedDict):
+class _SubstrateNodeEventResponse(TypedDict):
     name: str
     index: int
     extrinsic_index: int
@@ -58,15 +58,15 @@ class SubstrateEventData(HasLevel):
     # we receive decoded args from node datasource and encoded from subsquid datasource
     args: list[Any] | None = None
     decoded_args: dict[str, Any] | None = None
-    header: BlockHeader
-    header_extra: BlockHeaderSubsquid | None
+    header: _BlockHeader
+    header_extra: _BlockHeaderExtra | None
 
     @property
     def level(self) -> int:  # type: ignore[override]
         return self.header['number']
 
     @classmethod
-    def from_node(cls, event_dict: SubstrateEventDataDict, header: BlockHeader) -> Self:
+    def from_node(cls, event_dict: _SubstrateNodeEventResponse, header: _BlockHeader) -> Self:
         return cls(
             **event_dict,
             call_address=None,
@@ -76,7 +76,7 @@ class SubstrateEventData(HasLevel):
         )
 
     @classmethod
-    def from_subsquid(cls, event_dict: SubstrateEventDataSubsquid) -> Self:
+    def from_subsquid(cls, event_dict: _SubstrateSubsquidEventResponse) -> Self:
         return cls(
             name=event_dict['name'],
             index=event_dict['index'],
@@ -93,7 +93,7 @@ class SubstrateEventData(HasLevel):
         )
 
 
-class HeadBlock(TypedDict):
+class SubstrateHeadBlockData(TypedDict):
     parentHash: str
     number: str
     stateRoot: str
@@ -109,13 +109,14 @@ class SubstrateEvent(Generic[PayloadT]):
     data: SubstrateEventData
     runtime: SubstrateRuntime
 
-    # TODO: could be used in other models with typed payload
+    # TODO: Use lazy decoding in other models with typed payload
     @cached_property
     def payload(self) -> PayloadT:
+        # NOTE: from node datasource
         if self.data.decoded_args is not None:
             return cast(PayloadT, self.data.decoded_args)
 
-        # NOTE: both from subsquid
+        # NOTE: from subsquid datasource
         assert self.data.args is not None and self.data.header_extra is not None
         return cast(
             PayloadT,

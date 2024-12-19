@@ -287,7 +287,8 @@ class DatasourceConfig(ABC, NameMixin):
     """
 
     kind: str
-    url: str
+    url: Url
+    ws_url: WsUrl | None = None
     http: HttpConfig | None = None
 
 
