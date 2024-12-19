@@ -29,4 +29,5 @@ class SubstrateSubsquidDatasourceConfig(DatasourceConfig):
 
     @property
     def rollback_depth(self) -> int:
+        # NOTE: Subsquid data is always finalized
         return 0
