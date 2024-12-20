@@ -1442,6 +1442,9 @@
           "items": {
             "anyOf": [
               {
+                "type": "string"
+              },
+              {
                 "$ref": "#/$defs/StarknetSubsquidDatasourceConfig"
               },
               {

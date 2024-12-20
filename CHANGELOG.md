@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [Unreleased]
+## [8.1.3] - 2024-12-20
 
 ### Fixed
 
@@ -14,11 +14,11 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - cli: Fixed `--template` option being ignored when `--quiet` flag is set.
 - config: Fixed setting default loglevels when `logging` is a dict.
 - config: Fixed parsing config files after updating to pydantic 2.10.3.
+- config: Fixed starknet index validation error.
 - metrics: Fixed indexed objects counter.
-- abi(starknet): Added support for struct and array types, as well as u256 and ByteArray handlers.
-- matcher(starknet): Fixed event payload parsing (account for keys field)
-- fetcher(starknet): Fixed missing class property in sn node datasource
-- config(starknet): Fixed validation error
+- starknet: Added support for struct and array types, as well as u256 and ByteArray handlers.
+- starknet: Fixed event payload parsing (account for keys field).
+- starknet: Fixed missing class property in node datasource.
 
 ## [8.1.2] - 2024-12-10
 
@@ -560,9 +560,10 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.2...HEAD
-[8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.0.1...8.1.2
-[8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.0.0...8.1.1
+[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.3...HEAD
+[8.1.3]: https://github.com/dipdup-io/dipdup/compare/8.1.2...8.1.3
+[8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.1.1...8.1.2
+[8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.1.0...8.1.1
 [8.1.0]: https://github.com/dipdup-io/dipdup/compare/8.0.0...8.1.0
 [8.0.0]: https://github.com/dipdup-io/dipdup/compare/8.0.0b5...8.0.0
 [8.0.0b5]: https://github.com/dipdup-io/dipdup/compare/8.0.0b4...8.0.0b5
