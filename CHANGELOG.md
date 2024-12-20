@@ -15,6 +15,10 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - config: Fixed setting default loglevels when `logging` is a dict.
 - config: Fixed parsing config files after updating to pydantic 2.10.3.
 - metrics: Fixed indexed objects counter.
+- abi(starknet): Added support for struct and array types, as well as u256 and ByteArray handlers.
+- matcher(starknet): Fixed event payload parsing (account for keys field)
+- fetcher(starknet): Fixed missing class property in sn node datasource
+- config(starknet): Fixed validation error
 
 ## [8.1.2] - 2024-12-10
 
