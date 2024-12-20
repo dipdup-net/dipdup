@@ -73,7 +73,7 @@ def prepare_event_handler_args(
         typename=typename,
         name=handler_config.name,
     )['serializer']
-    data = [int(s, 16) for s in matched_event.data]
+    data = [int(x, 16) for x in matched_event.keys[1:] + matched_event.data]
 
     # holding context for error building
     with DeserializationContext.create(data) as context:

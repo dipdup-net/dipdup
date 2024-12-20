@@ -1,0 +1,27 @@
+spec_version: 3.0
+package: demo_starknet_events
+
+datasources:
+  subsquid:
+    kind: starknet.subsquid
+    url: https://v2.archive.subsquid.io/network/starknet-mainnet
+  node:
+    kind: starknet.node
+    url: https://starknet-mainnet.g.alchemy.com/v2
+
+contracts:
+  stark_usdt:
+    kind: starknet
+    address: '0x68f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8'
+    typename: stark_usdt
+
+indexes:
+  starknet_usdt_events:
+    kind: starknet.events
+    datasources:
+      - subsquid
+      - node
+    handlers:
+      - callback: on_transfer
+        contract: stark_usdt
+        name: Transfer

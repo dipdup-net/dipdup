@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 
 
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
+    NODE_LAST_MILE = 128
+
     _default_http_config = HttpConfig(
         batch_size=1000,
     )

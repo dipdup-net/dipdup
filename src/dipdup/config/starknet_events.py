@@ -9,6 +9,7 @@ from pydantic.dataclasses import dataclass
 from dipdup.config import Alias
 from dipdup.config import HandlerConfig
 from dipdup.config.starknet import StarknetContractConfig
+from dipdup.config.starknet import StarknetDatasourceConfigU
 from dipdup.config.starknet import StarknetIndexConfig
 from dipdup.models.starknet import StarknetSubscription
 from dipdup.subscriptions import Subscription
@@ -61,6 +62,7 @@ class StarknetEventsIndexConfig(StarknetIndexConfig):
     """
 
     kind: Literal['starknet.events']
+    datasources: tuple[Alias[StarknetDatasourceConfigU], ...]
     handlers: tuple[StarknetEventsHandlerConfig, ...]
 
     def get_subscriptions(self) -> set[Subscription]:
