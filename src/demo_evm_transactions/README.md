@@ -22,7 +22,7 @@ Run the indexer in memory:
 dipdup run
 ```
 
-Store data in SQLite database:
+Store data in SQLite database (defaults to /tmp, set `SQLITE_PATH` env variable):
 
 ```shell
 dipdup -c . -c configs/dipdup.sqlite.yaml run

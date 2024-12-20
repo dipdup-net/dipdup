@@ -41,14 +41,11 @@ def _convert_type(type_: CairoType) -> dict[str, Any]:
             return {'type': 'string'}
         return {
             'type': 'object',
-            'properties': {
-                key: _convert_type(value)
-                for key, value in type_.types.items()
-            },
+            'properties': {key: _convert_type(value) for key, value in type_.types.items()},
             'required': tuple(type_.types.keys()),
             'additionalProperties': False,
         }
-    
+
     if type_.__class__.__name__ == 'ArrayType':
         return {
             'type': 'array',
@@ -65,10 +62,7 @@ def _convert_type(type_: CairoType) -> dict[str, Any]:
 
 def _jsonschema_from_event(event: EventType) -> dict[str, Any]:
     # TODO: Unpack nested types (starknet.py could do that)
-    return {
-        '$schema': 'http://json-schema.org/draft/2019-09/schema#',
-        **_convert_type(event)
-    }
+    return {'$schema': 'http://json-schema.org/draft/2019-09/schema#', **_convert_type(event)}
 
 
 def sn_keccak(x: str) -> str:
