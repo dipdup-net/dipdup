@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
+## [Unreleased]
+
+### Fixed
+
+- subsquid: Fixed float type for `timestamp` field on event / transaction deserialization.
+- subsquid: Fixed empty field base conversion on event deserialization.
+
 ## [8.1.3] - 2024-12-20
 
 ### Fixed
