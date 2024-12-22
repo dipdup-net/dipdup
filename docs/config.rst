@@ -2,12 +2,12 @@
 
 .. autoclass:: dipdup.config.DipDupConfig
 
-.. autoclass:: dipdup.config.abi_etherscan.AbiEtherscanDatasourceConfig
 .. autoclass:: dipdup.config.AdvancedConfig
 .. autoclass:: dipdup.config.ApiConfig
 .. autoclass:: dipdup.config.coinbase.CoinbaseDatasourceConfig
 .. autoclass:: dipdup.config.evm.EvmContractConfig
 .. autoclass:: dipdup.config.evm_node.EvmNodeDatasourceConfig
+.. autoclass:: dipdup.config.evm_etherscan.EvmEtherscanDatasourceConfig
 .. autoclass:: dipdup.config.evm_events.EvmEventsHandlerConfig
 .. autoclass:: dipdup.config.evm_events.EvmEventsIndexConfig
 .. autoclass:: dipdup.config.evm_subsquid.EvmSubsquidDatasourceConfig

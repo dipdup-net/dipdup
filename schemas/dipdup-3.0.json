@@ -1,54 +1,5 @@
 {
   "$defs": {
-    "AbiEtherscanDatasourceConfig": {
-      "additionalProperties": false,
-      "description": "Etherscan datasource config",
-      "properties": {
-        "api_key": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "API key",
-          "title": "api_key"
-        },
-        "http": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/HttpConfig"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "HTTP client configuration",
-          "title": "http"
-        },
-        "kind": {
-          "const": "abi.etherscan",
-          "description": "always 'abi.etherscan'",
-          "title": "kind",
-          "type": "string"
-        },
-        "url": {
-          "description": "API URL",
-          "title": "url",
-          "type": "string"
-        }
-      },
-      "required": [
-        "kind",
-        "url"
-      ],
-      "title": "AbiEtherscanDatasourceConfig",
-      "type": "object"
-    },
     "AdvancedConfig": {
       "additionalProperties": true,
       "description": "This section allows users to tune some system-wide options, either experimental or unsuitable for generic configurations.",
@@ -285,6 +236,63 @@
       "title": "EvmContractConfig",
       "type": "object"
     },
+    "EvmEtherscanDatasourceConfig": {
+      "additionalProperties": false,
+      "description": "Etherscan datasource config",
+      "properties": {
+        "api_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "API key",
+          "title": "api_key"
+        },
+        "http": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HttpConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "HTTP client configuration",
+          "title": "http"
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "const": "evm.etherscan",
+              "type": "string"
+            },
+            {
+              "const": "abi.etherscan",
+              "type": "string"
+            }
+          ],
+          "description": "always 'evm.etherscan'",
+          "title": "kind"
+        },
+        "url": {
+          "description": "API URL",
+          "title": "url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "url"
+      ],
+      "title": "EvmEtherscanDatasourceConfig",
+      "type": "object"
+    },
     "EvmEventsHandlerConfig": {
       "additionalProperties": false,
       "description": "Subsquid event handler",
@@ -338,7 +346,7 @@
                 "$ref": "#/$defs/EvmNodeDatasourceConfig"
               },
               {
-                "$ref": "#/$defs/AbiEtherscanDatasourceConfig"
+                "$ref": "#/$defs/EvmEtherscanDatasourceConfig"
               }
             ]
           },
@@ -563,7 +571,7 @@
                 "$ref": "#/$defs/EvmNodeDatasourceConfig"
               },
               {
-                "$ref": "#/$defs/AbiEtherscanDatasourceConfig"
+                "$ref": "#/$defs/EvmEtherscanDatasourceConfig"
               }
             ]
           },
@@ -3054,7 +3062,7 @@
             "$ref": "#/$defs/CoinbaseDatasourceConfig"
           },
           {
-            "$ref": "#/$defs/AbiEtherscanDatasourceConfig"
+            "$ref": "#/$defs/EvmEtherscanDatasourceConfig"
           },
           {
             "$ref": "#/$defs/HttpDatasourceConfig"

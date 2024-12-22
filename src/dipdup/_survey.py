@@ -92,7 +92,7 @@ CONFIG_STRUCTURE: dict[str, BlockchainConfig] = {
                 'name': 'node',
             },
             {
-                'kind': 'abi.etherscan',
+                'kind': 'evm.etherscan',
                 'requires_api_key': True,
                 'default_url': 'https://api.etherscan.io/api',
                 'name': 'etherscan',
@@ -224,7 +224,7 @@ def get_datasource_comments(datasources: list[str]) -> tuple[str, ...]:
     default_comments = {
         'evm.subsquid': 'Use Subsquid as your datasource for EVM.',
         'evm.node': 'Connect to an EVM node.',
-        'abi.etherscan': 'Fetch ABI from Etherscan.',
+        'evm.etherscan': 'Fetch ABI from Etherscan.',
         'tezos.tzkt': 'Use TzKT API for Tezos.',
         'starknet.subsquid': 'Use Subsquid for Starknet.',
         'starknet.node': 'Connect to a Starknet node.',
@@ -420,7 +420,7 @@ def query_survey_config(blockchain: str) -> DipDupSurveyConfig:
             else:
                 api_key = '${ETHERSCAN_API_KEY:-' + api_key + '}'
 
-        if datasource_kind != 'abi.etherscan':
+        if datasource_kind != 'evm.etherscan':
             api_key = None
 
         if 'subsquid' in datasource_kind:

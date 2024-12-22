@@ -44,8 +44,8 @@ from dipdup.config.tezos_token_balances import TezosTokenBalancesIndexConfig
 from dipdup.config.tezos_token_transfers import TezosTokenTransfersIndexConfig
 from dipdup.datasources import Datasource
 from dipdup.datasources import IndexDatasource
-from dipdup.datasources.abi_etherscan import AbiEtherscanDatasource
 from dipdup.datasources.coinbase import CoinbaseDatasource
+from dipdup.datasources.evm_etherscan import EvmEtherscanDatasource
 from dipdup.datasources.evm_node import EvmNodeDatasource
 from dipdup.datasources.evm_subsquid import EvmSubsquidDatasource
 from dipdup.datasources.http import HttpDatasource
@@ -516,16 +516,19 @@ class DipDupContext:
         """Get `evm.node` datasource by name"""
         return self._get_datasource(name, EvmNodeDatasource)
 
-    def get_abi_etherscan_datasource(self, name: str) -> AbiEtherscanDatasource:
-        """Get `abi.etherscan` datasource by name
+    def get_evm_etherscan_datasource(self, name: str) -> EvmEtherscanDatasource:
+        """Get `evm.etherscan` datasource by name
 
         :param name: Name of the datasource
         """
-        return self._get_datasource(name, AbiEtherscanDatasource)
+        return self._get_datasource(name, EvmEtherscanDatasource)
 
-    def get_evm_datasource(self, name: str) -> EvmSubsquidDatasource | EvmNodeDatasource | AbiEtherscanDatasource:
+    # NOTE: Alias, remove in 9.0
+    get_abi_etherscan_datasource = get_evm_etherscan_datasource
+
+    def get_evm_datasource(self, name: str) -> EvmSubsquidDatasource | EvmNodeDatasource | EvmEtherscanDatasource:
         """Get `evm` datasource by name"""
-        return self._get_datasource(name, EvmSubsquidDatasource, EvmNodeDatasource, AbiEtherscanDatasource)  # type: ignore[return-value]
+        return self._get_datasource(name, EvmSubsquidDatasource, EvmNodeDatasource, EvmEtherscanDatasource)  # type: ignore[return-value]
 
     def get_starknet_datasource(self, name: str) -> StarknetSubsquidDatasource | StarknetNodeDatasource:
         """Get `starknet` datasource by name"""

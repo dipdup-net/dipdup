@@ -794,11 +794,14 @@ class DipDupConfig:
             raise ConfigurationError('`datasource` field must refer to TzKT datasource')
         return datasource
 
-    def get_abi_etherscan_datasource(self, name: str) -> AbiEtherscanDatasourceConfig:
+    def get_evm_etherscan_datasource(self, name: str) -> EvmEtherscanDatasourceConfig:
         datasource = self.get_datasource(name)
-        if not isinstance(datasource, AbiEtherscanDatasourceConfig):
+        if not isinstance(datasource, EvmEtherscanDatasourceConfig):
             raise ConfigurationError('`datasource` field must refer to Etherscan datasource')
         return datasource
+
+    # NOTE: Alias, remove in 9.0
+    get_abi_etherscan_datasource = get_evm_etherscan_datasource
 
     def get_substrate_subsquid_datasource(self, name: str) -> SubstrateSubsquidDatasourceConfig:
         datasource = self.get_datasource(name)
@@ -1125,9 +1128,9 @@ WARNING: A very dark magic ahead. Be extra careful when editing code below.
 """
 
 # NOTE: Reimport to avoid circular imports
-from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
 from dipdup.config.coinbase import CoinbaseDatasourceConfig
 from dipdup.config.evm import EvmContractConfig
+from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
 from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_node import EvmNodeDatasourceConfig
 from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
@@ -1163,7 +1166,7 @@ RuntimeConfigU = SubstrateRuntimeConfig
 ContractConfigU = EvmContractConfig | TezosContractConfig | StarknetContractConfig
 DatasourceConfigU = (
     CoinbaseDatasourceConfig
-    | AbiEtherscanDatasourceConfig
+    | EvmEtherscanDatasourceConfig
     | HttpDatasourceConfig
     | IpfsDatasourceConfig
     | EvmSubsquidDatasourceConfig

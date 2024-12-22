@@ -226,8 +226,8 @@ class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
 
 
 def create_datasource(config: DatasourceConfig) -> Datasource[Any]:
-    from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
     from dipdup.config.coinbase import CoinbaseDatasourceConfig
+    from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
     from dipdup.config.evm_node import EvmNodeDatasourceConfig
     from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
     from dipdup.config.http import HttpDatasourceConfig
@@ -239,8 +239,8 @@ def create_datasource(config: DatasourceConfig) -> Datasource[Any]:
     from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
     from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
     from dipdup.config.tzip_metadata import TzipMetadataDatasourceConfig
-    from dipdup.datasources.abi_etherscan import AbiEtherscanDatasource
     from dipdup.datasources.coinbase import CoinbaseDatasource
+    from dipdup.datasources.evm_etherscan import EvmEtherscanDatasource
     from dipdup.datasources.evm_node import EvmNodeDatasource
     from dipdup.datasources.evm_subsquid import EvmSubsquidDatasource
     from dipdup.datasources.http import HttpDatasource
@@ -254,7 +254,7 @@ def create_datasource(config: DatasourceConfig) -> Datasource[Any]:
     from dipdup.datasources.tzip_metadata import TzipMetadataDatasource
 
     by_config: dict[type[DatasourceConfig], type[Datasource[Any]]] = {
-        AbiEtherscanDatasourceConfig: AbiEtherscanDatasource,
+        EvmEtherscanDatasourceConfig: EvmEtherscanDatasource,
         CoinbaseDatasourceConfig: CoinbaseDatasource,
         TezosTzktDatasourceConfig: TezosTzktDatasource,
         TzipMetadataDatasourceConfig: TzipMetadataDatasource,
