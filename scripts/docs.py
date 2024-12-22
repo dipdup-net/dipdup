@@ -810,7 +810,7 @@ def move_pages(path: Path, insert: int, pop: int) -> None:
                 break
 
             file = toc[index]
-            new_name = path / f'{index + 1}.{file.name.split(".")[1]}.md'
+            new_name = path / f'{index + 1}.{'.'.join(file.stem.split(".")[1:])}.md'
             file.rename(new_name)
             toc[index + 1] = new_name
 
@@ -828,7 +828,7 @@ def move_pages(path: Path, insert: int, pop: int) -> None:
         for index in sorted(toc.keys()):
             if index > pop:
                 file = toc.pop(index)
-                new_name = path / f'{index - 1}.{file.name.split(".")[1]}.md'
+                new_name = path / f'{index + 1}.{'.'.join(file.stem.split(".")[1:])}.md'
                 file.rename(new_name)
                 toc[index - 1] = new_name
 

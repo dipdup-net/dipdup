@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [Unreleased]
+## [8.2.0rc1] - ????-??-??
 
 ### Added
 
@@ -577,7 +577,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.3...HEAD
+[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.2.0rc1...HEAD
+[8.2.0rc1]: https://github.com/dipdup-io/dipdup/compare/8.1.3...8.2.0rc1
 [8.1.3]: https://github.com/dipdup-io/dipdup/compare/8.1.2...8.1.3
 [8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.1.1...8.1.2
 [8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.1.0...8.1.1
