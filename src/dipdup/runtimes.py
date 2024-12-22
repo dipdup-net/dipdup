@@ -122,7 +122,7 @@ class SubstrateRuntime:
             except FileNotFoundError:
                 # FIXME: Using last known version to help with missing abis
                 last_known = sorted_glob(self.abi_path, 'v*.json')[-1].stem
-                _logger.info('using last known version `%s`', last_known)
+                _logger.debug('using last known version `%s`', last_known)
                 self._spec_versions[name] = self.get_spec_version(last_known[1:])
 
         return self._spec_versions[name]

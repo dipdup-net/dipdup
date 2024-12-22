@@ -19,8 +19,7 @@ on:
       - '.github/workflows/installer.yml'
 
 env:
-  # FIXME: substrate preview
-  FRONTEND_BRANCH: feat/substrate
+  FRONTEND_BRANCH: ${{ github.ref == 'refs/heads/docs-next' && 'dev' || 'master' }}
   GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
 
 jobs:
@@ -66,8 +65,7 @@ jobs:
 
       # NOTE: Installer is tested in `installer` workflow
       - name: Commit and push frontend
-        # FIXME: substrate preview
-        # if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag'
         run: |
           cp src/dipdup/install.py ../interface/public/install.py
           cd ../interface

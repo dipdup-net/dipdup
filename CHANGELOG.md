@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [8.1.3] - 2024-12-20
+## [Unreleased]
 
 ### Added
 
@@ -15,7 +15,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - substrate.subscan: Added `substrate.subscan` datasource to fetch ABIs from Subscan.
 - substrate.subsquid: Added `substrate.subsquid` datasource to fetch historical data from Squid Network.
 
-## [Unreleased]
+## [8.1.3] - 2024-12-20
 
 ### Fixed
 
