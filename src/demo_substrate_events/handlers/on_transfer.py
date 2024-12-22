@@ -21,6 +21,7 @@ async def sql_update(
     )
 
 
+# NOTE: Not used, just for demonstration purposes
 async def orm_update(
     ctx: HandlerContext,
     address: str,
@@ -47,9 +48,5 @@ async def on_transfer(
     if not amount:
         return
 
-    if ctx.is_finalized:
-        await sql_update(ctx, event.payload['from'], -amount, event.data.level)
-        await sql_update(ctx, event.payload['to'], amount, event.data.level)
-    else:
-        await orm_update(ctx, event.payload['from'], -amount, event.data.level)
-        await orm_update(ctx, event.payload['to'], amount, event.data.level)
+    await sql_update(ctx, event.payload['from'], -amount, event.data.level)
+    await sql_update(ctx, event.payload['to'], amount, event.data.level)
