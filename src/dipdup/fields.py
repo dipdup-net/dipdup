@@ -4,10 +4,12 @@ from contextlib import suppress
 from copy import copy
 from decimal import Decimal
 from enum import Enum
+from functools import partial
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import TypeVar
 
+import orjson
 from tortoise.contrib.postgres.fields import ArrayField as ArrayField
 from tortoise.exceptions import ConfigurationError as TortoiseConfigurationError
 from tortoise.fields import relational as relational
@@ -26,7 +28,7 @@ from tortoise.fields.data import DatetimeField as DatetimeField
 from tortoise.fields.data import FloatField as FloatField
 from tortoise.fields.data import IntEnumFieldInstance as IntEnumFieldInstance
 from tortoise.fields.data import IntField as IntField
-from tortoise.fields.data import JSONField as JSONField
+from tortoise.fields.data import JSONField as _JSONField
 from tortoise.fields.data import SmallIntField as SmallIntField
 from tortoise.fields.data import TimeDeltaField as TimeDeltaField
 from tortoise.fields.data import TimeField as TimeField
@@ -44,6 +46,7 @@ from tortoise.fields.relational import OneToOneRelation as OneToOneRelation
 from tortoise.fields.relational import ReverseRelation as ReverseRelation
 
 from dipdup.exceptions import FrameworkException
+from dipdup.utils import json_dumps_plain
 
 if TYPE_CHECKING:
     from tortoise.models import Model as _TortoiseModel
@@ -53,6 +56,13 @@ ForeignKeyField = ForeignKeyFieldInstance
 ManyToManyField = ManyToManyFieldInstance
 
 _EnumFieldT = TypeVar('_EnumFieldT', bound=Enum)
+
+
+JSONField = partial(
+    _JSONField,
+    encoder=json_dumps_plain,
+    decoder=orjson.loads,
+)
 
 
 class EnumField(Field[_EnumFieldT]):

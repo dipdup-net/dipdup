@@ -1,0 +1,18 @@
+name: demo_substrate_events
+
+services:
+  dipdup:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: ["-c", "dipdup.yaml", "-c", "configs/dipdup.sqlite.yaml", "run"]
+    restart: always
+    env_file: .env
+    ports:
+      - 46339
+      - 9000
+    volumes:
+      - sqlite:${SQLITE_PATH:-/tmp/demo_substrate_events.sqlite}
+
+volumes:
+  sqlite:

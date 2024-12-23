@@ -267,6 +267,17 @@ class ContractConfig(ABC, NameMixin):
         return Path(*self.module_name.split('.'))
 
 
+# FIXME: we use Substrate runtimes as contracts for codegen
+class RuntimeConfig(ContractConfig):
+    """Runtime config
+
+    :param kind: Defined by child class
+    :param typename: Alias for the typeclass directory
+    """
+
+    pass
+
+
 class DatasourceConfig(ABC, NameMixin):
     """Base class for datasource configs
 
@@ -276,7 +287,8 @@ class DatasourceConfig(ABC, NameMixin):
     """
 
     kind: str
-    url: str
+    url: Url
+    ws_url: WsUrl | None = None
     http: HttpConfig | None = None
 
 
@@ -556,6 +568,7 @@ class DipDupConfig:
     :param package: Name of indexer's Python package, existing or not
     :param datasources: Mapping of datasource aliases and datasource configs
     :param database: Database config
+    :param runtimes: Mapping of runtime aliases and runtime configs
     :param contracts: Mapping of contract aliases and contract configs
     :param indexes: Mapping of index aliases and index configs
     :param templates: Mapping of template aliases and index templates
@@ -576,6 +589,7 @@ class DipDupConfig:
     database: SqliteDatabaseConfig | PostgresDatabaseConfig = Field(
         default_factory=lambda *a, **kw: SqliteDatabaseConfig(kind='sqlite')
     )
+    runtimes: dict[str, RuntimeConfigU] = Field(default_factory=dict)
     contracts: dict[str, ContractConfigU] = Field(default_factory=dict)
     indexes: dict[str, IndexConfigU] = Field(default_factory=dict)
     templates: dict[str, ResolvedIndexConfigU] = Field(default_factory=dict)
@@ -780,10 +794,19 @@ class DipDupConfig:
             raise ConfigurationError('`datasource` field must refer to TzKT datasource')
         return datasource
 
-    def get_abi_etherscan_datasource(self, name: str) -> AbiEtherscanDatasourceConfig:
+    def get_evm_etherscan_datasource(self, name: str) -> EvmEtherscanDatasourceConfig:
         datasource = self.get_datasource(name)
-        if not isinstance(datasource, AbiEtherscanDatasourceConfig):
+        if not isinstance(datasource, EvmEtherscanDatasourceConfig):
             raise ConfigurationError('`datasource` field must refer to Etherscan datasource')
+        return datasource
+
+    # NOTE: Alias, remove in 9.0
+    get_abi_etherscan_datasource = get_evm_etherscan_datasource
+
+    def get_substrate_subsquid_datasource(self, name: str) -> SubstrateSubsquidDatasourceConfig:
+        datasource = self.get_datasource(name)
+        if not isinstance(datasource, SubstrateSubsquidDatasourceConfig):
+            raise ConfigurationError('`datasource` field must refer to Subsquid datasource')
         return datasource
 
     def set_up_logging(self) -> None:
@@ -1066,6 +1089,13 @@ class DipDupConfig:
 
                 if isinstance(handler_config.contract, str):
                     handler_config.contract = self.get_starknet_contract(handler_config.contract)
+
+        elif isinstance(index_config, SubstrateEventsIndexConfig):
+            if isinstance(index_config.runtime, str):
+                index_config.runtime = self.runtimes[index_config.runtime]
+            for handler_config in index_config.handlers:
+                handler_config.parent = index_config
+
         else:
             raise NotImplementedError(f'Index kind `{index_config.kind}` is not supported')
 
@@ -1075,6 +1105,7 @@ class DipDupConfig:
             (
                 self.contracts,
                 self.datasources,
+                self.runtimes,
                 self.hooks,
                 self.jobs,
                 self.templates,
@@ -1097,9 +1128,9 @@ WARNING: A very dark magic ahead. Be extra careful when editing code below.
 """
 
 # NOTE: Reimport to avoid circular imports
-from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
 from dipdup.config.coinbase import CoinbaseDatasourceConfig
 from dipdup.config.evm import EvmContractConfig
+from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
 from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_node import EvmNodeDatasourceConfig
 from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
@@ -1110,6 +1141,11 @@ from dipdup.config.starknet import StarknetContractConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.config.starknet_subsquid import StarknetSubsquidDatasourceConfig
+from dipdup.config.substrate import SubstrateRuntimeConfig
+from dipdup.config.substrate_events import SubstrateEventsIndexConfig
+from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
+from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
+from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
 from dipdup.config.tezos import TezosContractConfig
 from dipdup.config.tezos_big_maps import TezosBigMapsIndexConfig
 from dipdup.config.tezos_events import TezosEventsIndexConfig
@@ -1126,10 +1162,11 @@ from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
 from dipdup.config.tzip_metadata import TzipMetadataDatasourceConfig
 
 # NOTE: Unions for Pydantic config deserialization
+RuntimeConfigU = SubstrateRuntimeConfig
 ContractConfigU = EvmContractConfig | TezosContractConfig | StarknetContractConfig
 DatasourceConfigU = (
     CoinbaseDatasourceConfig
-    | AbiEtherscanDatasourceConfig
+    | EvmEtherscanDatasourceConfig
     | HttpDatasourceConfig
     | IpfsDatasourceConfig
     | EvmSubsquidDatasourceConfig
@@ -1138,6 +1175,9 @@ DatasourceConfigU = (
     | TezosTzktDatasourceConfig
     | StarknetSubsquidDatasourceConfig
     | StarknetNodeDatasourceConfig
+    | SubstrateSubsquidDatasourceConfig
+    | SubstrateSubscanDatasourceConfig
+    | SubstrateNodeDatasourceConfig
 )
 TezosIndexConfigU = (
     TezosBigMapsIndexConfig
@@ -1150,8 +1190,9 @@ TezosIndexConfigU = (
 )
 EvmIndexConfigU = EvmEventsIndexConfig | EvmTransactionsIndexConfig
 StarknetIndexConfigU = StarknetEventsIndexConfig
+SubstrateIndexConfigU = SubstrateEventsIndexConfig
 
-ResolvedIndexConfigU = TezosIndexConfigU | EvmIndexConfigU | StarknetIndexConfigU
+ResolvedIndexConfigU = TezosIndexConfigU | EvmIndexConfigU | StarknetIndexConfigU | SubstrateIndexConfigU
 IndexConfigU = ResolvedIndexConfigU | IndexTemplateConfig
 
 

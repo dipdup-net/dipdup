@@ -1,0 +1,24 @@
+database:
+  kind: postgres
+  host: ${POSTGRES_HOST:-db}
+  port: 5432
+  user: ${POSTGRES_USER:-dipdup}
+  password: ${POSTGRES_PASSWORD}
+  database: ${POSTGRES_DB:-dipdup}
+
+hasura:
+  url: http://${HASURA_HOST:-hasura}:8080
+  admin_secret: ${HASURA_SECRET}
+  allow_aggregations: ${HASURA_ALLOW_AGGREGATIONS:-true}
+  select_limit: ${HASURA_SELECT_LIMIT:-10000}
+  camel_case: ${HASURA_CAMEL_CASE:-true}
+
+sentry:
+  dsn: ${SENTRY_DSN:-''}
+  environment: ${SENTRY_ENVIRONMENT:-''}
+
+prometheus:
+  host: 0.0.0.0
+
+api:
+  host: 0.0.0.0

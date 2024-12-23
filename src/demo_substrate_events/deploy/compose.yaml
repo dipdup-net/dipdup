@@ -1,0 +1,54 @@
+name: demo_substrate_events
+
+services:
+  dipdup:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: always
+    env_file: .env
+    ports:
+      - 46339
+      - 9000
+    command: ["-c", "dipdup.yaml", "-c", "configs/dipdup.compose.yaml", "run"]
+    depends_on:
+      - db
+      - hasura
+
+  db:
+    image: postgres:15
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_USER=dipdup
+      - POSTGRES_DB=dipdup
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dipdup"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  hasura:
+    image: hasura/graphql-engine:latest
+    ports:
+      - "${HASURA_HOST_PORT:-8080}:8080"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=postgres://dipdup:${POSTGRES_PASSWORD}@db:5432/dipdup
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_SECRET}
+      - HASURA_GRAPHQL_ENABLE_CONSOLE=true
+      - HASURA_GRAPHQL_DEV_MODE=true
+      - HASURA_GRAPHQL_LOG_LEVEL=info
+      - HASURA_GRAPHQL_ENABLE_TELEMETRY=false
+      - HASURA_GRAPHQL_UNAUTHORIZED_ROLE=user
+      - HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES=true
+
+volumes:
+  db:

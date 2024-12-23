@@ -6,12 +6,22 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [Unreleased]
+## [8.2.0rc1] - ????-??-??
+
+### Added
+
+- substrate.events: Added `subtrate.events` index kind to process Substrate events.
+- substrate.node: Added `subtrate.node` datasource to receive data from Substrate node.
+- substrate.subscan: Added `substrate.subscan` datasource to fetch ABIs from Subscan.
+- substrate.subsquid: Added `substrate.subsquid` datasource to fetch historical data from Squid Network.
 
 ### Fixed
 
-- subsquid: Fixed float type for `timestamp` field on event / transaction deserialization.
-- subsquid: Fixed empty field base conversion on event deserialization.
+- evm.subsquid: Fixed event/transaction model deserialization.
+
+### Changed
+
+- evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
 
 ## [8.1.3] - 2024-12-20
 
@@ -45,7 +55,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Added
 
-- abi.etherscan: Try to extract ABI from webpage when API call fails.
+- evm.etherscan: Try to extract ABI from webpage when API call fails.
 - cli: Added `schema` subcommands to manage database migrations: `migrate`, `upgrade`, `downgrade`, `heads` and `history`.
 - cli: Added interactive mode for `new` command.
 - database: Support database migrations using [`aerich`](https://github.com/tortoise/aerich).
@@ -225,7 +235,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 ### Removed
 
 - config: `node_only` index config flag has been removed; add `evm.node` datasource(s) to the `datasources` list instead.
-- config: `abi` index config field has been removed; add `abi.etherscan` datasource(s) to the `datasources` list instead.
+- config: `abi` index config field has been removed; add `evm.etherscan` datasource(s) to the `datasources` list instead.
 
 ### Other
 
@@ -285,7 +295,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
-- abi.etherscan: Raise `AbiNotAvailableError` when contract is not verified.
+- evm.etherscan: Raise `AbiNotAvailableError` when contract is not verified.
 - cli: Fixed incorrect indexer status logging.
 - evm.node: Fixed memory leak when using realtime subscriptions.
 - evm.node: Fixed processing chain reorgs.
@@ -343,7 +353,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
-- abi.etherscan: Fixed handling "rate limit reached" errors.
+- evm.etherscan: Fixed handling "rate limit reached" errors.
 - cli: Fixed setting logger levels based on config and env variables.
 - http: Fixed incorrect number of retries performed on failed requests.
 
@@ -511,7 +521,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Added
 
-- abi.etherscan: Added `abi.etherscan` datasource to fetch ABIs from Etherscan.
+- evm.etherscan: Added `evm.etherscan` datasource to fetch ABIs from Etherscan.
 - api: Added `/performance` endpoint to request indexing stats.
 - cli: Added `report` command group to manage performance and crash reports created by DipDup.
 - config: Added `advanced.decimal_precision` field to overwrite precision if it's not guessed correctly based on project models.
@@ -567,7 +577,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.1.3...HEAD
+[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.2.0rc1...HEAD
+[8.2.0rc1]: https://github.com/dipdup-io/dipdup/compare/8.1.3...8.2.0rc1
 [8.1.3]: https://github.com/dipdup-io/dipdup/compare/8.1.2...8.1.3
 [8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.1.1...8.1.2
 [8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.1.0...8.1.1

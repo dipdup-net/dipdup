@@ -13,7 +13,7 @@ from dipdup.config import Alias
 from dipdup.config import ContractConfig
 from dipdup.config import Hex
 from dipdup.config import IndexConfig
-from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
+from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
 from dipdup.config.evm_node import EvmNodeDatasourceConfig
 from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
 from dipdup.exceptions import ConfigurationError
@@ -21,7 +21,7 @@ from dipdup.exceptions import ConfigurationError
 EVM_ADDRESS_PREFIXES = ('0x',)
 EVM_ADDRESS_LENGTH = 42
 
-EvmDatasourceConfigU: TypeAlias = EvmSubsquidDatasourceConfig | EvmNodeDatasourceConfig | AbiEtherscanDatasourceConfig
+EvmDatasourceConfigU: TypeAlias = EvmSubsquidDatasourceConfig | EvmNodeDatasourceConfig | EvmEtherscanDatasourceConfig
 
 
 def _validate_evm_address(v: str) -> str:

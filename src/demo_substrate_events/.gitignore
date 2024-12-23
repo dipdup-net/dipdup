@@ -1,0 +1,29 @@
+# Ignore all
+*
+!*/
+
+# Add metadata and build files
+!demo_substrate_events
+!.gitignore
+!.dockerignore
+!py.typed
+!**/Dockerfile
+!**/Makefile
+!**/pyproject.toml
+!**/*.lock
+!**/README.md
+!**/.keep
+
+# Add Python code
+!**/*.py
+**/.*_cache
+**/__pycache__
+
+# Add configs and scripts (but not env!)
+!**/*.graphql
+!**/*.json
+!**/*.sql
+!**/*.yaml
+!**/*.yml
+!**/*.j2
+!**/*.env.default

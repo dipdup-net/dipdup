@@ -190,11 +190,15 @@ class Index(ABC, Generic[IndexConfigT, IndexQueueItemT, IndexDatasourceT]):
         return self._state
 
     @property
-    def synchronized(self) -> bool:
+    def is_active(self) -> bool:
+        return self.state.status not in (IndexStatus.disabled, IndexStatus.failed)
+
+    @property
+    def is_synchronized(self) -> bool:
         return self.state.status == IndexStatus.realtime
 
     @property
-    def realtime(self) -> bool:
+    def is_realtime(self) -> bool:
         return self.state.status == IndexStatus.realtime and not self.queue
 
     def get_sync_level(self) -> int:

@@ -144,6 +144,8 @@ IGNORED_MODEL_CLASSES = {
     'dipdup.models.MessageType',
     'dipdup.models.QuerySet',
     'dipdup.models.RollbackMessage',
+    'dipdup.models.substrate.HeadBlock',
+    'dipdup.models.substrate_node.SubstrateNodeHeadSubscription',
     'dipdup.models.subsquid.AbstractSubsquidQuery',
     'dipdup.models.subsquid.SubsquidMessageType',
     'dipdup.models.starknet.StarknetSubscription',
@@ -514,7 +516,7 @@ def dump_references() -> None:
                 else:
                     package_path_str = '.' + package_path.with_suffix('').as_posix().replace('/', '.')
                 # NOTE: Skip private modules and classes
-                if '._' in package_path_str or 'ABC' in match.group(2):
+                if '._' in package_path_str or 'ABC' in match.group(2) or match.group(1)[0] == '_':
                     continue
                 classes_in_package.add(f'dipdup.{ref}{package_path_str}.{match.group(1)}')
 
@@ -808,7 +810,7 @@ def move_pages(path: Path, insert: int, pop: int) -> None:
                 break
 
             file = toc[index]
-            new_name = path / f'{index + 1}.{file.name.split(".")[1]}.md'
+            new_name = path / f'{index + 1}.{'.'.join(file.stem.split(".")[1:])}.md'
             file.rename(new_name)
             toc[index + 1] = new_name
 
@@ -826,7 +828,7 @@ def move_pages(path: Path, insert: int, pop: int) -> None:
         for index in sorted(toc.keys()):
             if index > pop:
                 file = toc.pop(index)
-                new_name = path / f'{index - 1}.{file.name.split(".")[1]}.md'
+                new_name = path / f'{index + 1}.{'.'.join(file.stem.split(".")[1:])}.md'
                 file.rename(new_name)
                 toc[index - 1] = new_name
 

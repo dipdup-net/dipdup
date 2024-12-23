@@ -5,9 +5,9 @@ from typing import cast
 from dipdup.codegen import CodeGenerator
 from dipdup.config import EvmIndexConfigU
 from dipdup.config import HandlerConfig
-from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
 from dipdup.config.evm import EvmContractConfig
 from dipdup.config.evm import EvmIndexConfig
+from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
 from dipdup.config.evm_events import EvmEventsHandlerConfig
 from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_transactions import EvmTransactionsHandlerConfig
@@ -60,7 +60,7 @@ class EvmCodeGenerator(CodeGenerator):
         pass
 
     async def _fetch_abi(self, index_config: EvmIndexConfigU) -> None:
-        datasource_configs = tuple(c for c in index_config.datasources if isinstance(c, AbiEtherscanDatasourceConfig))
+        datasource_configs = tuple(c for c in index_config.datasources if isinstance(c, EvmEtherscanDatasourceConfig))
 
         contract: EvmContractConfig | None = None
 

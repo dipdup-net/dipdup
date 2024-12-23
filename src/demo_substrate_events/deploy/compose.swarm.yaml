@@ -1,0 +1,91 @@
+name: demo_substrate_events
+
+services:
+  dipdup:
+    image: ${IMAGE:-ghcr.io/dipdup-io/dipdup}:${TAG:-8}
+    depends_on:
+      - db
+      - hasura
+    command: ["-c", "dipdup.yaml", "-c", "configs/dipdup.swarm.yaml", "run"]
+    env_file: .env
+    networks:
+      - internal
+      - prometheus-private
+    deploy:
+      mode: replicated
+      replicas: ${INDEXER_ENABLED:-1}
+      labels:
+        - prometheus-job=${SERVICE}
+        - prometheus-port=8000
+      placement: &placement
+        constraints:
+          - node.labels.${SERVICE} == true
+    logging: &logging
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+        tag: "\{\{.Name\}\}.\{\{.ImageID\}\}"
+
+  db:
+    image: postgres:15
+    volumes:
+      - db:/var/lib/postgresql/data
+    env_file: .env
+    environment:
+      - POSTGRES_USER=dipdup
+      - POSTGRES_DB=dipdup
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dipdup"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement: *placement
+    logging: *logging
+
+  hasura:
+    image: hasura/graphql-engine:latest
+    depends_on:
+      - db
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=postgres://dipdup:${POSTGRES_PASSWORD}@demo_substrate_events_db:5432/dipdup
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_SECRET}
+      - HASURA_GRAPHQL_ENABLE_CONSOLE=true
+      - HASURA_GRAPHQL_DEV_MODE=false
+      - HASURA_GRAPHQL_LOG_LEVEL=warn
+      - HASURA_GRAPHQL_ENABLE_TELEMETRY=false
+      - HASURA_GRAPHQL_UNAUTHORIZED_ROLE=user
+      - HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES=true
+    networks:
+      - internal
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.${SERVICE}.loadbalancer.server.port=8080
+        - "traefik.http.routers.${SERVICE}.rule=Host(`${HOST}`) && (PathPrefix(`/v1/graphql`) || PathPrefix(`/api/rest`))"
+        - traefik.http.routers.${SERVICE}.entrypoints=http,${INGRESS:-ingress}
+        - "traefik.http.routers.${SERVICE}-console.rule=Host(`${SERVICE}.${SWARM_ROOT_DOMAIN}`)"
+        - traefik.http.routers.${SERVICE}-console.entrypoints=https
+        - traefik.http.middlewares.${SERVICE}-console.headers.customrequestheaders.X-Hasura-Admin-Secret=${HASURA_SECRET}
+        - traefik.http.routers.${SERVICE}-console.middlewares=authelia@docker,${SERVICE}-console
+      placement: *placement
+    logging: *logging
+
+volumes:
+  db:
+
+networks:
+  internal:
+  traefik-public:
+    external: true
+  prometheus-private:
+    external: true
