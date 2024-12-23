@@ -4,6 +4,7 @@ import math
 from asyncio import Queue
 from collections.abc import Awaitable
 from collections.abc import Callable
+from contextlib import suppress
 from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
@@ -203,7 +204,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
                 # NOTE: Set None to identify possible subscriptions conflicts
                 self._pending_subscription = None
             else:
-                raise Exception
+                raise FrameworkException('id in data, but no pending subscription')
         elif 'method' in data and data['method'].startswith('chain_'):
             subscription_id = data['params']['subscription']
             if subscription_id not in self._subscription_ids:
@@ -247,7 +248,12 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
         return await self._jsonrpc_request('chain_getBlock', [hash])  # type: ignore[no-any-return]
 
     async def get_events(self, block_hash: str) -> tuple[_SubstrateNodeEventResponse, ...]:
-        events = await self._interface.get_events(block_hash)
+        # FIXME: aiosubstrate bug, fix asap
+        while True:
+            with suppress(AttributeError):
+                events = await self._interface.get_events(block_hash)
+                break
+            await asyncio.sleep(0.1)
 
         result: list[_SubstrateNodeEventResponse] = []
         for raw_event in events:

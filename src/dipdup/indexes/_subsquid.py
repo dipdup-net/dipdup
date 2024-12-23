@@ -46,6 +46,8 @@ class SubsquidIndex(
         node = node or random.choice(self.node_datasources)
 
         node_sync_level = await node.get_head_level()
+        node._logger.info('current head is %s', node_sync_level)
+
         subsquid_lag = abs(node_sync_level - subsquid_level)
         subsquid_available = subsquid_level - index_level
         self._logger.info('Subsquid is %s levels behind; %s available', subsquid_lag, subsquid_available)
@@ -64,7 +66,9 @@ class SubsquidIndex(
             return
 
         if self.subsquid_datasources:
-            subsquid_sync_level = await self.subsquid_datasources[0].get_head_level()
+            datasource = self.subsquid_datasources[0]
+            subsquid_sync_level = await datasource.get_head_level()
+            datasource._logger.info('current head is %s', subsquid_sync_level)
             metrics._sqd_processor_chain_height = subsquid_sync_level
         else:
             subsquid_sync_level = 0
@@ -74,15 +78,16 @@ class SubsquidIndex(
         # NOTE: Fetch last blocks from node if there are not enough realtime messages in queue
         if node_sync_level:
             sync_level = min(sync_level, node_sync_level)
-            self._logger.debug('Using node datasource; sync level: %s', sync_level)
+            self._logger.info('Synchronizing with `node`: %s -> %s', index_level, sync_level)
             await self._synchronize_node(sync_level)
         else:
             sync_level = min(sync_level, subsquid_sync_level)
+            self._logger.info('Synchronizing with `subsquid`: %s -> %s', index_level, sync_level)
             await self._synchronize_subsquid(sync_level)
 
         if not self.node_datasources and not self._subsquid_started:
             self._subsquid_started = True
-            self._logger.info('No `evm.node` datasources available; polling Subsquid')
+            self._logger.info('No `node` datasources available; polling Subsquid')
             for datasource in self.subsquid_datasources:
                 await datasource.start()
 

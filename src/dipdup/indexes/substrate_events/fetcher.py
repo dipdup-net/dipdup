@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import AsyncIterator
 from collections.abc import Iterable
+from contextlib import suppress
 from typing import Any
 
 from dipdup.datasources.substrate_node import SubstrateNodeDatasource
@@ -159,14 +160,16 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
         )
 
         while True:
-            if sum(queues[q].qsize() for q in queues) == 0 and all(t.done() for t in tasks):
+            if sum(queues[q].qsize() for q in queues) == 0 and all(t.done() for t in tasks[:-1]):
                 break
 
             for t in tasks:
-                if t.done():
+                if t.done() or t.cancelled():
                     await t
 
-            header, events = await queues['events'].get()
-            yield tuple(SubstrateEventData.from_node(event, header) for event in events)
+            with suppress(asyncio.TimeoutError):
+                while True:
+                    header, events = await asyncio.wait_for(queues['events'].get(), timeout=1)
+                    yield tuple(SubstrateEventData.from_node(event, header) for event in events)
 
         tasks[-1].cancel()
