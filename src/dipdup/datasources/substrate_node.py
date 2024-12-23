@@ -194,8 +194,6 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
             # NOTE: Save subscription id
             if self._pending_subscription:
                 self._subscription_ids[data['result']] = self._pending_subscription
-                self._requests[data['id']] = (self._requests[data['id']][0], data)
-                self._requests[data['id']][0].set()
 
                 # NOTE: Possibly unreliable logic from evm_node, and possibly too time consuming for message handling
                 level = await self.get_head_level()
@@ -203,8 +201,10 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
 
                 # NOTE: Set None to identify possible subscriptions conflicts
                 self._pending_subscription = None
-            else:
-                raise FrameworkException('id in data, but no pending subscription')
+
+            self._requests[data['id']] = (self._requests[data['id']][0], data)
+            self._requests[data['id']][0].set()
+
         elif 'method' in data and data['method'].startswith('chain_'):
             subscription_id = data['params']['subscription']
             if subscription_id not in self._subscription_ids:
