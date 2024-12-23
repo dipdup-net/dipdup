@@ -92,7 +92,7 @@ class MetadataStorage:
 
 class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
     _default_http_config = HttpConfig(
-        batch_size=5,
+        batch_size=10,
     )
 
     def __init__(self, config: SubstrateNodeDatasourceConfig) -> None:
