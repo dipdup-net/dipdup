@@ -912,7 +912,7 @@ files = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.4"
+version = "3.1.5"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
 groups = ["default", "docs", "perf"]
@@ -920,8 +920,8 @@ dependencies = [
     "MarkupSafe>=2.0",
 ]
 files = [
-    {file = "jinja2-3.1.4-py3-none-any.whl", hash = "sha256:bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d"},
-    {file = "jinja2-3.1.4.tar.gz", hash = "sha256:4a3aee7acbbe7303aede8e9648d13b8bf88a429282aa6122a993f0ac800cb369"},
+    {file = "jinja2-3.1.5-py3-none-any.whl", hash = "sha256:aba0f4dc9ed8013c424088f68a5c226f7d6097ed89b246d7749c2ec4175c6adb"},
+    {file = "jinja2-3.1.5.tar.gz", hash = "sha256:8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb"},
 ]
 
 [[package]]
@@ -1993,9 +1993,9 @@ dependencies = [
     "asgiref<4.0.0,>=3.4.1",
     "bip-utils<3.0.0,>=2.9.3",
     "crypto-cpp-py==1.4.4",
-    "eth-keyfile<0.9.0,>=0.8.1",
+    "eth-keyfile<1.0.0,>=0.8.1",
     "lark<2.0.0,>=1.1.5",
-    "ledgerwallet<0.6.0,>=0.5.0",
+    "ledgerwallet<1.0.0,>=0.5.0",
     "marshmallow-dataclass<8.8.0",
     "marshmallow-oneofschema==3.1.1",
     "marshmallow<4.0.0,>=3.15.0",
