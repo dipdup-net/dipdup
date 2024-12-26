@@ -8,12 +8,12 @@ from contextlib import suppress
 from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
-from functools import partial
+from functools import cached_property
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 
 import orjson
-import pysignalr.exceptions
 
 from dipdup.config import HttpConfig
 from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
@@ -28,7 +28,9 @@ from dipdup.models.substrate_node import SubstrateNodeHeadSubscription
 from dipdup.models.substrate_node import SubstrateNodeSubscription
 from dipdup.pysignalr import Message
 from dipdup.pysignalr import WebsocketMessage
-from dipdup.utils import Watchdog
+
+if TYPE_CHECKING:
+    from aiosubstrate.base import SubstrateInterface
 
 _logger = logging.getLogger(__name__)
 
@@ -97,19 +99,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
     )
 
     def __init__(self, config: SubstrateNodeDatasourceConfig) -> None:
-        from aiosubstrate.base import SubstrateInterface
-
-        # NOTE: Use our aiohttp session and limiters
-        SubstrateInterface.http_request = partial(self._jsonrpc_request, raw=True)  # type: ignore[method-assign]
-
         super().__init__(config)
         self._pending_subscription: SubstrateNodeSubscription | None = None
         self._subscription_ids: dict[str, SubstrateNodeSubscription] = {}
-        self._interface = SubstrateInterface(config.url)  # type: ignore[no-untyped-call]
 
         self._emitter_queue: Queue[SubscriptionMessage] = Queue()
-
-        self._watchdog: Watchdog = Watchdog(self._http_config.connection_timeout)
 
         self._on_head_callbacks: set[HeadCallback] = set()
         self._on_event_callbacks: set[EventCallback] = set()
@@ -119,7 +113,6 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
             await asyncio.gather(
                 self._ws_loop(),
                 self._emitter_loop(),
-                # self._watchdog.run(),
             )
         else:
             while True:
@@ -135,22 +128,11 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
         await self._interface.init_props()  # type: ignore[no-untyped-call]
         self._interface.reload_type_registry()
 
-    async def _ws_loop(self) -> None:
-        # TODO: probably add to inheritance WebsocketSubscriptionDatasource, and move this method there
-        self._logger.info('Establishing realtime connection')
-        client = self._get_ws_client()
-        retry_sleep = self._http_config.retry_sleep
+    @cached_property
+    def _interface(self) -> 'SubstrateInterface':
+        from dipdup.datasources._aiosubstrate import SubstrateInterfaceProxy
 
-        for _ in range(1, self._http_config.retry_count + 1):
-            try:
-                await client.run()
-            except pysignalr.exceptions.ConnectionError as e:
-                self._logger.error('Websocket connection error: %s', e)
-                await self.emit_disconnected()
-                await asyncio.sleep(retry_sleep)
-                retry_sleep *= self._http_config.retry_multiplier
-
-        raise DatasourceError('Websocket connection failed', self.name)
+        return SubstrateInterfaceProxy(self)
 
     @property
     def ws_available(self) -> bool:
@@ -224,11 +206,10 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
 
     async def get_block_header(self, hash: str) -> _BlockHeader:
         response = await self._jsonrpc_request('chain_getHeader', [hash])
-        # FIXME: missing fields
-        return {
+        return {  # type: ignore[typeddict-item]
+            **response,
             'hash': hash,
             'number': int(response['number'], 16),
-            'prev_root': response['parentHash'],
         }
 
     async def get_metadata_header(self, height: int) -> MetadataHeader:
@@ -342,7 +323,7 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
             self._logger.info('New head: %s', level)
             await self.emit_head(level_data.head)
 
-            # NOTE: subscribing to finalized head, no rollback required
+            # NOTE: Subscribing to finalized head, no rollback handling required
 
             if level_data.fetch_events:
                 block_hash = await self.get_block_hash(level)
