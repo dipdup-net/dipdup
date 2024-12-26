@@ -68,8 +68,6 @@ jobs:
 
       - name: Run all checks
         run: pdm run make all
-        env:
-          NODE_API_KEY: ${{ secrets.ALCHEMY_KEY }}
 
       - name: Publish stable image
         uses: docker/build-push-action@v5

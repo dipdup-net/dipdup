@@ -48,5 +48,3 @@ jobs:
 
       - name: Run tests
         run: pdm run make test
-        env:
-          NODE_API_KEY: ${{ secrets.ALCHEMY_KEY }}
