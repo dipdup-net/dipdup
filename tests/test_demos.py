@@ -148,6 +148,20 @@ async def assert_run_evm_transactions() -> None:
     assert holders == 22
 
 
+async def assert_run_starknet_events() -> None:
+    import demo_starknet_events.models
+
+    holders = await demo_starknet_events.models.Holder.filter().count()
+    assert holders == 15
+
+
+async def assert_run_substrate_events() -> None:
+    import demo_substrate_events.models
+
+    holders = await demo_substrate_events.models.Holder.filter().count()
+    assert holders == 11
+
+
 async def assert_run_dao() -> None:
     import demo_tezos_dao.models
 
@@ -160,18 +174,35 @@ async def assert_run_dao() -> None:
 
 test_args = ('config', 'package', 'cmd', 'assert_fn')
 test_params = (
-    ('demo_tezos_token.yml', 'demo_tezos_token', 'run', assert_run_token),
-    ('demo_tezos_token.yml', 'demo_tezos_token', 'init', None),
-    ('demo_tezos_nft_marketplace.yml', 'demo_tezos_nft_marketplace', 'run', assert_run_nft_marketplace),
-    ('demo_tezos_nft_marketplace.yml', 'demo_tezos_nft_marketplace', 'init', None),
+    # NOTE: Tezos
     ('demo_tezos_auction.yml', 'demo_tezos_auction', 'run', assert_run_auction),
     ('demo_tezos_auction.yml', 'demo_tezos_auction', 'init', None),
+    ('demo_tezos_dao.yml', 'demo_tezos_dao', 'run', assert_run_dao),
+    ('demo_tezos_dao.yml', 'demo_tezos_dao', 'init', None),
+    ('demo_tezos_dex.yml', 'demo_tezos_dex', 'run', assert_run_dex),
+    ('demo_tezos_dex.yml', 'demo_tezos_dex', 'init', None),
+    ('demo_tezos_domains.yml', 'demo_tezos_domains', 'run', assert_run_domains),
+    ('demo_tezos_domains.yml', 'demo_tezos_domains', 'init', None),
+    ('demo_tezos_etherlink.yml', 'demo_tezos_etherlink', 'run', None),
+    ('demo_tezos_etherlink.yml', 'demo_tezos_etherlink', 'init', None),
+    ('demo_tezos_events.yml', 'demo_tezos_events', 'run', assert_run_events),
+    ('demo_tezos_events.yml', 'demo_tezos_events', 'init', None),
+    ('demo_tezos_factories.yml', 'demo_tezos_factories', 'run', assert_run_factories),
+    ('demo_tezos_factories.yml', 'demo_tezos_factories', 'init', None),
+    ('demo_tezos_nft_marketplace.yml', 'demo_tezos_nft_marketplace', 'run', assert_run_nft_marketplace),
+    ('demo_tezos_nft_marketplace.yml', 'demo_tezos_nft_marketplace', 'init', None),
     (
         'demo_tezos_token_transfers.yml',
         'demo_tezos_token_transfers',
         'run',
         partial(assert_run_token_transfers, 4, '-0.01912431'),
     ),
+    ('demo_tezos_raw.yml', 'demo_tezos_raw', 'run', assert_run_raw),
+    ('demo_tezos_raw.yml', 'demo_tezos_raw', 'init', None),
+    ('demo_tezos_token.yml', 'demo_tezos_token', 'run', assert_run_token),
+    ('demo_tezos_token.yml', 'demo_tezos_token', 'init', None),
+    ('demo_tezos_token_balances.yml', 'demo_tezos_token_balances', 'run', assert_run_balances),
+    ('demo_tezos_token_balances.yml', 'demo_tezos_token_balances', 'init', None),
     # TODO: Too many token transfer runs
     ('demo_tezos_token_transfers.yml', 'demo_tezos_token_transfers', 'init', None),
     (
@@ -193,30 +224,21 @@ test_params = (
     #     'run',
     #     partial(assert_run_token_transfers, 2, '-0.02302128'),
     # ),
-    ('demo_tezos_token_balances.yml', 'demo_tezos_token_balances', 'run', assert_run_balances),
-    ('demo_tezos_token_balances.yml', 'demo_tezos_token_balances', 'init', None),
-    ('demo_tezos_domains.yml', 'demo_tezos_domains', 'run', assert_run_domains),
-    ('demo_tezos_domains.yml', 'demo_tezos_domains', 'init', None),
-    ('demo_tezos_dex.yml', 'demo_tezos_dex', 'run', assert_run_dex),
-    ('demo_tezos_dex.yml', 'demo_tezos_dex', 'init', None),
-    ('demo_tezos_dao.yml', 'demo_tezos_dao', 'run', assert_run_dao),
-    ('demo_tezos_dao.yml', 'demo_tezos_dao', 'init', None),
-    ('demo_tezos_factories.yml', 'demo_tezos_factories', 'run', assert_run_factories),
-    ('demo_tezos_factories.yml', 'demo_tezos_factories', 'init', None),
-    ('demo_tezos_events.yml', 'demo_tezos_events', 'run', assert_run_events),
-    ('demo_tezos_events.yml', 'demo_tezos_events', 'init', None),
-    ('demo_tezos_raw.yml', 'demo_tezos_raw', 'run', assert_run_raw),
-    ('demo_tezos_raw.yml', 'demo_tezos_raw', 'init', None),
+    # NOTE: EVM indexes
     ('demo_evm_events.yml:test_evm.yml', 'demo_evm_events', 'run', assert_run_evm_events),
     ('demo_evm_events.yml:test_evm.yml', 'demo_evm_events', 'init', None),
     ('demo_evm_transactions.yml:test_evm.yml', 'demo_evm_transactions', 'run', assert_run_evm_transactions),
     ('demo_evm_transactions.yml:test_evm.yml', 'demo_evm_transactions', 'init', None),
-    ('demo_tezos_etherlink.yml', 'demo_tezos_etherlink', 'run', None),
-    ('demo_tezos_etherlink.yml', 'demo_tezos_etherlink', 'init', None),
-    # NOTE: Indexes with `evm.node` as index datasource
+    # NOTE: EVM indexes with node only
     ('demo_evm_events_node.yml:test_evm.yml', 'demo_evm_events', 'run', assert_run_evm_events),
     ('demo_evm_transactions_node.yml:test_evm.yml', 'demo_evm_transactions', 'run', assert_run_evm_transactions),
-    # NOTE: Smoke tests for small tools.
+    # NOTE: Starknet indexes
+    ('demo_starknet_events.yml', 'demo_starknet_events', 'run', assert_run_starknet_events),
+    ('demo_starknet_events.yml', 'demo_starknet_events', 'init', None),
+    # NOTE: Substrate indexes
+    ('demo_substrate_events.yml', 'demo_substrate_events', 'run', assert_run_substrate_events),
+    ('demo_substrate_events.yml', 'demo_substrate_events', 'init', None),
+    # NOTE: Smoke tests for small tools
     ('demo_tezos_dex.yml', 'demo_tezos_dex', ('config', 'env', '--compose', '--internal'), None),
     ('demo_tezos_dex.yml', 'demo_tezos_dex', ('config', 'export', '--full'), None),
     ('demo_tezos_dex.yml', 'demo_tezos_dex', ('package', 'tree'), None),
@@ -238,8 +260,12 @@ async def test_run_init(
         config_paths.append(TEST_CONFIGS / path)
     config_paths.append(TEST_CONFIGS / 'test_sqlite.yaml')
 
-    if 'evm' in config and not {'NODE_API_KEY', 'ETHERSCAN_API_KEY'} <= set(os.environ):
-        pytest.skip('EVM tests require NODE_API_KEY and ETHERSCAN_API_KEY environment variables')
+    if 'evm' in config and not {'ALCHEMY_API_KEY', 'ETHERSCAN_API_KEY'} <= set(os.environ):
+        pytest.skip('EVM tests require ALCHEMY_API_KEY and ETHERSCAN_API_KEY environment variables')
+    if 'starknet' in config and not {'ALCHEMY_API_KEY'} <= set(os.environ):
+        pytest.skip('Starknet tests require ALCHEMY_API_KEY environment variable')
+    if 'substrate' in config and not {'ONFINALITY_API_KEY'} <= set(os.environ):
+        pytest.skip('Substrate tests require ONFINALITY_API_KEY environment variable')
 
     async with AsyncExitStack() as stack:
         tmp_package_path, env = await stack.enter_async_context(

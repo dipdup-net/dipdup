@@ -4,10 +4,10 @@ package: demo_starknet_events
 datasources:
   subsquid:
     kind: starknet.subsquid
-    url: https://v2.archive.subsquid.io/network/starknet-mainnet
+    url: ${SUBSQUID_URL:-https://v2.archive.subsquid.io/network/starknet-mainnet}
   node:
     kind: starknet.node
-    url: https://starknet-mainnet.g.alchemy.com/v2
+    url: ${NODE_URL:-https://starknet-mainnet.g.alchemy.com/v2}/${ALCHEMY_API_KEY:-''}
 
 contracts:
   stark_usdt:
@@ -25,3 +25,5 @@ indexes:
       - callback: on_transfer
         contract: stark_usdt
         name: Transfer
+    first_level: 1005479
+    last_level: 1005489

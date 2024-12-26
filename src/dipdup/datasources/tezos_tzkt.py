@@ -1186,7 +1186,7 @@ class TezosTzktDatasource(WebsocketDatasource[TezosTzktDatasourceConfig]):
                 offset += self.request_limit
 
     def _get_ws_client(self) -> WebsocketTransport:
-        return self._get_signalr_client()._transport  # type: ignore[return-value]
+        return self._get_signalr_client()  # type: ignore[return-value]
 
     def _get_signalr_client(self) -> SignalRClient:
         """Create SignalR client, register message callbacks"""
