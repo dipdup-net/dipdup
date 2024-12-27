@@ -70,6 +70,7 @@ jobs:
         run: pdm run make all
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
           ONFINALITY_API_KEY: ${{ secrets.ONFINALITY_API_KEY }}
 
       - name: Publish stable image
