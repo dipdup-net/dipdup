@@ -48,3 +48,6 @@ jobs:
 
       - name: Run tests
         run: pdm run make test
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ONFINALITY_API_KEY: ${{ secrets.ONFINALITY_API_KEY }}

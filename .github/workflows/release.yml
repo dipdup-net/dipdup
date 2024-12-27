@@ -68,6 +68,9 @@ jobs:
 
       - name: Run all checks
         run: pdm run make all
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ONFINALITY_API_KEY: ${{ secrets.ONFINALITY_API_KEY }}
 
       - name: Publish stable image
         uses: docker/build-push-action@v5
