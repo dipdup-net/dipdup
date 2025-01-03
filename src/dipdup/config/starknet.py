@@ -42,14 +42,11 @@ def _validate_starknet_address(v: str) -> str:
     # 
     # Convert hex to decimal and check if it's less than 2**251
     numeric_value = int(v, 16)
-    if not (numeric_value < 2**251):
-        raise ValueError(f'{v} exceeds Starkent address range [0...2**251]')
-
-    value = hex(numeric_value)
-    if not _TRUNCATED_STARKNET_ADDRESS_REGEXP.fullmatch(value):
+    truncated_value = hex(numeric_value)
+    if not _TRUNCATED_STARKNET_ADDRESS_REGEXP.fullmatch(truncated_value):
         raise ValueError(f'{v} is not a valid Starknet contract address')
 
-    return value
+    return truncated_value
 
 
 type StarknetAddress = Annotated[Hex, AfterValidator(_validate_starknet_address)]
