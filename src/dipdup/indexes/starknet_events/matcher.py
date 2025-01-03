@@ -1,7 +1,7 @@
 import logging
 from collections import deque
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, Union
 
 from starknet_py.serialization._context import DeserializationContext  # type: ignore
 from starknet_py.serialization.data_serializers._common import deserialize_to_dict  # type: ignore
@@ -14,10 +14,27 @@ from dipdup.utils import parse_object
 from dipdup.utils import pascal_to_snake
 from dipdup.utils import snake_to_pascal
 
+
 _logger = logging.getLogger(__name__)
 
 MatchedEventsT = tuple[StarknetEventsHandlerConfig, StarknetEvent[Any]]
 
+
+def truncate_address_padding(address: Union[str, None]) -> Union[str, None]:
+    if address is None:
+        return None
+    
+    if isinstance(value, str):
+        try:
+            value = int(value, 16)
+        except ValueError:
+            _logger.debug(
+                'Can not truncate incorrect address %s', 
+                value
+            )
+            return None
+
+    return hex(value)
 
 def match_events(
     package: DipDupPackage,
@@ -43,8 +60,12 @@ def match_events(
             continue
 
         for handler_config, identifier, address in matching_data:
-            if address and address != event.from_address:
-                continue
+            if address:              
+                truncated_address = truncate_address_padding(address)
+                truncated_event_from = truncate_address_padding(event.from_address)
+                if truncated_address != truncated_event_from:
+                    continue
+            
             if identifier != event.keys[0]:
                 continue
 
