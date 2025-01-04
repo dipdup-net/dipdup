@@ -147,37 +147,6 @@ exclude_lines = [
     "if env.DEBUG:",
 ]
 
-
-[tool.pdm.resolution]
-# NOTE: Introduced by starknetpy 0.24; depends on half of the PyPI
-excludes = ["bip-utils", "ledgerwallet"]
-
-[tool.pdm.dev-dependencies]
-lint = [
-    "black",
-    "mypy",
-    "ruff",
-    "types-pytz",
-    "types-tabulate",
-]
-test = [
-    "docker",
-    "pytest",
-    "pytest-aiohttp",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-xdist",
-]
-docs = [
-    "Sphinx",
-    "sphinx-click",
-    "sphinx-markdown-builder",
-    "watchdog",
-]
-perf = [
-    "scalene",
-]
-
 [tool.pdm.build]
 includes = ["src/dipdup"]
 

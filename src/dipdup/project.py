@@ -97,7 +97,7 @@ def get_default_answers() -> Answers:
         postgres_data_path='/var/lib/postgresql/data',
         hasura_image='hasura/graphql-engine:latest',
         line_length='120',
-        package_manager='pdm',
+        package_manager='uv',
         _survey_config=None,
     )
 
@@ -274,11 +274,13 @@ def answers_from_terminal(template: str | None) -> Answers:
     _, answers['package_manager'] = prompt_anyof(
         question='Choose package manager',
         options=(
+            'uv'
             'pdm',
             'poetry',
             'none',
         ),
         comments=(
+            'uv (recommended)'
             'PDM',
             'Poetry',
             '[none]',

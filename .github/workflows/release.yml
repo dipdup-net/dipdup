@@ -60,14 +60,14 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install PDM
-        run: pipx install pdm
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Run install
-        run: pdm install
+        run: make install
 
       - name: Run all checks
-        run: pdm run make all
+        run: uv run make all
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
