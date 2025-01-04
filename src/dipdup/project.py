@@ -274,14 +274,12 @@ def answers_from_terminal(template: str | None) -> Answers:
     _, answers['package_manager'] = prompt_anyof(
         question='Choose package manager',
         options=(
-            'uv'
-            'pdm',
+            'uv' 'pdm',
             'poetry',
             'none',
         ),
         comments=(
-            'uv (recommended)'
-            'PDM',
+            'uv (recommended)' 'PDM',
             'Poetry',
             '[none]',
         ),

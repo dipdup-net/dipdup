@@ -6,7 +6,7 @@ from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.datasources import IndexDatasource
 
 if TYPE_CHECKING:
-    from starknet_py.net.client_models import EventsChunk  # type: ignore[import-untyped]
+    from starknet_py.net.client_models import EventsChunk
 
     from dipdup.datasources._starknetpy import StarknetpyClient
 
@@ -52,7 +52,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             raise NotImplementedError('Realtime mode is not supported yet; remove `ws_url` from datasource config')
 
     async def get_head_level(self) -> int:
-        return await self.starknetpy.get_block_number()  # type: ignore[no-any-return]
+        return await self.starknetpy.get_block_number()
 
     async def get_events(
         self,
@@ -64,7 +64,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     ) -> 'EventsChunk':
         return await self.starknetpy.get_events(
             address=address,
-            keys=keys,
+            keys=keys,  # type: ignore[arg-type]
             from_block_number=first_level,
             to_block_number=last_level,
             chunk_size=self._http_config.batch_size,

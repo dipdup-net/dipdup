@@ -61,7 +61,7 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
         )
 
         for event in events_chunk.events:
-            self._buffer[event.block_number].append(
+            self._buffer[event.block_number].append(  # type: ignore[index]
                 StarknetEventData.from_starknetpy(
                     event=event,
                     # FIXME: No block header without a separate request
@@ -73,7 +73,7 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
         if events_chunk.continuation_token:
             self._offset = events_chunk.continuation_token
             if events_chunk.events:
-                self._head = events_chunk.events[-1].block_number
+                self._head = events_chunk.events[-1].block_number  # type: ignore[assignment]
         else:
             self._head = self._last_level
             self._offset = None

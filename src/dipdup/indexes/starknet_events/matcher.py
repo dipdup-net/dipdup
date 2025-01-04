@@ -3,8 +3,8 @@ from collections import deque
 from collections.abc import Iterable
 from typing import Any
 
-from starknet_py.serialization._context import DeserializationContext  # type: ignore
-from starknet_py.serialization.data_serializers._common import deserialize_to_dict  # type: ignore
+from starknet_py.serialization._context import DeserializationContext
+from starknet_py.serialization.data_serializers._common import deserialize_to_dict
 
 from dipdup.config.starknet_events import StarknetEventsHandlerConfig
 from dipdup.models.starknet import StarknetEvent
