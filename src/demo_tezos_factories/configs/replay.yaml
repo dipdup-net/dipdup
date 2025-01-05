@@ -15,4 +15,4 @@ replay:
   postgres_data_path: /var/lib/postgresql/data
   hasura_image: hasura/graphql-engine:latest
   line_length: 120
-  package_manager: pdm
+  package_manager: uv

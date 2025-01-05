@@ -57,14 +57,14 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     async def get_events(
         self,
         address: str | None,
-        keys: list[list[str]] | None,
+        keys: list[list[str | int]] | None,
         first_level: int,
         last_level: int,
         continuation_token: str | None = None,
     ) -> 'EventsChunk':
         return await self.starknetpy.get_events(
             address=address,
-            keys=keys,  # type: ignore[arg-type]
+            keys=keys,
             from_block_number=first_level,
             to_block_number=last_level,
             chunk_size=self._http_config.batch_size,
