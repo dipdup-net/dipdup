@@ -216,8 +216,8 @@ def parse_object(
 
                 # NOTE: Might be `from_` or other reserved keyword
                 field_k = '{k}_ ' if k not in type_.model_fields else k
-                nested_type = type_.model_fields[field_k].annotation  # type: ignore[arg-type]
-                model_dict[k] = parse_object(nested_type, v, plain=True)
+                nested_type = type_.model_fields[field_k].annotation
+                model_dict[k] = parse_object(nested_type, v, plain=True)  # type: ignore[arg-type]
 
         return type_(**model_dict)
     except ValidationError as e:
