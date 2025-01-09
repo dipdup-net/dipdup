@@ -14,6 +14,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - evm: Fixed parsing tuple types in ABI.
 - evm.subsquid: Fixed type of `timestamp` field of event/transaction models.
 - evm.subsquid: Fixed empty field base conversion on event deserialization.
+- starknet: Fixed parsing contract addresses starting with `0x0`.
 
 ## [8.1.3] - 2024-12-20
 
