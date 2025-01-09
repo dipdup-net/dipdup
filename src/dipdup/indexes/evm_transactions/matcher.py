@@ -49,7 +49,7 @@ def prepare_transaction_handler_args(
         name=handler_config.method,
         signature=handler_config.signature,
     )['inputs']
-    from web3._utils.abi import collapse_if_tuple
+    from eth_utils.abi import collapse_if_tuple
 
     data = decode_abi(
         types=tuple(collapse_if_tuple(input) for input in inputs),

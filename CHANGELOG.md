@@ -10,8 +10,9 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
-- subsquid: Fixed float type for `timestamp` field on event / transaction deserialization.
-- subsquid: Fixed empty field base conversion on event deserialization.
+- evm: Fixed parsing tuple types in ABI.
+- evm.subsquid: Fixed type of `timestamp` field of event/transaction models.
+- evm.subsquid: Fixed empty field base conversion on event deserialization.
 
 ## [8.1.3] - 2024-12-20
 

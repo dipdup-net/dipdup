@@ -129,7 +129,7 @@ def _convert_abi(abi_path: Path) -> EvmAbi:
                 EvmEventAbi(
                     name=abi_item['name'],
                     topic0=topic0_from_abi(abi_item),
-                    inputs=inputs,
+                    inputs=tuple(inputs),
                     topic_count=len([i for i in inputs if i[1]]),
                 )
             )
@@ -195,7 +195,7 @@ def topic0_from_abi(event: dict[str, Any]) -> str:
         raise FrameworkException(f'`{event["name"]}` is not an event')
 
     types = []
-    from web3._utils.abi import collapse_if_tuple
+    from eth_utils.abi import collapse_if_tuple
 
     for input in event['inputs']:
         types.append(collapse_if_tuple(input))

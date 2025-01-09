@@ -211,9 +211,13 @@ def parse_object(
 
         if nested:
             for k, v in model_dict.items():
-                if isinstance(v, Sequence):
-                    nested_type = type_.model_fields[k].annotation
-                    model_dict[k] = parse_object(nested_type, v, plain=True)
+                if not isinstance(v, list | tuple):
+                    continue
+
+                # NOTE: Might be `from_` or other reserved keyword
+                field_k = '{k}_ ' if k not in type_.model_fields else k
+                nested_type = type_.model_fields[field_k].annotation  # type: ignore[arg-type]
+                model_dict[k] = parse_object(nested_type, v, plain=True)
 
         return type_(**model_dict)
     except ValidationError as e:
