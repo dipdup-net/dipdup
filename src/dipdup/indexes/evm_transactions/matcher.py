@@ -49,8 +49,10 @@ def prepare_transaction_handler_args(
         name=handler_config.method,
         signature=handler_config.signature,
     )['inputs']
+    from web3._utils.abi import collapse_if_tuple
+
     data = decode_abi(
-        types=tuple(input['type'] for input in inputs),
+        types=tuple(collapse_if_tuple(input) for input in inputs),
         data=decode_hex(matched_transaction.input[10:]),
         strict=False,
     )

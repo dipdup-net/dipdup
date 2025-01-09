@@ -29,8 +29,6 @@ _abi_type_map: dict[str, str] = {
     'bytes': 'string',
     'bool': 'boolean',
     'string': 'string',
-    # TODO: arrays and tuples
-    # https://docs.soliditylang.org/en/develop/abi-spec.html#types
     'tuple': 'object',
 }
 
@@ -52,12 +50,25 @@ def _convert_name(name: str) -> str:
 
 
 def jsonschema_from_abi(abi: dict[str, Any]) -> dict[str, Any]:
+    properties, required = {}, []
+    for item in abi['inputs']:
+        name = _convert_name(item['name'])
+        if item['type'] == 'tuple':
+            properties[name] = {
+                'type': 'object',
+                'properties': {
+                    _convert_name(i['name']): {'type': _convert_type(i['type'])} for i in item['components']
+                },
+            }
+        else:
+            properties[name] = {'type': _convert_type(item['type'])}
+        required.append(name)
+
     return {
         '$schema': 'http://json-schema.org/draft/2019-09/schema#',
         'type': 'object',
-        'properties': {_convert_name(i['name']): {'type': _convert_type(i['type'])} for i in abi['inputs']},
-        'required': [_convert_name(i['name']) for i in abi['inputs']],
-        'additionalProperties': False,
+        'properties': properties,
+        'required': required,
     }
 
 
@@ -108,7 +119,12 @@ def _convert_abi(abi_path: Path) -> EvmAbi:
                 )
             )
         elif abi_item['type'] == 'event':
-            inputs = tuple((i['type'], i['indexed']) for i in abi_item['inputs'])
+            inputs = []
+            for item in abi_item['inputs']:
+                if (type_ := item['type']) == 'tuple':
+                    type_ = '(' + ','.join(c['type'] for c in item['components']) + ')'
+                inputs.append((type_, item['indexed']))
+
             events.append(
                 EvmEventAbi(
                     name=abi_item['name'],
@@ -178,7 +194,13 @@ def topic0_from_abi(event: dict[str, Any]) -> str:
     if event.get('type') != 'event':
         raise FrameworkException(f'`{event["name"]}` is not an event')
 
-    signature = f'{event["name"]}({",".join([i["type"] for i in event["inputs"]])})'
+    types = []
+    from web3._utils.abi import collapse_if_tuple
+
+    for input in event['inputs']:
+        types.append(collapse_if_tuple(input))
+
+    signature = f'{event["name"]}({",".join(types)})'
     return '0x' + eth_utils.crypto.keccak(text=signature).hex()
 
 

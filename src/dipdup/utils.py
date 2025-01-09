@@ -200,13 +200,22 @@ def parse_object(
     type_: type[ObjectT],
     data: Mapping[str, Any] | Sequence[Any] | None,
     plain: bool = False,
+    nested: bool = False,
 ) -> ObjectT:
     try:
         if plain is False or data is None:
             return type_.model_validate(data)
 
         model_keys = tuple(field.alias or key for key, field in type_.model_fields.items())
-        return type_(**dict(zip(model_keys, data, strict=True)))
+        model_dict = dict(zip(model_keys, data, strict=True))
+
+        if nested:
+            for k, v in model_dict.items():
+                if isinstance(v, Sequence):
+                    nested_type = type_.model_fields[k].annotation
+                    model_dict[k] = parse_object(nested_type, v, plain=True)
+
+        return type_(**model_dict)
     except ValidationError as e:
         raise InvalidDataError(f'Failed to parse: {e.errors()}', type_, data) from e
     except ValueError as e:
