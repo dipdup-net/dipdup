@@ -10,6 +10,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
+- evm: Fixed sending JSONRPC requests via web3.py provider.
 - evm: Fixed parsing tuple types in ABI.
 - evm.subsquid: Fixed type of `timestamp` field of event/transaction models.
 - evm.subsquid: Fixed empty field base conversion on event deserialization.
