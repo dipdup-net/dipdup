@@ -40,7 +40,13 @@ def decode_event_data(
 
     non_indexed_bytes = decode_hex(data)
     if non_indexed_bytes:
-        non_indexed_values = iter(decode_abi(tuple(n for n, i in inputs if not i), non_indexed_bytes))
+        non_indexed_values = iter(
+            decode_abi(
+                types=tuple(n for n, i in inputs if not i),
+                data=non_indexed_bytes,
+                strict=False,
+            )
+        )
     else:
         # NOTE: Node truncates trailing zeros in event data
         non_indexed_values = cycle((0,))
@@ -81,6 +87,7 @@ def prepare_event_handler_args(
         type_=type_,
         data=data,
         plain=True,
+        nested=True,
     )
     return EvmEvent(
         data=matched_event,
