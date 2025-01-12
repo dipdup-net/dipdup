@@ -38,6 +38,7 @@ TEMPLATES: dict[str, tuple[str, ...]] = {
         'demo_evm_uniswap',
     ),
     'starknet': ('demo_starknet_events',),
+    'substrate': ('demo_substrate_events',),
     'tezos': (
         'demo_tezos_auction',
         'demo_tezos_dao',
@@ -148,11 +149,13 @@ def template_from_terminal() -> tuple[str | None, DipDupSurveyConfig | None]:
         options=(
             'EVM',
             'Starknet',
+            'Substrate',
             'Tezos',
         ),
         comments=(
             'EVM-compatible blockchains',
             'Starknet',
+            'Substrate',
             'Tezos',
         ),
         default=0,
@@ -315,7 +318,7 @@ def render_project(
     _render(
         answers,
         template_path=Path(__file__).parent / 'templates' / 'replay.yaml.j2',
-        output_path=Path(answers['package']) / 'configs' / 'replay.yaml',
+        output_path=get_package_path(answers['package']) / 'configs' / 'replay.yaml',
         force=force,
     )
 
@@ -338,7 +341,7 @@ def render_base(
     _render(
         answers=answers,
         template_path=Path(__file__).parent / 'templates' / 'replay.yaml.j2',
-        output_path=Path('configs') / 'replay.yaml',
+        output_path=get_package_path(answers['package']) / Path('configs') / 'replay.yaml',
         force=force,
     )
 
@@ -353,9 +356,10 @@ def _render_templates(
     from jinja2 import Template
 
     project_path = Path(__file__).parent / 'projects' / path
-    project_paths = project_path.glob('**/*.j2')
+    project_templates = set(project_path.glob('**/*.j2'))
+    project_files = set(project_path.glob('**/*')) - project_templates
 
-    for path in project_paths:
+    for path in project_templates:
         template_path = path.relative_to(Path(__file__).parent)
         relative_path = str(Path(*template_path.parts[2:]))[:-3]
 
@@ -369,7 +373,18 @@ def _render_templates(
             # NOTE: Remove ".j2" from extension
         ).with_suffix(path.suffix[:-3])
         output_path = Path(Template(str(output_path)).render(project=answers))
+
         _render(answers, template_path, output_path, force)
+
+    # NOTE: If there are files without .j2 extension, just copy them
+    for path in project_files:
+        if path.is_dir() or path.name == 'replay.yaml':
+            continue
+        output_path = Path(
+            get_package_path(answers['package']),
+            *path.relative_to(project_path).parts,
+        )
+        write(output_path, path.read_bytes(), overwrite=force)
 
 
 def _render(answers: Answers, template_path: Path, output_path: Path, force: bool) -> None:

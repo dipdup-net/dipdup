@@ -3,16 +3,16 @@
 .. autoclass:: dipdup.config.DipDupConfig
 
 .. autoclass:: dipdup.config.abi_etherscan.AbiEtherscanDatasourceConfig
+.. autoclass:: dipdup.config.ContractConfig
 .. autoclass:: dipdup.config.AdvancedConfig
 .. autoclass:: dipdup.config.ApiConfig
 .. autoclass:: dipdup.config.coinbase.CoinbaseDatasourceConfig
-.. autoclass:: dipdup.config.ContractConfig
 .. autoclass:: dipdup.config.evm.EvmContractConfig
 .. autoclass:: dipdup.config.evm_node.EvmNodeDatasourceConfig
+.. autoclass:: dipdup.config.evm_etherscan.EvmEtherscanDatasourceConfig
 .. autoclass:: dipdup.config.evm_events.EvmEventsHandlerConfig
 .. autoclass:: dipdup.config.evm_events.EvmEventsIndexConfig
 .. autoclass:: dipdup.config.evm_subsquid.EvmSubsquidDatasourceConfig
-.. autoclass:: dipdup.config.evm.EvmIndexConfig
 .. autoclass:: dipdup.config.evm_transactions.EvmTransactionsHandlerConfig
 .. autoclass:: dipdup.config.evm_transactions.EvmTransactionsIndexConfig
 .. autoclass:: dipdup.config.HandlerConfig
@@ -28,6 +28,7 @@
 .. autoclass:: dipdup.config.PostgresDatabaseConfig
 .. autoclass:: dipdup.config.PrometheusConfig
 .. autoclass:: dipdup.config.ResolvedHttpConfig
+.. autoclass:: dipdup.config.RuntimeConfig
 .. autoclass:: dipdup.config.SentryConfig
 .. autoclass:: dipdup.config.SqliteDatabaseConfig
 .. autoclass:: dipdup.config.SystemHookConfig
@@ -55,9 +56,13 @@
 .. autoclass:: dipdup.config.tezos_token_transfers.TezosTokenTransfersHandlerConfig
 .. autoclass:: dipdup.config.tezos_token_transfers.TezosTokenTransfersIndexConfig
 .. autoclass:: dipdup.config.starknet.StarknetContractConfig 
-.. autoclass:: dipdup.config.starknet.StarknetIndexConfig
 .. autoclass:: dipdup.config.starknet_events.StarknetEventsHandlerConfig
 .. autoclass:: dipdup.config.starknet_events.StarknetEventsIndexConfig
 .. autoclass:: dipdup.config.starknet_node.StarknetNodeDatasourceConfig
 .. autoclass:: dipdup.config.starknet_subsquid.StarknetSubsquidDatasourceConfig
+.. autoclass:: dipdup.config.substrate.SubstrateRuntimeConfig
+.. autoclass:: dipdup.config.substrate_events.SubstrateEventsHandlerConfig
+.. autoclass:: dipdup.config.substrate_events.SubstrateEventsIndexConfig
+.. autoclass:: dipdup.config.substrate_subsquid.SubstrateSubsquidDatasourceConfig
+.. autoclass:: dipdup.config.substrate_subscan.SubstrateSubscanDatasourceConfig
 .. autoclass:: dipdup.config.tzip_metadata.TzipMetadataDatasourceConfig

@@ -11,6 +11,7 @@ class SubsquidMessageType(MessageType, Enum):
     evm_traces = 'evm_traces'
     evm_transactions = 'evm_transactions'
     starknet_events = 'starknet_events'
+    substrate_events = 'substrate_events'
 
 
 FieldSelection = dict[str, dict[str, bool]]

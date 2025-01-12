@@ -4,6 +4,7 @@ import platform
 import sys
 import tomllib
 from contextlib import suppress
+from functools import cache
 from os import getenv
 from pathlib import Path
 
@@ -31,6 +32,7 @@ def get_pyproject_name() -> str | None:
     raise FrameworkException('`pyproject.toml` found, but has neither `project` nor `tool.poetry` section')
 
 
+@cache
 def get_package_path(package: str) -> Path:
     """Absolute path to the indexer package, existing or default"""
 

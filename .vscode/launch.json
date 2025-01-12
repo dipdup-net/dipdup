@@ -38,6 +38,42 @@
       }
     },
     {
+      "name": "demo_substrate_events: run",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "dipdup",
+      "args": [
+        "-e",
+        ".env",
+        "run"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src/demo_substrate_events",
+      "justMyCode": false,
+      "env": {
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
+      }
+    },
+    {
+      "name": "demo_substrate_events: init",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "dipdup",
+      "args": [
+        "-e",
+        ".env",
+        "init"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src/demo_substrate_events",
+      "justMyCode": false,
+      "env": {
+        "DIPDUP_DEBUG": "1",
+        "DIPDUP_NO_SYMLINK": "1"
+      }
+    },
+    {
       "name": "demo_evm_events: run",
       "type": "debugpy",
       "request": "launch",

@@ -28,7 +28,6 @@ from tortoise.queryset import UpdateQuery as TortoiseUpdateQuery
 from dipdup import env
 from dipdup import fields
 from dipdup.exceptions import FrameworkException
-from dipdup.utils import json_dumps_plain
 
 if TYPE_CHECKING:
     from collections import deque
@@ -59,6 +58,7 @@ class IndexType(Enum):
     tezos_token_transfers = 'tezos.token_transfers'
     tezos_token_balances = 'tezos.token_balances'
     starknet_events = 'starknet.events'
+    substrate_events = 'substrate.events'
 
 
 class MessageType:
@@ -161,7 +161,7 @@ class ModelUpdate(TortoiseModel):
     index = fields.TextField()
 
     action = fields.EnumField(ModelUpdateAction)
-    data: dict[str, Any] = fields.JSONField(encoder=json_dumps_plain, null=True)
+    data: dict[str, Any] = fields.JSONField(null=True)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
@@ -641,7 +641,7 @@ class Index(TortoiseModel):
 
     config_hash = fields.TextField(null=True)
     template = fields.TextField(null=True)
-    template_values: dict[str, Any] = fields.JSONField(encoder=json_dumps_plain, null=True)
+    template_values: dict[str, Any] = fields.JSONField(null=True)
 
     level = fields.IntField(default=0)
 
@@ -676,7 +676,7 @@ class Contract(TortoiseModel):
 
 class Meta(TortoiseModel):
     key = fields.TextField(primary_key=True)
-    value = fields.JSONField(encoder=json_dumps_plain, null=True)
+    value = fields.JSONField(null=True)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
@@ -691,7 +691,7 @@ class Meta(TortoiseModel):
 class ContractMetadata(Model):
     network = fields.TextField()
     contract = fields.TextField()
-    metadata = fields.JSONField(encoder=json_dumps_plain, null=True)
+    metadata = fields.JSONField(null=True)
     update_id = fields.IntField()
 
     created_at = fields.DatetimeField(auto_now_add=True)
@@ -706,7 +706,7 @@ class TokenMetadata(Model):
     network = fields.TextField()
     contract = fields.TextField()
     token_id = fields.TextField()
-    metadata = fields.JSONField(encoder=json_dumps_plain, null=True)
+    metadata = fields.JSONField(null=True)
     update_id = fields.IntField()
 
     created_at = fields.DatetimeField(auto_now_add=True)

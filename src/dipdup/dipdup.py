@@ -45,6 +45,7 @@ from dipdup.datasources import Datasource
 from dipdup.datasources import IndexDatasource
 from dipdup.datasources import create_datasource
 from dipdup.datasources.evm_node import EvmNodeDatasource
+from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.tezos_tzkt import TezosTzktDatasource
 from dipdup.datasources.tezos_tzkt import late_tzkt_initialization
 from dipdup.exceptions import ConfigInitializationException
@@ -52,6 +53,7 @@ from dipdup.exceptions import FrameworkException
 from dipdup.hasura import HasuraGateway
 from dipdup.indexes.evm_events.index import EvmEventsIndex
 from dipdup.indexes.evm_transactions.index import EvmTransactionsIndex
+from dipdup.indexes.substrate_events.index import SubstrateEventsIndex
 from dipdup.indexes.tezos_big_maps.index import TezosBigMapsIndex
 from dipdup.indexes.tezos_events.index import TezosEventsIndex
 from dipdup.indexes.tezos_head.index import TezosHeadIndex
@@ -72,6 +74,8 @@ from dipdup.models.evm import EvmEventData
 from dipdup.models.evm import EvmTransactionData
 from dipdup.models.evm_node import EvmNodeHeadData
 from dipdup.models.evm_node import EvmNodeSyncingData
+from dipdup.models.substrate import SubstrateEventData
+from dipdup.models.substrate import SubstrateHeadBlockData
 from dipdup.models.tezos import TezosBigMapData
 from dipdup.models.tezos import TezosEventData
 from dipdup.models.tezos import TezosHeadBlockData
@@ -226,11 +230,11 @@ class IndexDispatcher:
         active, synced, realtime = 0, 0, 0
         levels_indexed, levels_total, levels_interval = 0, 0, 0
         for index in self._indexes.values():
-            # FIXME: We don't remove disabled indexes from dispatcher anymore
-            active += 1
-            if index.synchronized:
+            if index.is_active:
+                active += 1
+            if index.is_synchronized:
                 synced += 1
-            if index.realtime:
+            if index.is_realtime:
                 realtime += 1
 
             try:
@@ -315,9 +319,9 @@ class IndexDispatcher:
         if not progress:
             if self._indexes:
                 if scanned_levels:
-                    msg = f'indexing: {scanned_levels:6} levels, estimating...'
-                elif objects_indexed := int(metrics.objects_indexed):
-                    msg = f'indexing: {objects_indexed:6} objects, estimating...'
+                    msg = f'indexing: {scanned_levels} levels, estimating...'
+                elif metrics.objects_indexed:
+                    msg = f'indexing: {metrics.objects_indexed} objects, estimating...'
                 else:
                     msg = 'indexing: warming up...'
             else:
@@ -325,13 +329,17 @@ class IndexDispatcher:
             _logger.info(msg)
             return
 
-        levels_speed, objects_speed = int(metrics.levels_nonempty_speed), int(metrics.objects_speed)
+        levels_speed, objects_speed = float(metrics.levels_nonempty_speed), float(metrics.objects_speed)
         msg = 'last mile' if metrics.synchronized_at else 'indexing'
         msg += f': {progress:5.1f}% done, {left} levels left'
 
         # NOTE: Resulting message is about 80 chars with the current logging format
         msg += ' ' * (48 - len(msg))
-        msg += f' {levels_speed:5} L {objects_speed:5} O'
+
+        def fmt(speed: float) -> str:
+            return '    0' if speed < 0.1 else f'{speed:5.{0 if speed >= 1 else 1}f}'
+
+        msg += f' {fmt(levels_speed)} L {fmt(objects_speed)} O'
         _logger.info(msg)
 
     async def _apply_filters(self, index: TezosOperationsIndex) -> None:
@@ -450,6 +458,9 @@ class IndexDispatcher:
                 datasource.call_on_events(self._on_evm_node_events)
                 datasource.call_on_transactions(self._on_evm_node_transactions)
                 datasource.call_on_syncing(self._on_evm_node_syncing)
+            elif isinstance(datasource, SubstrateNodeDatasource):
+                datasource.call_on_head(self._on_substrate_head)
+                datasource.call_on_events(self._on_substrate_events)
 
     async def _on_tzkt_head(self, datasource: TezosTzktDatasource, head: TezosHeadBlockData) -> None:
         # NOTE: Do not await query results, it may block Websocket loop. We do not use Head anyway.
@@ -546,6 +557,23 @@ class IndexDispatcher:
             if isinstance(index, TezosEventsIndex) and datasource in index.datasources:
                 index.push_realtime_message(events)
 
+    async def _on_substrate_head(
+        self,
+        datasource: SubstrateNodeDatasource,
+        head: SubstrateHeadBlockData,
+    ) -> None:
+        # TODO: update Head. Does fire_and_forget work atm?
+        metrics._datasource_head_updated[datasource.name] = time.time()
+
+    async def _on_substrate_events(
+        self,
+        datasource: SubstrateNodeDatasource,
+        events: tuple[SubstrateEventData, ...],
+    ) -> None:
+        for index in self._indexes.values():
+            if isinstance(index, SubstrateEventsIndex) and datasource in index.datasources:
+                index.push_realtime_message(events)
+
     async def _on_rollback(
         self,
         datasource: IndexDatasource[Any],
@@ -635,6 +663,7 @@ class DipDup:
         """Create new or update existing dipdup project"""
         from dipdup.codegen.evm import EvmCodeGenerator
         from dipdup.codegen.starknet import StarknetCodeGenerator
+        from dipdup.codegen.substrate import SubstrateCodeGenerator
         from dipdup.codegen.tezos import TezosCodeGenerator
 
         await self._create_datasources()
@@ -648,9 +677,10 @@ class DipDup:
 
             codegen_classes: tuple[type[CodeGenerator], ...] = (  # type: ignore[assignment]
                 CommonCodeGenerator,
-                TezosCodeGenerator,
                 EvmCodeGenerator,
                 StarknetCodeGenerator,
+                SubstrateCodeGenerator,
+                TezosCodeGenerator,
             )
             for codegen_cls in codegen_classes:
                 codegen = codegen_cls(

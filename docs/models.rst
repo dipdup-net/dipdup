@@ -50,6 +50,14 @@ Starknet
 .. autoclass:: dipdup.models.starknet.StarknetTransactionData
 
 -------------------------------------------------------------------------------
+Substrate
+-------------------------------------------------------------------------------
+
+.. autoclass:: dipdup.models.substrate.SubstrateEvent
+.. autoclass:: dipdup.models.substrate.SubstrateEventData
+.. autoclass:: dipdup.models.substrate.SubstrateHeadBlockData
+
+-------------------------------------------------------------------------------
 Tezos
 -------------------------------------------------------------------------------
 

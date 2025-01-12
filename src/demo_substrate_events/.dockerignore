@@ -1,0 +1,22 @@
+# Ignore all
+*
+
+# Add metadata and build files
+!demo_substrate_events
+!pyproject.toml
+!*.lock
+!README.md
+
+# Add Python code
+!**/*.py
+**/.*_cache
+**/__pycache__
+
+# Add configs and scripts (but not env!)
+!**/*.graphql
+!**/*.json
+!**/*.sql
+!**/*.yaml
+!**/*.yml
+!**/*.j2
+!**/.keep

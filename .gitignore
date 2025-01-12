@@ -12,6 +12,7 @@
 !**/pdm.lock
 !**/README.md
 !**/.keep
+!**/py.typed
 
 # Add Python code
 !**/*.py

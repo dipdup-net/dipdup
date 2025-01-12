@@ -143,8 +143,7 @@ class WebsocketDatasource(IndexDatasource[DatasourceConfigT]):
 
         self._logger.debug('Creating Websocket client')
 
-        # FIXME: correct config class
-        url = self._config.ws_url  # type: ignore
+        url = self._config.ws_url
         if not url:
             raise FrameworkException('Spawning node datasource, but `ws_url` is not set')
         self._ws_client = WebsocketTransport(
@@ -227,29 +226,35 @@ class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
 
 
 def create_datasource(config: DatasourceConfig) -> Datasource[Any]:
-    from dipdup.config.abi_etherscan import AbiEtherscanDatasourceConfig
     from dipdup.config.coinbase import CoinbaseDatasourceConfig
+    from dipdup.config.evm_etherscan import EvmEtherscanDatasourceConfig
     from dipdup.config.evm_node import EvmNodeDatasourceConfig
     from dipdup.config.evm_subsquid import EvmSubsquidDatasourceConfig
     from dipdup.config.http import HttpDatasourceConfig
     from dipdup.config.ipfs import IpfsDatasourceConfig
     from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
     from dipdup.config.starknet_subsquid import StarknetSubsquidDatasourceConfig
+    from dipdup.config.substrate_node import SubstrateNodeDatasourceConfig
+    from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
+    from dipdup.config.substrate_subsquid import SubstrateSubsquidDatasourceConfig
     from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
     from dipdup.config.tzip_metadata import TzipMetadataDatasourceConfig
-    from dipdup.datasources.abi_etherscan import AbiEtherscanDatasource
     from dipdup.datasources.coinbase import CoinbaseDatasource
+    from dipdup.datasources.evm_etherscan import EvmEtherscanDatasource
     from dipdup.datasources.evm_node import EvmNodeDatasource
     from dipdup.datasources.evm_subsquid import EvmSubsquidDatasource
     from dipdup.datasources.http import HttpDatasource
     from dipdup.datasources.ipfs import IpfsDatasource
     from dipdup.datasources.starknet_node import StarknetNodeDatasource
     from dipdup.datasources.starknet_subsquid import StarknetSubsquidDatasource
+    from dipdup.datasources.substrate_node import SubstrateNodeDatasource
+    from dipdup.datasources.substrate_subscan import SubstrateSubscanDatasource
+    from dipdup.datasources.substrate_subsquid import SubstrateSubsquidDatasource
     from dipdup.datasources.tezos_tzkt import TezosTzktDatasource
     from dipdup.datasources.tzip_metadata import TzipMetadataDatasource
 
     by_config: dict[type[DatasourceConfig], type[Datasource[Any]]] = {
-        AbiEtherscanDatasourceConfig: AbiEtherscanDatasource,
+        EvmEtherscanDatasourceConfig: EvmEtherscanDatasource,
         CoinbaseDatasourceConfig: CoinbaseDatasource,
         TezosTzktDatasourceConfig: TezosTzktDatasource,
         TzipMetadataDatasourceConfig: TzipMetadataDatasource,
@@ -259,6 +264,9 @@ def create_datasource(config: DatasourceConfig) -> Datasource[Any]:
         EvmNodeDatasourceConfig: EvmNodeDatasource,
         StarknetSubsquidDatasourceConfig: StarknetSubsquidDatasource,
         StarknetNodeDatasourceConfig: StarknetNodeDatasource,
+        SubstrateSubsquidDatasourceConfig: SubstrateSubsquidDatasource,
+        SubstrateSubscanDatasourceConfig: SubstrateSubscanDatasource,
+        SubstrateNodeDatasourceConfig: SubstrateNodeDatasource,
     }
 
     try:
