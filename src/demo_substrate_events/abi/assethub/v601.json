@@ -2474,8 +2474,7 @@
               "Twox64Concat"
             ],
             "key_vec": [
-              "[U8; 4]",
-              "Vec<U8>"
+              "Tuple:[U8; 4]Vec<U8>"
             ],
             "value": "AccountId",
             "keys_id": 178,

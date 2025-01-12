@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
 class DecreaseLiquidityPayload(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
     tokenId: int
     liquidity: int
     amount0: int

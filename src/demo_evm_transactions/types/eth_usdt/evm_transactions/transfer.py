@@ -3,12 +3,8 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
 class TransferInput(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
     to: str
     value: int

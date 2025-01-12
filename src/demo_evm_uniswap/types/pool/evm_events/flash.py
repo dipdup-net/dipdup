@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
 class FlashPayload(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
     sender: str
     recipient: str
     amount0: int

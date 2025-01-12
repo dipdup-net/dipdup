@@ -3,12 +3,8 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-from pydantic import ConfigDict
 
 
 class InitializePayload(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
     sqrtPriceX96: int
     tick: int
