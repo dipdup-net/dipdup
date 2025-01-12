@@ -176,7 +176,7 @@ class JsonRpcDatasource(WebsocketDatasource[DatasourceConfigT]):
         raw: bool = False,
         ws: bool = False,
     ) -> Any:
-        request_id = uuid4().hex
+        request_id = str(int(uuid4()))
         request = {
             'jsonrpc': '2.0',
             'id': request_id,
