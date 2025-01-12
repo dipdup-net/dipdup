@@ -25,6 +25,7 @@ _HEX_ADDRESS_REGEXP = re.compile(r'(0x)?[0-9a-f]{1,64}', re.IGNORECASE | re.ASCI
 # Spec: https://github.com/starkware-libs/starknet-specs/blob/master/api/starknet_api_openrpc.json
 _TRUNCATED_STARKNET_ADDRESS_REGEXP = re.compile(r'^0x(0|[a-fA-F1-9]{1}[a-fA-F0-9]{0,62})$', re.ASCII)
 
+
 def _validate_starknet_address(v: str) -> str:
     """
     Checks if the given value is a valid StarkNet address within the range [0, 2**251).
@@ -34,12 +35,14 @@ def _validate_starknet_address(v: str) -> str:
         return v
 
     if _HEX_ADDRESS_REGEXP.fullmatch(v) is None:
-        raise ValueError(f'{v} is not a valid contract address (check if it is a hex string in the form 0x[64 hex chars])')
+        raise ValueError(
+            f'{v} is not a valid contract address (check if it is a hex string in the form 0x[64 hex chars])'
+        )
 
-    # Following code is similar to: 
+    # Following code is similar to:
     #   https://github.com/software-mansion/starknet.py/blob/a8d73538d409d9ef7c756921e43d10925f2838bc/starknet_py/net/client_utils.py#L60
     #   starknet_py.net.client_utils._to_rpc_felt method
-    # 
+    #
     # Convert hex to decimal and check if it's less than 2**251
     numeric_value = int(v, 16)
     truncated_value = hex(numeric_value)
