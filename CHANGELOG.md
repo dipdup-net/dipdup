@@ -23,6 +23,16 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 - evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
 
+## [8.1.4] - 2025-01-12
+
+### Fixed
+
+- evm: Fixed sending JSONRPC requests via web3.py provider.
+- evm: Fixed parsing tuple types in ABI.
+- evm.subsquid: Fixed type of `timestamp` field of event/transaction models.
+- evm.subsquid: Fixed empty field base conversion on event deserialization.
+- starknet: Fixed parsing contract addresses starting with `0x0`.
+
 ## [8.1.3] - 2024-12-20
 
 ### Fixed
@@ -578,7 +588,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 <!-- Versions -->
 [Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.2.0rc1...HEAD
-[8.2.0rc1]: https://github.com/dipdup-io/dipdup/compare/8.1.3...8.2.0rc1
+[8.2.0rc1]: https://github.com/dipdup-io/dipdup/compare/8.1.4...8.2.0rc1
+[8.1.4]: https://github.com/dipdup-io/dipdup/compare/8.1.3...8.1.4
 [8.1.3]: https://github.com/dipdup-io/dipdup/compare/8.1.2...8.1.3
 [8.1.2]: https://github.com/dipdup-io/dipdup/compare/8.1.1...8.1.2
 [8.1.1]: https://github.com/dipdup-io/dipdup/compare/8.1.0...8.1.1

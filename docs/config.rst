@@ -2,6 +2,8 @@
 
 .. autoclass:: dipdup.config.DipDupConfig
 
+.. autoclass:: dipdup.config.abi_etherscan.AbiEtherscanDatasourceConfig
+.. autoclass:: dipdup.config.ContractConfig
 .. autoclass:: dipdup.config.AdvancedConfig
 .. autoclass:: dipdup.config.ApiConfig
 .. autoclass:: dipdup.config.coinbase.CoinbaseDatasourceConfig
