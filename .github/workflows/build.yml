@@ -12,7 +12,7 @@ on:
       - 'src/**'
       - 'Dockerfile'
       - 'pyproject.toml'
-      # NOTE: Dumped with `pdm run update`
+      # NOTE: Dumped with `make update`
       - 'requirements.txt'
       - '.github/workflows/build.yml'
 

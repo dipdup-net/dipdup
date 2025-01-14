@@ -46,14 +46,14 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install PDM
-        run: pip install pdm
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install markdownlint-cli
         run: npm install -g markdownlint-cli
 
       - name: Install project
-        run: pdm sync
+        run: make install
 
       - name: Clone frontend
         run: |
@@ -61,7 +61,7 @@ jobs:
           gh repo clone dipdup-io/interface ../interface -- --single-branch --branch "$FRONTEND_BRANCH"
 
       - name: Build docs
-        run: pdm run make docs
+        run: uv run make docs
 
       # NOTE: Installer is tested in `installer` workflow
       - name: Commit and push frontend

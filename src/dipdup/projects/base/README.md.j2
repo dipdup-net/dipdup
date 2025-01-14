@@ -41,16 +41,9 @@ docker-compose up
 
 To set up the development environment:
 
-{% if project.package_manager == 'pdm' -%}
 ```shell
-pdm install
-$(pdm venv activate)
+make install
+source .venv/bin/activate
 ```
-{%- elif project.package_manager == 'poetry' -%}
-```shell
-poetry install
-poetry shell
-```
-{%- endif %}
 
 Run `make all` to run full CI check or `make help` to see other available commands.

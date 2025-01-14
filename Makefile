@@ -18,11 +18,12 @@ help:           ## Show this help (default)
 ##
 
 install:        ## Install dependencies
-	pdm sync --clean
+	uv sync --all-extras --all-groups --locked
 
 update:         ## Update dependencies and dump requirements.txt
-	pdm update
-	pdm export --without-hashes -f requirements --prod -o requirements.txt
+	uv sync --all-extras --all-groups
+	uv export --all-extras --locked --no-group lint --no-group test --no-group docs --no-group perf > requirements.txt
+
 
 ##
 ##-- CI
