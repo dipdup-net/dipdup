@@ -121,9 +121,10 @@ class SubstrateRuntime:
                 )
             except FileNotFoundError:
                 # FIXME: Using last known version to help with missing abis
-                last_known = sorted_glob(self.abi_path, 'v*.json')[-1].stem
-                _logger.debug('using last known version `%s`', last_known)
-                self._spec_versions[name] = self.get_spec_version(last_known[1:])
+                available = sorted_glob(self.abi_path, 'v*.json')
+                last_known = next(i for i in available if int(i.stem[1:]) >= int(name[1:]))
+                _logger.debug('using last known version `%s`', last_known.name)
+                self._spec_versions[name] = self.get_spec_version(last_known.stem[1:])
 
         return self._spec_versions[name]
 
@@ -141,17 +142,20 @@ class SubstrateRuntime:
         )
 
         if isinstance(args, list):
+            arg_names = event_abi.get('args_name', [])
+            arg_names = [a for a in arg_names if a]
+
             # NOTE: Old metadata
-            if 'args_name' not in event_abi:
-                arg_names = extract_args_name(event_abi['docs'][0])
+            if not arg_names:
+                arg_names = extract_args_name(event_abi['docs'][0])            
             # NOTE: Optionals
-            else:
-                args, unprocessed_args = [], [*args]
-                for arg_type in event_abi['args']:
-                    if arg_type.startswith('option<'):
-                        args.append(None)
-                    else:
-                        args.append(unprocessed_args.pop(0))
+
+            args, unprocessed_args = [], [*args]
+            for arg_type in event_abi['args']:
+                if arg_type.startswith('option<'):
+                    args.append(None)
+                else:
+                    args.append(unprocessed_args.pop(0))
 
             args = dict(zip(arg_names, args, strict=True))
         else:
