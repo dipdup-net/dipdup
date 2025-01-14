@@ -141,8 +141,18 @@ class SubstrateRuntime:
         )
 
         if isinstance(args, list):
-            assert 'args_name' not in event_abi
-            arg_names = extract_args_name(event_abi['docs'][0])
+            # NOTE: Old metadata
+            if 'args_name' not in event_abi:
+                arg_names = extract_args_name(event_abi['docs'][0])
+            # NOTE: Optionals
+            else:
+                args, unprocessed_args = [], [*args]
+                for arg_type in event_abi['args']:
+                    if arg_type.startswith('option<'):
+                        args.append(None)
+                    else:
+                        args.append(unprocessed_args.pop(0))
+
             args = dict(zip(arg_names, args, strict=True))
         else:
             arg_names = event_abi['args_name']
