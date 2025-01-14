@@ -1,5 +1,5 @@
 {{ header }}
-{%- if project.package_manager in ('pdm', 'uv', 'none') %}
+{%- if project.package_manager != 'poetry' %}
 [project]
 name = "{{ project.package }}"
 version = "{{ project.version }}"
@@ -20,7 +20,7 @@ dev = [
     "ruff",
     "mypy",
 ]
-{% elif project.package_manager == 'poetry' %}
+{% else %}
 [tool.poetry]
 name = "{{ project.package }}"
 version = "{{ project.version }}"
