@@ -116,7 +116,7 @@ class SubstrateEvent(Generic[PayloadT]):
             payload = self.data.decoded_args
         elif self.data.args is not None and self.data.header_extra is not None:
             payload = self.runtime.decode_event_args(
-                name=self.name,
+                name=self.data.name,
                 args=self.data.args,
                 spec_version=str(self.data.header_extra['specVersion']),
             )
