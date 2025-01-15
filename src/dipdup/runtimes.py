@@ -162,10 +162,9 @@ class SubstrateRuntime:
         )
         # FIXME: Do we need original type names?
         arg_types = event_abi.get('args_type_name') or event_abi['args']
+        arg_names = get_event_arg_names(event_abi)
 
         if isinstance(args, list):
-            arg_names = get_event_arg_names(event_abi)
-
             # FIXME: Optionals are processed incorrectly now
             args, unprocessed_args = [], [*args]
             for arg_type in arg_types:
@@ -175,8 +174,7 @@ class SubstrateRuntime:
                     args.append(unprocessed_args.pop(0))
 
             args = dict(zip(arg_names, args, strict=True))
-        else:
-            arg_names = get_event_arg_names(event_abi)
+
 
         payload = {}
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):
