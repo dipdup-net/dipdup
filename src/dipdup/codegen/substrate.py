@@ -15,6 +15,7 @@ from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
 from dipdup.datasources import Datasource
 from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subscan import SubstrateSubscanDatasource
+from dipdup.exceptions import ConfigurationError
 from dipdup.package import DipDupPackage
 from dipdup.runtimes import SubstrateRuntime
 from dipdup.runtimes import extract_args_name
@@ -181,6 +182,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                         qualname = f'{module["name"]}.{event_item["name"]}'
                         if qualname not in events:
                             continue
+                        target_events[runtime_name].remove(qualname)
 
                         # FIXME: ignore when only docs changed?
                         dump = orjson.dumps({**event_item, 'name': ''})
@@ -205,6 +207,11 @@ class SubstrateCodeGenerator(CodeGenerator):
                         jsonschema = event_metadata_to_jsonschema(type_registry, event_item)
 
                         write(schema_path, json_dumps(jsonschema))
+
+        for runtime_name, events in target_events.items():
+            if events:
+                msg = f'Runtime `{runtime_name}` misses following events: {', '.join(events)}'
+                raise ConfigurationError(msg)
 
     async def _generate_types(self, force: bool = False) -> None:
         await super()._generate_types(force)
