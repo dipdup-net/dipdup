@@ -1,6 +1,7 @@
 import logging
 import re
 from contextlib import suppress
+from copy import copy
 from functools import cache
 from functools import cached_property
 from pathlib import Path
@@ -174,12 +175,15 @@ class SubstrateRuntime:
 
             args = dict(zip(arg_names, args, strict=True))
         else:
-            arg_names = event_abi['args_name']
+            arg_names = get_event_arg_names(event_abi)
 
         payload = {}
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):
             if isinstance(value, int):
                 payload[key] = value
+                continue
+            if isinstance(value, str) and value[:2] != '0x':
+                payload[key] = int(value)
                 continue
             if isinstance(value, dict) and '__kind' in value:
                 payload[key] = value['__kind']
@@ -197,8 +201,8 @@ class SubstrateRuntime:
 
             payload[key] = scale_obj.value_serialized
 
-        # FIXME: Subsquid camelcases arg keys for some reason
-        for key in payload:
+        # NOTE: Subsquid camelcases arg keys for some reason
+        for key in copy(payload):
             if key not in arg_names:
                 new_key = pascal_to_snake(key)
                 payload[new_key] = payload.pop(key)
