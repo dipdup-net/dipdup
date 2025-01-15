@@ -8,7 +8,6 @@ import orjson
 
 from dipdup.codegen import CodeGenerator
 from dipdup.config import DipDupConfig
-from dipdup.config import HandlerConfig
 from dipdup.config.substrate import SubstrateIndexConfig
 from dipdup.config.substrate_events import SubstrateEventsIndexConfig
 from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
@@ -152,10 +151,7 @@ class SubstrateCodeGenerator(CodeGenerator):
 
             processed.add(name)
 
-    async def generate_schemas(self) -> None:
-        self._cleanup_schemas()
-
-        handler_config: HandlerConfig
+    def get_target_events(self) -> dict[str, list[str]]:
         target_events: dict[str, list[str]] = {}
 
         for index_config in self._config.indexes.values():
@@ -165,6 +161,13 @@ class SubstrateCodeGenerator(CodeGenerator):
                     target_events[runtime_name] = []
                 for handler_config in index_config.handlers:
                     target_events[runtime_name].append(handler_config.name)
+
+        return target_events
+
+    async def generate_schemas(self) -> None:
+        self._cleanup_schemas()
+
+        target_events = self.get_target_events()
 
         if not target_events:
             return
@@ -216,9 +219,28 @@ class SubstrateCodeGenerator(CodeGenerator):
     async def _generate_types(self, force: bool = False) -> None:
         await super()._generate_types(force)
 
+        target_events = self.get_target_events()
+
         for typeclass_dir in self._package.types.glob('**/substrate_events/*'):
 
-            typeclass_name = f'{snake_to_pascal(typeclass_dir.name)}Payload'
+            # NOTE: Find corresponding event
+            try:
+                events = target_events[typeclass_dir.parts[-3]]
+            except KeyError:
+                self._logger.info(
+                    'No indexes in config use `%s` runtime; skipping `%s`', typeclass_dir.parts[-3], typeclass_dir.name
+                )
+                continue
+
+            for event_name in events:
+                if pascal_to_snake(event_name.replace('.', '')) == typeclass_dir.stem:
+                    name = event_name
+                    break
+            else:
+                raise Exception(f'Event not found for {typeclass_dir}')
+
+            # NOTE: Don't extract from typeclass path! XYK.Sell -> xyk_sell -> XykSellPayload; should be XYKSellPayload.
+            typeclass_name = f'{snake_to_pascal(name)}Payload'
 
             versions = [p.stem[1:] for p in sorted_glob(typeclass_dir, '*.py') if p.name.startswith('v')]
             root_lines = [
