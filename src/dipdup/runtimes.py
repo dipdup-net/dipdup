@@ -151,6 +151,7 @@ class SubstrateRuntime:
         spec_version: str,
     ) -> dict[str, Any]:
         from scalecodec.base import ScaleBytes
+        from scalecodec.exceptions import RemainingScaleBytesNotEmptyException
 
         spec_obj = self.get_spec_version(spec_version)
         event_abi = spec_obj.get_event_abi(
@@ -178,6 +179,9 @@ class SubstrateRuntime:
             if isinstance(value, int):
                 payload[key] = value
                 continue
+            if isinstance(value, dict) and '__kind' in value:
+                payload[key] = value['__kind']
+                continue
 
             scale_obj = self.runtime_config.create_scale_object(
                 type_string=type_,
@@ -186,8 +190,18 @@ class SubstrateRuntime:
             )
 
             # FIXME: padding
+            try:
+                scale_obj.decode(check_remaining=False)
+            except RemainingScaleBytesNotEmptyException:
+                padded_value = value + ('00' * (scale_obj.data.offset - scale_obj.data.length))
+                print(padded_value)
+                scale_obj = self.runtime_config.create_scale_object(
+                    type_string=type_,
+                    data=ScaleBytes(padded_value),
+                    metadata=spec_obj._metadata,
+                )
+                scale_obj.decode(check_remaining=False)
 
-            scale_obj.decode(check_remaining=False)
             payload[key] = scale_obj.value_serialized
 
         return payload
