@@ -38,7 +38,7 @@ class SubstrateEventsHandlerConfig(HandlerConfig):
         yield package, 'models as models'
 
         event_cls = snake_to_pascal(self.name) + 'Payload'
-        event_module = pascal_to_snake(self.name)
+        event_module = pascal_to_snake(self.name.replace('.', ''))
 
         parent = cast(SubstrateIndexConfig, self.parent)
         yield f'{package}.types.{parent.runtime.name}.substrate_events.{event_module}', event_cls
