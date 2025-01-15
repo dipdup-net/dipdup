@@ -83,9 +83,10 @@ def event_metadata_to_jsonschema(
     metadata: dict[str, Any],
 ) -> dict[str, Any]:
     description = '\n'.join(metadata['docs']).replace(r'\[', '[').replace(r'\]', ']')
-    args_name = [a for a in metadata.get('args_name', ()) if a]
+    args_name = tuple(a for a in metadata.get('args_name', ()) if a)
     if not args_name:
-        args_name = extract_args_name(description)  # type: ignore[assignment]
+        args_name = extract_args_name(tuple(metadata['docs']))
+
     schema = {
         '$schema': 'http://json-schema.org/draft-07/schema#',
         'title': metadata['name'],

@@ -1,5 +1,4 @@
 import logging
-import re
 from contextlib import suppress
 from copy import copy
 from functools import cache
@@ -24,13 +23,13 @@ _logger = logging.getLogger(__name__)
 
 
 @cache
-def extract_args_name(docs: list[str]) -> tuple[str, ...]:
+def extract_args_name(docs: tuple[str, ...]) -> tuple[str, ...]:
     docs_str = ''.join(docs).replace('\\n', '').replace('\n', '')
 
     # find the last bracket pair, [] or ()
     open_bracket = max(docs_str.rfind('['), docs_str.rfind('('))
     close_bracket = max(docs_str.rfind(']'), docs_str.rfind(')'))
-    slice = docs_str[open_bracket + 1:close_bracket]
+    slice = docs_str[open_bracket + 1 : close_bracket]
 
     return tuple(arg.strip('\\ ') for arg in slice.split(','))
 
@@ -74,7 +73,8 @@ class SubstrateSpecVersion:
                         continue
                     self._events[qualname] = event
                     found = True
-            else:
+
+            if not found:
                 raise FrameworkException(f'Event `{qualname}` not found in `{self._name}` spec')
 
         return self._events[qualname]
@@ -86,7 +86,7 @@ def get_event_arg_names(event_abi: dict[str, Any]) -> tuple[str, ...]:
 
     # NOTE: Old metadata
     if not arg_names:
-        arg_names = extract_args_name(event_abi['docs'])
+        arg_names = extract_args_name(tuple(event_abi['docs']))
 
     return tuple(arg_names)
 
@@ -174,7 +174,6 @@ class SubstrateRuntime:
                     args.append(unprocessed_args.pop(0))
 
             args = dict(zip(arg_names, args, strict=True))
-
 
         payload = {}
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):
