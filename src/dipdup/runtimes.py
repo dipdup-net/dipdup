@@ -24,15 +24,15 @@ _logger = logging.getLogger(__name__)
 
 
 @cache
-def extract_args_name(description: str) -> tuple[str, ...]:
-    pattern = r'\((.*?)\)|\[(.*?)\]'
-    match = re.search(pattern, description)
+def extract_args_name(docs: list[str]) -> tuple[str, ...]:
+    docs_str = ''.join(docs).replace('\\n', '').replace('\n', '')
 
-    if not match:
-        raise ValueError('No valid bracket pairs found in the description')
+    # find the last bracket pair, [] or ()
+    open_bracket = max(docs_str.rfind('['), docs_str.rfind('('))
+    close_bracket = max(docs_str.rfind(']'), docs_str.rfind(')'))
+    slice = docs_str[open_bracket + 1:close_bracket]
 
-    args_str = match.group(1) or match.group(2)
-    return tuple(arg.strip('\\') for arg in args_str.split(', '))
+    return tuple(arg.strip('\\ ') for arg in slice.split(','))
 
 
 @cache
@@ -86,7 +86,7 @@ def get_event_arg_names(event_abi: dict[str, Any]) -> tuple[str, ...]:
 
     # NOTE: Old metadata
     if not arg_names:
-        arg_names = extract_args_name(event_abi['docs'][0])
+        arg_names = extract_args_name(event_abi['docs'])
 
     return tuple(arg_names)
 
