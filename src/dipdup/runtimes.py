@@ -12,6 +12,7 @@ import orjson
 from dipdup.config.substrate import SubstrateRuntimeConfig
 from dipdup.exceptions import FrameworkException
 from dipdup.package import DipDupPackage
+from dipdup.utils import pascal_to_snake
 from dipdup.utils import sorted_glob
 
 if TYPE_CHECKING:
@@ -190,9 +191,16 @@ class SubstrateRuntime:
                 metadata=spec_obj._metadata,
             )
 
+            # NOTE: Exception is raised after decoding is over
             with suppress(RemainingScaleBytesNotEmptyException):
                 scale_obj.decode(check_remaining=False)
 
             payload[key] = scale_obj.value_serialized
+
+        # FIXME: Subsquid camelcases arg keys for some reason
+        for key in payload:
+            if key not in arg_names:
+                new_key = pascal_to_snake(key)
+                payload[new_key] = payload.pop(key)
 
         return payload
