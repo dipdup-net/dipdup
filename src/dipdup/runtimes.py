@@ -160,15 +160,16 @@ class SubstrateRuntime:
         event_abi = spec_obj.get_event_abi(
             qualname=name,
         )
+        # FIXME: Do we need original type names?
         arg_types = event_abi.get('args_type_name') or event_abi['args']
 
         if isinstance(args, list):
             arg_names = get_event_arg_names(event_abi)
 
-            # NOTE: Optionals
+            # FIXME: Optionals are processed incorrectly now
             args, unprocessed_args = [], [*args]
             for arg_type in arg_types:
-                if arg_type.startswith('option<'):
+                if arg_type.lower().startswith('option<'):
                     args.append(None)
                 else:
                     args.append(unprocessed_args.pop(0))

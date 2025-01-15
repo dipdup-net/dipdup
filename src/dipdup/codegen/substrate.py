@@ -212,7 +212,7 @@ class SubstrateCodeGenerator(CodeGenerator):
 
             typeclass_name = f'{snake_to_pascal(typeclass_dir.name)}Payload'
 
-            versions = [p.stem[1:] for p in typeclass_dir.glob('*.py') if p.name.startswith('v')]
+            versions = [p.stem[1:] for p in sorted_glob(typeclass_dir, '*.py') if p.name.startswith('v')]
             root_lines = [
                 *(f'from .v{v} import V{v}' for v in versions),
                 '',
