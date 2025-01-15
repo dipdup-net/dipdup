@@ -1,5 +1,6 @@
 import logging
 import re
+from contextlib import suppress
 from functools import cache
 from functools import cached_property
 from pathlib import Path
@@ -151,7 +152,7 @@ class SubstrateRuntime:
         spec_version: str,
     ) -> dict[str, Any]:
         from scalecodec.base import ScaleBytes
-        from scalecodec.exceptions import RemainingScaleBytesNotEmptyException
+        from scalecodec.exceptions import RemainingScaleBytesNotEmptyException  # type: ignore[import-untyped]
 
         spec_obj = self.get_spec_version(spec_version)
         event_abi = spec_obj.get_event_abi(
@@ -189,17 +190,7 @@ class SubstrateRuntime:
                 metadata=spec_obj._metadata,
             )
 
-            # FIXME: padding
-            try:
-                scale_obj.decode(check_remaining=False)
-            except RemainingScaleBytesNotEmptyException:
-                padded_value = value + ('00' * (scale_obj.data.offset - scale_obj.data.length))
-                print(padded_value)
-                scale_obj = self.runtime_config.create_scale_object(
-                    type_string=type_,
-                    data=ScaleBytes(padded_value),
-                    metadata=spec_obj._metadata,
-                )
+            with suppress(RemainingScaleBytesNotEmptyException):
                 scale_obj.decode(check_remaining=False)
 
             payload[key] = scale_obj.value_serialized
