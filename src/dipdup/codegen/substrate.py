@@ -198,7 +198,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                             / 'substrate'
                             / runtime_name
                             / 'substrate_events'
-                            / pascal_to_snake(qualname)
+                            / pascal_to_snake(qualname.replace('.', ''))
                             / f'{metadata_path.stem.replace('.', '_')}.json'
                         )
                         if schema_path.exists():
