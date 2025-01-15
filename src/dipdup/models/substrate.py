@@ -9,6 +9,7 @@ from typing import cast
 
 from dipdup.fetcher import HasLevel
 from dipdup.runtimes import SubstrateRuntime
+from dipdup.runtimes import get_event_arg_names
 
 
 class _BlockHeader(TypedDict):
@@ -113,7 +114,10 @@ class SubstrateEvent(Generic[PayloadT]):
     def payload(self) -> PayloadT:
         # NOTE: We receive decoded args from node datasource and encoded from subsquid datasource
         if self.data.decoded_args is not None:
-            payload = self.data.decoded_args
+            spec_version = self.runtime.get_spec_version(self.runtime.runtime_config.active_spec_version_id)
+            abi = spec_version.get_event_abi(self.data.name)
+            arg_names = get_event_arg_names(abi)
+            payload = dict(zip(arg_names, self.data.decoded_args, strict=False))
         elif self.data.args is not None and self.data.header_extra is not None:
             payload = self.runtime.decode_event_args(
                 name=self.data.name,

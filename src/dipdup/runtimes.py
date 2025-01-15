@@ -77,6 +77,17 @@ class SubstrateSpecVersion:
         return self._events[qualname]
 
 
+def get_event_arg_names(event_abi: dict[str, Any]) -> tuple[str, ...]:
+    arg_names = event_abi.get('args_name', [])
+    arg_names = [a for a in arg_names if a]
+
+    # NOTE: Old metadata
+    if not arg_names:
+        arg_names = extract_args_name(event_abi['docs'][0])
+
+    return tuple(arg_names)
+
+
 class SubstrateRuntime:
     def __init__(
         self,
@@ -112,19 +123,24 @@ class SubstrateRuntime:
     def get_spec_version(self, name: str) -> SubstrateSpecVersion:
         if name not in self._spec_versions:
             _logger.info('loading spec version `%s`', name)
-            try:
-                metadata_path = self.abi_path.joinpath(f'v{name}.json')
-                metadata = orjson.loads(metadata_path.read_bytes())
-                self._spec_versions[name] = SubstrateSpecVersion(
-                    name=f'v{name}',
-                    metadata=metadata,
-                )
-            except FileNotFoundError:
+
+            metadata_path = self.abi_path.joinpath(f'v{name}.json')
+
+            if not metadata_path.is_file():
+                metadata_path = self._package.abi_local.joinpath(self._config.name, f'v{name}.json')
+
+            if not metadata_path.is_file():
                 # FIXME: Using last known version to help with missing abis
                 available = sorted_glob(self.abi_path, 'v*.json')
                 last_known = next(i for i in available if int(i.stem[1:]) >= int(name[1:]))
                 _logger.debug('using last known version `%s`', last_known.name)
                 self._spec_versions[name] = self.get_spec_version(last_known.stem[1:])
+            else:
+                metadata = orjson.loads(metadata_path.read_bytes())
+                self._spec_versions[name] = SubstrateSpecVersion(
+                    name=f'v{name}',
+                    metadata=metadata,
+                )
 
         return self._spec_versions[name]
 
@@ -140,18 +156,14 @@ class SubstrateRuntime:
         event_abi = spec_obj.get_event_abi(
             qualname=name,
         )
+        arg_types = event_abi.get('args_type_name') or event_abi['args']
 
         if isinstance(args, list):
-            arg_names = event_abi.get('args_name', [])
-            arg_names = [a for a in arg_names if a]
+            arg_names = get_event_arg_names(event_abi)
 
-            # NOTE: Old metadata
-            if not arg_names:
-                arg_names = extract_args_name(event_abi['docs'][0])            
             # NOTE: Optionals
-
             args, unprocessed_args = [], [*args]
-            for arg_type in event_abi['args']:
+            for arg_type in arg_types:
                 if arg_type.startswith('option<'):
                     args.append(None)
                 else:
@@ -161,19 +173,21 @@ class SubstrateRuntime:
         else:
             arg_names = event_abi['args_name']
 
-        arg_types = event_abi['args']
-
         payload = {}
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):
-            if not isinstance(value, str) or not value.startswith('0x'):
+            if isinstance(value, int):
                 payload[key] = value
                 continue
 
             scale_obj = self.runtime_config.create_scale_object(
                 type_string=type_,
                 data=ScaleBytes(value),
+                metadata=spec_obj._metadata,
             )
-            scale_obj.decode()
+
+            # FIXME: padding
+
+            scale_obj.decode(check_remaining=False)
             payload[key] = scale_obj.value_serialized
 
         return payload
