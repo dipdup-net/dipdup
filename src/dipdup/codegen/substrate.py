@@ -67,6 +67,11 @@ def scale_type_to_jsonschema(
         schema['type'] = 'boolean'
     elif type_string in ['String', 'str']:
         schema['type'] = 'string'
+    # FIXME: We need to parse weird values like `Tuple:staging_xcm:v4:location:Locationstaging_xcm:v4:location:Location`; mind the missing delimeters
+    elif type_string.startswith('Tuple:'):
+        # inner_types = type_string[6:]
+        raise NotImplementedError
+
     elif type_string.startswith('Vec<'):
         inner_type = type_string[4:-1]
         schema['type'] = 'array'

@@ -155,9 +155,8 @@ class SubstrateRuntime:
         from scalecodec.base import ScaleBytes
 
         spec_obj = self.get_spec_version(spec_version)
-        event_abi = spec_obj.get_event_abi(
-            qualname=name,
-        )
+        event_abi = spec_obj.get_event_abi(name)
+
         # FIXME: Do we need original type names?
         # arg_types = event_abi.get('args_type_name') or event_abi['args']
         arg_types = event_abi['args']
@@ -183,19 +182,14 @@ class SubstrateRuntime:
                 payload[key] = int(value)
                 continue
 
-            # FIXME: Unwrap correctly
-            if isinstance(value, dict) and '__kind' in value:
-                payload[key] = value['__kind']
-                continue
-
-            # NOTE: Scale decoder expects vec length at the beginning
+            # NOTE: Scale decoder expects vec length at the beginning; Subsquid strips it
             if type_.startswith('Vec<'):
                 value_len = len(value[2:]) * 2
                 value = f'0x{value_len:02x}{value[2:]}'
 
             scale_obj = self.runtime_config.create_scale_object(
                 type_string=type_,
-                data=ScaleBytes(value),
+                data=ScaleBytes(value) if isinstance(value, str) else value,
             )
 
             payload[key] = scale_obj.process()
