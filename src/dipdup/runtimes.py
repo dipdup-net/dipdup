@@ -187,10 +187,15 @@ class SubstrateRuntime:
                 value_len = len(value[2:]) * 2
                 value = f'0x{value_len:02x}{value[2:]}'
 
-            scale_obj = self.runtime_config.create_scale_object(
-                type_string=type_,
-                data=ScaleBytes(value) if isinstance(value, str) else value,
-            )
+            try:
+                scale_obj = self.runtime_config.create_scale_object(
+                    type_string=type_,
+                    data=ScaleBytes(value) if isinstance(value, str) else value,
+                )
+            except NotImplementedError:
+                _logger.error('unsupported type `%s`', type_)
+                payload[key] = value
+                continue
 
             payload[key] = scale_obj.process()
 

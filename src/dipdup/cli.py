@@ -1,10 +1,10 @@
 # NOTE: All imports except the basic ones are very lazy in this module. Let's keep it that way.
 import asyncio
 import atexit
-from collections import defaultdict
 import logging
 import sys
 import traceback
+from collections import defaultdict
 from collections.abc import Callable
 from collections.abc import Coroutine
 from contextlib import AsyncExitStack
@@ -979,11 +979,13 @@ async def self_env(ctx: click.Context) -> None:
     env.refresh()
     env.print()
 
+
 @cli.group(hidden=True)
 @click.pass_context
 @_cli_wrapper
 async def abi(ctx: click.Context) -> None:
     pass
+
 
 @abi.command(name='lookup', hidden=True)
 @click.pass_context
@@ -1006,7 +1008,7 @@ async def abi_lookup(ctx: click.Context, query: str) -> None:
     res = subprocess.run(
         ('grep', '-n', '-r', query, *abi_paths),
         capture_output=True,
-        check=True,
+        check=False,
     )
     out = res.stdout.decode()
     lines = out.splitlines()
@@ -1021,6 +1023,7 @@ async def abi_lookup(ctx: click.Context, query: str) -> None:
         for line in sorted(lines):
             echo('- ' + line)
         echo('')
+
 
 @cli.group()
 @click.pass_context

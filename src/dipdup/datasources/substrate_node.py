@@ -121,15 +121,18 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
                 await asyncio.sleep(self._http_config.polling_interval)
 
     async def initialize(self) -> None:
-        version_info = await self._interface.rpc_request('system_version', [])
-        self._logger.info('running version %s', version_info['result'])
-
         level = await self.get_head_level()
         self.set_sync_level(None, level)
 
         # NOTE: Prepare substrate_interface
         await self._interface.init_props()  # type: ignore[no-untyped-call]
         self._interface.reload_type_registry()
+
+        self._logger.info(
+            'connected to %s (%s)',
+            self._interface.chain,
+            self._interface.version,
+        )
 
     @cached_property
     def _interface(self) -> 'SubstrateInterface':
