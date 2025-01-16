@@ -121,6 +121,9 @@ class SubstrateNodeDatasource(JsonRpcDatasource[SubstrateNodeDatasourceConfig]):
                 await asyncio.sleep(self._http_config.polling_interval)
 
     async def initialize(self) -> None:
+        version_info = await self._interface.rpc_request('system_version', [])
+        self._logger.info('running version %s', version_info['result'])
+
         level = await self.get_head_level()
         self.set_sync_level(None, level)
 
