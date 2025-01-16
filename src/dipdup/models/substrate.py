@@ -49,7 +49,7 @@ class _SubstrateNodeEventResponse(TypedDict):
     name: str
     index: int
     extrinsic_index: int
-    decoded_args: dict[str, Any]
+    decoded_args: dict[str, Any] | list[Any]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -60,7 +60,7 @@ class SubstrateEventData(HasLevel):
     extrinsic_index: int
     call_address: list[str] | None
     args: list[Any] | None = None
-    decoded_args: dict[str, Any] | None = None
+    decoded_args: dict[str, Any] | list[Any] | None = None
     header: _BlockHeader
     header_extra: _BlockHeaderExtra | None
 

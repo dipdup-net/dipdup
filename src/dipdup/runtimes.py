@@ -1,5 +1,4 @@
 import logging
-from contextlib import suppress
 from copy import copy
 from functools import cache
 from functools import cached_property
@@ -154,7 +153,6 @@ class SubstrateRuntime:
         spec_version: str,
     ) -> dict[str, Any]:
         from scalecodec.base import ScaleBytes
-        from scalecodec.exceptions import RemainingScaleBytesNotEmptyException  # type: ignore[import-untyped]
 
         spec_obj = self.get_spec_version(spec_version)
         event_abi = spec_obj.get_event_abi(
@@ -194,7 +192,7 @@ class SubstrateRuntime:
             if type_.startswith('Vec<'):
                 value_len = len(value[2:]) * 2
                 value = f'0x{value_len:02x}{value[2:]}'
-                
+
             scale_obj = self.runtime_config.create_scale_object(
                 type_string=type_,
                 data=ScaleBytes(value),

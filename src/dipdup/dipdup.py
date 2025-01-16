@@ -839,7 +839,9 @@ class DipDup:
 
         from prometheus_client import start_http_server
 
-        _logger.info('Setting up Prometheus at http://%s:%s', self._config.prometheus.host, self._config.prometheus.port)
+        _logger.info(
+            'Setting up Prometheus at http://%s:%s', self._config.prometheus.host, self._config.prometheus.port
+        )
         start_http_server(self._config.prometheus.port, self._config.prometheus.host)
 
     async def _set_up_api(self, stack: AsyncExitStack) -> None:
