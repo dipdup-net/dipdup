@@ -161,7 +161,8 @@ class SubstrateRuntime:
             qualname=name,
         )
         # FIXME: Do we need original type names?
-        arg_types = event_abi.get('args_type_name') or event_abi['args']
+        # arg_types = event_abi.get('args_type_name') or event_abi['args']
+        arg_types = event_abi['args']
         arg_names = get_event_arg_names(event_abi)
 
         if isinstance(args, list):
@@ -187,17 +188,17 @@ class SubstrateRuntime:
                 payload[key] = value['__kind']
                 continue
 
+            # NOTE: Scale decoder expects vec length at the beginning
+            if type_.startswith('Vec<'):
+                value_len = len(value[2:]) * 2
+                value = f'0x{value_len:02x}{value[2:]}'
+                
             scale_obj = self.runtime_config.create_scale_object(
                 type_string=type_,
                 data=ScaleBytes(value),
-                metadata=spec_obj._metadata,
             )
 
-            # NOTE: Exception is raised after decoding is over
-            with suppress(RemainingScaleBytesNotEmptyException):
-                scale_obj.decode(check_remaining=False)
-
-            payload[key] = scale_obj.value_serialized
+            payload[key] = scale_obj.process()
 
         # NOTE: Subsquid camelcases arg keys for some reason
         for key in copy(payload):
