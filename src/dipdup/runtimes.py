@@ -184,6 +184,8 @@ class SubstrateRuntime:
             if isinstance(value, str) and value[:2] != '0x':
                 payload[key] = int(value)
                 continue
+
+            # FIXME: Unwrap correctly
             if isinstance(value, dict) and '__kind' in value:
                 payload[key] = value['__kind']
                 continue
