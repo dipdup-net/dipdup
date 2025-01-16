@@ -112,15 +112,16 @@ class SubstrateRuntime:
         if self._interface:
             return self._interface.runtime_config
 
-        from scalecodec.base import RuntimeConfigurationObject
+        # from scalecodec.base import RuntimeConfigurationObject
 
-        # FIXME: Generic configuration for cases when node datasources are not available
-        runtime_config = RuntimeConfigurationObject()
-        runtime_config.update_type_registry(get_type_registry('legacy'))
-        runtime_config.update_type_registry(get_type_registry('core'))
-        runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
+        # # FIXME: Generic configuration for cases when node datasources are not available
+        # runtime_config = RuntimeConfigurationObject()
+        # runtime_config.update_type_registry(get_type_registry('legacy'))
+        # runtime_config.update_type_registry(get_type_registry('core'))
+        # runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
 
-        return runtime_config
+        # return runtime_config
+        raise NotImplementedError('Runtime configuration is not available')
 
     def get_spec_version(self, name: str) -> SubstrateSpecVersion:
         if name not in self._spec_versions:
@@ -174,18 +175,43 @@ class SubstrateRuntime:
             args = dict(zip(arg_names, args, strict=True))
 
         payload = {}
-        for (key, value), type_ in zip(args.items(), arg_types, strict=True):
+
+        def parse(value: Any, type_: str) -> Any | None:
             if isinstance(value, int):
-                payload[key] = value
-                continue
+                return value
+
             if isinstance(value, str) and value[:2] != '0x':
-                payload[key] = int(value)
-                continue
+                return int(value)
+
+            # FIXME: Tuple type string have neither brackets no delimeter... Could be a Subscan thing, need to check.
+            # FIXME: All we can do is to check if all inner types are equal or return original items
+            if isinstance(value, list) and type_.startswith('Tuple:'):
+                inner = type_[6:]
+                inner_item_len = int(len(inner) / len(value))
+
+                if '<' in inner:
+                    raise NotImplementedError('Cannot parse nested structures in tuples')
+
+                inner_types = []
+                for i in range(0, len(type_), inner_item_len):
+                    inner_types.append(inner[i : i + inner_item_len])
+                inner_types = [i for i in inner_types if i]
+
+                if len(set(inner_types)) != 1:
+                    raise NotImplementedError('Cannot parse tuples with different types')
+
+                return [parse(v, inner_types[0]) for v in value]
 
             # NOTE: Scale decoder expects vec length at the beginning; Subsquid strips it
             if type_.startswith('Vec<'):
-                value_len = len(value[2:]) * 2
-                value = f'0x{value_len:02x}{value[2:]}'
+                if isinstance(value, str):
+                    value_len = len(value[2:]) * 2
+                    value = f'0x{value_len:02x}{value[2:]}'
+                elif isinstance(value, list):
+                    inner = type_[4:-1]
+                    return [parse(v, inner) for v in value]
+                else:
+                    raise NotImplementedError('Unsupported Vec type')
 
             try:
                 scale_obj = self.runtime_config.create_scale_object(
@@ -194,10 +220,18 @@ class SubstrateRuntime:
                 )
             except NotImplementedError:
                 _logger.error('unsupported type `%s`', type_)
-                payload[key] = value
-                continue
+                return value
 
-            payload[key] = scale_obj.process()
+            return scale_obj.process()
+
+        for (key, value), type_ in zip(args.items(), arg_types, strict=True):
+            try:
+                res = parse(value, type_)
+            except NotImplementedError:
+                _logger.error('failed to parse `%s`', key)
+
+            if res is not None:
+                payload[key] = res
 
         # NOTE: Subsquid camelcases arg keys for some reason
         for key in copy(payload):
