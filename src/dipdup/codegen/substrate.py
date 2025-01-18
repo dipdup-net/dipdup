@@ -18,6 +18,8 @@ from dipdup.exceptions import ConfigurationError
 from dipdup.package import DipDupPackage
 from dipdup.runtimes import SubstrateRuntime
 from dipdup.runtimes import extract_args_name
+from dipdup.runtimes import extract_tuple_inner_types
+from dipdup.runtimes import get_type_key
 from dipdup.utils import json_dumps
 from dipdup.utils import pascal_to_snake
 from dipdup.utils import snake_to_pascal
@@ -31,8 +33,9 @@ def scale_type_to_jsonschema(
     type_registry: dict[str, Any],
     type_string: str,
 ) -> dict[str, Any]:
-    if type_string in type_registry['types']:
-        type_def = type_registry['types'][type_string]
+    type_key = get_type_key(type_string)
+    if {type_string, type_key} & set(type_registry['types']):
+        type_def = type_registry['types'][type_key]
         if isinstance(type_def, str):
             return scale_type_to_jsonschema(type_registry, type_def)
         if isinstance(type_def, dict):
@@ -69,8 +72,9 @@ def scale_type_to_jsonschema(
         schema['type'] = 'string'
     # FIXME: We need to parse weird values like `Tuple:staging_xcm:v4:location:Locationstaging_xcm:v4:location:Location`; mind the missing delimeters
     elif type_string.startswith('Tuple:'):
-        # inner_types = type_string[6:]
-        raise NotImplementedError
+        inner_types = extract_tuple_inner_types(type_string, 0, type_registry)
+        schema['type'] = 'array'
+        schema['items'] = [scale_type_to_jsonschema(type_registry, t) for t in inner_types]
 
     elif type_string.startswith('Vec<'):
         inner_type = type_string[4:-1]
@@ -242,7 +246,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                     name = event_name
                     break
             else:
-                raise Exception(f'Event not found for {typeclass_dir}')
+                raise Exception(f'Event not found for {typeclass_dir.stem}')
 
             # NOTE: Don't extract from typeclass path! XYK.Sell -> xyk_sell -> XykSellPayload; should be XYKSellPayload.
             typeclass_name = f'{snake_to_pascal(name)}Payload'

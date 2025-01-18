@@ -33,6 +33,46 @@ def extract_args_name(docs: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(arg.strip('\\ ') for arg in slice.split(','))
 
 
+def get_type_key(type_: str) -> str:
+    return type_.split(':')[-1].lower()
+
+
+def extract_tuple_inner_types(type_: str, length: int, registry: dict[str, Any]) -> list[str]:
+    inner = type_[6:]
+    inner_types = []
+
+    if '<' in inner:
+        raise NotImplementedError('Cannot parse nested structures in tuples')
+
+    # NOTE: Try simple case first, all items have the same type
+    if length:
+        inner_item_len = int(len(inner) / length)
+
+        for i in range(0, len(type_), inner_item_len):
+            inner_types.append(inner[i : i + inner_item_len])
+        inner_types = [i for i in inner_types if i]
+
+    # NOTE: Or read inner type until there's a match in the type registry
+    if len(set(inner_types)) in (0, 1):
+        inner_types = []
+        current_type = ''
+        for i in range(len(inner)):
+            current_type += inner[i]
+            cropped_type = get_type_key(current_type)
+            if cropped_type in registry['types']:
+                if i < len(inner) - 1 and inner[i + 1] == ':':
+                    continue
+
+                # inner_types.append(cropped_type)
+                inner_types.append(current_type)
+                current_type = ''
+
+        if current_type or not inner_types:
+            raise NotImplementedError('Cannot parse tuple with mixed types')
+
+    return inner_types
+
+
 @cache
 def get_type_registry(name_or_path: str | Path) -> 'RuntimeConfigurationObject':
     from scalecodec.type_registry import load_type_registry_preset  # type: ignore[import-untyped]
@@ -178,9 +218,6 @@ class SubstrateRuntime:
 
         payload = {}
 
-        def strip_type(v: str) -> str:
-            return v.split(':')[-1].lower()
-
         def parse(value: Any, type_: str) -> Any:
             if isinstance(value, int):
                 return value
@@ -190,35 +227,7 @@ class SubstrateRuntime:
 
             # FIXME: Tuple type string have neither brackets no delimeters... Could be a Subscan thing, need to check.
             if isinstance(value, list) and type_.startswith('Tuple:'):
-                inner = type_[6:]
-                inner_item_len = int(len(inner) / len(value))
-
-                if '<' in inner:
-                    raise NotImplementedError('Cannot parse nested structures in tuples')
-
-                # NOTE: Try simple case first, all items have the same type
-                inner_types = []
-                for i in range(0, len(type_), inner_item_len):
-                    inner_types.append(inner[i : i + inner_item_len])
-                inner_types = [i for i in inner_types if i]
-
-                # NOTE: Or read inner type until there's a match in the type registry
-                if len(set(inner_types)) != 1:
-                    inner_types = []
-                    current_type = ''
-                    for i in range(len(inner)):
-                        current_type += inner[i]
-                        cropped_type = strip_type(current_type)
-                        if cropped_type in self.runtime_config.type_registry['types']:
-                            if i < len(inner) - 1 and inner[i + 1] == ':':
-                                continue
-
-                            inner_types.append(cropped_type)
-                            current_type = ''
-
-                    if current_type or not inner_types:
-                        raise NotImplementedError('Cannot parse tuple with mixed types')
-
+                inner_types = extract_tuple_inner_types(type_, len(value), registry=self.runtime_config.registry)
                 return [parse(v, t) for v, t in zip(value, inner_types, strict=True)]
 
             # NOTE: Scale decoder expects vec length at the beginning; Subsquid strips it
