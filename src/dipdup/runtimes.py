@@ -44,31 +44,24 @@ def extract_tuple_inner_types(type_: str, length: int, registry: dict[str, Any])
     if '<' in inner:
         raise NotImplementedError('Cannot parse nested structures in tuples')
 
-    # NOTE: Try simple case first, all items have the same type
-    if length:
-        inner_item_len = int(len(inner) / length)
+    # NOTE: Read inner types until there's a match in the type registry
+    buffer = ''
+    for i in range(len(inner)):
+        buffer += inner[i]
+        type_key = get_type_key(buffer)
 
-        for i in range(0, len(type_), inner_item_len):
-            inner_types.append(inner[i : i + inner_item_len])
-        inner_types = [i for i in inner_types if i]
+        if type_key not in registry['types']:
+            continue
+        if i < len(inner) - 1 and inner[i + 1] == ':':
+            continue
 
-    # NOTE: Or read inner type until there's a match in the type registry
-    if len(set(inner_types)) in (0, 1):
-        inner_types = []
-        current_type = ''
-        for i in range(len(inner)):
-            current_type += inner[i]
-            cropped_type = get_type_key(current_type)
-            if cropped_type in registry['types']:
-                if i < len(inner) - 1 and inner[i + 1] == ':':
-                    continue
+        # FIXME: ???
+        # inner_types.append(buffer)
+        inner_types.append(type_key)
+        buffer = ''
 
-                # inner_types.append(cropped_type)
-                inner_types.append(current_type)
-                current_type = ''
-
-        if current_type or not inner_types:
-            raise NotImplementedError('Cannot parse tuple with mixed types')
+    if buffer or not inner_types:
+        raise NotImplementedError('Cannot parse tuple with mixed types')
 
     return inner_types
 
@@ -227,7 +220,11 @@ class SubstrateRuntime:
 
             # FIXME: Tuple type string have neither brackets no delimeters... Could be a Subscan thing, need to check.
             if isinstance(value, list) and type_.startswith('Tuple:'):
-                inner_types = extract_tuple_inner_types(type_, len(value), registry=self.runtime_config.registry)
+                inner_types = extract_tuple_inner_types(
+                    type_=type_,
+                    length=len(value),
+                    registry=self.runtime_config.type_registry,
+                )
                 return [parse(v, t) for v, t in zip(value, inner_types, strict=True)]
 
             # NOTE: Scale decoder expects vec length at the beginning; Subsquid strips it
