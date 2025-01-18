@@ -110,18 +110,20 @@ class SubstrateRuntime:
     @cached_property
     def runtime_config(self) -> 'RuntimeConfigurationObject':
         if self._interface:
-            return self._interface.runtime_config
+            runtime_config = self._interface.runtime_config
 
-        # from scalecodec.base import RuntimeConfigurationObject
+            # FIXME: Substrate interface doesn't update registry when needed
+            runtime_config.update_type_registry(get_type_registry('legacy'))
+        else:
+            from scalecodec.base import RuntimeConfigurationObject
 
-        # # FIXME: Generic configuration for cases when node datasources are not available
-        # runtime_config = RuntimeConfigurationObject()
-        # runtime_config.update_type_registry(get_type_registry('legacy'))
-        # runtime_config.update_type_registry(get_type_registry('core'))
-        # runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
+            # FIXME: Generic configuration for cases when node datasources are not available
+            runtime_config = RuntimeConfigurationObject()
+            runtime_config.update_type_registry(get_type_registry('legacy'))
+            runtime_config.update_type_registry(get_type_registry('core'))
+            runtime_config.update_type_registry(get_type_registry(self._config.type_registry or self._config.name))
 
-        # return runtime_config
-        raise NotImplementedError('Runtime configuration is not available')
+        return runtime_config
 
     def get_spec_version(self, name: str) -> SubstrateSpecVersion:
         if name not in self._spec_versions:
@@ -176,15 +178,17 @@ class SubstrateRuntime:
 
         payload = {}
 
-        def parse(value: Any, type_: str) -> Any | None:
+        def strip_type(v: str) -> str:
+            return v.split(':')[-1].lower()
+
+        def parse(value: Any, type_: str) -> Any:
             if isinstance(value, int):
                 return value
 
             if isinstance(value, str) and value[:2] != '0x':
                 return int(value)
 
-            # FIXME: Tuple type string have neither brackets no delimeter... Could be a Subscan thing, need to check.
-            # FIXME: All we can do is to check if all inner types are equal or return original items
+            # FIXME: Tuple type string have neither brackets no delimeters... Could be a Subscan thing, need to check.
             if isinstance(value, list) and type_.startswith('Tuple:'):
                 inner = type_[6:]
                 inner_item_len = int(len(inner) / len(value))
@@ -192,15 +196,30 @@ class SubstrateRuntime:
                 if '<' in inner:
                     raise NotImplementedError('Cannot parse nested structures in tuples')
 
+                # NOTE: Try simple case first, all items have the same type
                 inner_types = []
                 for i in range(0, len(type_), inner_item_len):
                     inner_types.append(inner[i : i + inner_item_len])
                 inner_types = [i for i in inner_types if i]
 
+                # NOTE: Or read inner type until there's a match in the type registry
                 if len(set(inner_types)) != 1:
-                    raise NotImplementedError('Cannot parse tuples with different types')
+                    inner_types = []
+                    current_type = ''
+                    for i in range(len(inner)):
+                        current_type += inner[i]
+                        cropped_type = strip_type(current_type)
+                        if cropped_type in self.runtime_config.type_registry['types']:
+                            if i < len(inner) - 1 and inner[i + 1] == ':':
+                                continue
 
-                return [parse(v, inner_types[0]) for v in value]
+                            inner_types.append(cropped_type)
+                            current_type = ''
+
+                    if current_type or not inner_types:
+                        raise NotImplementedError('Cannot parse tuple with mixed types')
+
+                return [parse(v, t) for v, t in zip(value, inner_types, strict=True)]
 
             # NOTE: Scale decoder expects vec length at the beginning; Subsquid strips it
             if type_.startswith('Vec<'):
@@ -218,20 +237,14 @@ class SubstrateRuntime:
                     type_string=type_,
                     data=ScaleBytes(value) if isinstance(value, str) else value,
                 )
-            except NotImplementedError:
-                _logger.error('unsupported type `%s`', type_)
+            except (NotImplementedError, AssertionError) as e:
+                _logger.error('unsupported type `%s`: %s', type_, e)
                 return value
 
             return scale_obj.process()
 
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):
-            try:
-                res = parse(value, type_)
-            except NotImplementedError:
-                _logger.error('failed to parse `%s`', key)
-
-            if res is not None:
-                payload[key] = res
+            payload[key] = parse(value, type_)
 
         # NOTE: Subsquid camelcases arg keys for some reason
         for key in copy(payload):
