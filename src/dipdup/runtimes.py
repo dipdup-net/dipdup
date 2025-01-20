@@ -37,7 +37,7 @@ def get_type_key(type_: str) -> str:
     return type_.split(':')[-1].lower()
 
 
-def extract_tuple_inner_types(type_: str, length: int, registry: dict[str, Any]) -> list[str]:
+def extract_tuple_inner_types(type_: str, registry: dict[str, Any]) -> list[str]:
     inner = type_[6:]
     inner_types = []
 
@@ -222,7 +222,6 @@ class SubstrateRuntime:
             if isinstance(value, list) and type_.startswith('Tuple:'):
                 inner_types = extract_tuple_inner_types(
                     type_=type_,
-                    length=len(value),
                     registry=self.runtime_config.type_registry,
                 )
                 return [parse(v, t) for v, t in zip(value, inner_types, strict=True)]
@@ -238,15 +237,13 @@ class SubstrateRuntime:
                 else:
                     raise NotImplementedError('Unsupported Vec type')
 
-            try:
-                scale_obj = self.runtime_config.create_scale_object(
-                    type_string=type_,
-                    data=ScaleBytes(value) if isinstance(value, str) else value,
-                )
-            except (NotImplementedError, AssertionError) as e:
-                _logger.error('unsupported type `%s`: %s', type_, e)
+            if not isinstance(value, str):
                 return value
 
+            scale_obj = self.runtime_config.create_scale_object(
+                type_string=type_,
+                data=ScaleBytes(value),
+            )
             return scale_obj.process()
 
         for (key, value), type_ in zip(args.items(), arg_types, strict=True):

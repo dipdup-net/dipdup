@@ -72,7 +72,7 @@ def scale_type_to_jsonschema(
         schema['type'] = 'string'
     # FIXME: We need to parse weird values like `Tuple:staging_xcm:v4:location:Locationstaging_xcm:v4:location:Location`; mind the missing delimeters
     elif type_string.startswith('Tuple:'):
-        inner_types = extract_tuple_inner_types(type_string, 0, type_registry)
+        inner_types = extract_tuple_inner_types(type_string, type_registry)
         schema['type'] = 'array'
         schema['items'] = [scale_type_to_jsonschema(type_registry, t) for t in inner_types]
 

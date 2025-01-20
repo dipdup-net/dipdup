@@ -135,7 +135,6 @@ class Index(ABC, Generic[IndexConfigT, IndexQueueItemT, IndexDatasourceT]):
         matched_handlers = self._match_level_data(self._config.handlers, level_data)
 
         total_matched = len(matched_handlers)
-        # metrics.set_index_handlers_matched(total_matched)
         metrics.handlers_matched[self.name] += total_matched
         metrics.time_in_matcher[self.name] += time.time() - started_at
 
