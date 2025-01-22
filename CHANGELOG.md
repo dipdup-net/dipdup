@@ -10,6 +10,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Added
 
+- project: Support uv package manager in the default project template.
 - substrate.events: Added `subtrate.events` index kind to process Substrate events.
 - substrate.node: Added `subtrate.node` datasource to receive data from Substrate node.
 - substrate.subscan: Added `substrate.subscan` datasource to fetch ABIs from Subscan.
@@ -17,11 +18,13 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
+- database: Don't process internal models twice if imported from the project.
 - evm.subsquid: Fixed event/transaction model deserialization.
 
 ### Changed
 
 - evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
+- project: Expose Prometheus and internal API ports in default sqlite environment.
 
 ## [8.1.4] - 2025-01-12
 

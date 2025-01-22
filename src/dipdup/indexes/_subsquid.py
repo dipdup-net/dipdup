@@ -78,16 +78,16 @@ class SubsquidIndex(
         # NOTE: Fetch last blocks from node if there are not enough realtime messages in queue
         if node_sync_level:
             sync_level = min(sync_level, node_sync_level)
-            self._logger.info('Synchronizing with `node`: %s -> %s', index_level, sync_level)
+            self._logger.info('Synchronizing with node: %s -> %s', index_level, sync_level)
             await self._synchronize_node(sync_level)
         else:
             sync_level = min(sync_level, subsquid_sync_level)
-            self._logger.info('Synchronizing with `subsquid`: %s -> %s', index_level, sync_level)
+            self._logger.info('Synchronizing with Subsquid: %s -> %s', index_level, sync_level)
             await self._synchronize_subsquid(sync_level)
 
         if not self.node_datasources and not self._subsquid_started:
             self._subsquid_started = True
-            self._logger.info('No `node` datasources available; polling Subsquid')
+            self._logger.info('No node datasources available; polling Subsquid')
             for datasource in self.subsquid_datasources:
                 await datasource.start()
 

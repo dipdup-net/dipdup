@@ -10,6 +10,9 @@ from dipdup.indexes.substrate_node import SubstrateNodeFetcher
 from dipdup.indexes.substrate_subsquid import SubstrateSubsquidFetcher
 from dipdup.models.substrate import SubstrateEventData
 
+# NOTE: Don't increase buffer beyond this limit when fetching event data from three channels
+EVENTS_QUEUE_LIMIT = 50
+
 
 class SubstrateSubsquidEventFetcher(SubstrateSubsquidFetcher[SubstrateEventData]):
     def __init__(
@@ -60,10 +63,10 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
         async for level, events in self.readahead_by_level(self.fetch_events()):
             yield level, events
 
+    # TODO: Make this code more generic, something like chained `FetcherChannel` class
     async def fetch_events(self) -> AsyncIterator[tuple[SubstrateEventData, ...]]:
         node = self.get_random_node()
         batch_size = node._http_config.batch_size
-        queue_limit = 50
 
         queues: dict[str, asyncio.Queue[Any]] = {
             'levels': asyncio.Queue(),
@@ -82,7 +85,7 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
                 )
                 for block_hash in block_hashes:
                     await queues['hashes'].put(block_hash)
-                if queues['hashes'].qsize() >= queue_limit:
+                if queues['hashes'].qsize() >= EVENTS_QUEUE_LIMIT:
                     await asyncio.sleep(1)
 
             batch = []
@@ -102,7 +105,7 @@ class SubstrateNodeEventFetcher(SubstrateNodeFetcher[SubstrateEventData]):
                 )
                 for block_header in block_headers:
                     await queues['headers'].put(block_header)
-                if queues['headers'].qsize() >= queue_limit:
+                if queues['headers'].qsize() >= EVENTS_QUEUE_LIMIT:
                     await asyncio.sleep(1)
 
             batch = []
