@@ -3,18 +3,17 @@ requires-python = "==3.12.*"
 
 [[package]]
 name = "aerich"
-version = "0.7.2"
+version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "click" },
+    { name = "asyncclick" },
     { name = "dictdiffer" },
     { name = "pydantic" },
-    { name = "tomlkit" },
     { name = "tortoise-orm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/cd/ae9c60ffc21e2d41e22c62cbf24a60dfad937222d880489703842d179746/aerich-0.7.2.tar.gz", hash = "sha256:31d67de7b96184636b89de99062e059e5e6204b6251d24c33eb21fc9cf982e09", size = 26965 }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/41/3c478b7a344abda866f2c644b056ebae638499bbe0eec0010e7361211774/aerich-0.8.1.tar.gz", hash = "sha256:1e95b1c04dfc0c634dd43b0123933038c820140e17a4b27885a63b7461eb0632", size = 31429 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/14/708cee9c87d86d0f0e058c86b09ddda41d5cbb0db8a59c48e4c0a43589bd/aerich-0.7.2-py3-none-any.whl", hash = "sha256:84c78c07d45436b89ca4db5411eca4e9292a591fb7d6fd4282fa4a7d0c6d2af1", size = 37662 },
+    { url = "https://files.pythonhosted.org/packages/49/72/50b961b8f46080c626a566be7769163d593b429a5d94029cc32ef5f1fe4d/aerich-0.8.1-py3-none-any.whl", hash = "sha256:2743cf85bd9957ea173055dad07ee5a3219067e4f117d5402a44204c27e83c9f", size = 42303 },
 ]
 
 [[package]]
@@ -185,6 +184,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/80/e2/2b4651eff771f6fd900d233e175ddc5e2be502c7eb62c0c42f975c6d36cd/async-lru-2.0.4.tar.gz", hash = "sha256:b8a59a5df60805ff63220b2a0c5b5393da5521b113cd5465a44eb037d81a5627", size = 10019 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/9f/3c3503693386c4b0f245eaf5ca6198e3b28879ca0a40bde6b0e319793453/async_lru-2.0.4-py3-none-any.whl", hash = "sha256:ff02944ce3c288c5be660c42dbcca0742b32c3b279d6dceda655190240b99224", size = 6111 },
+]
+
+[[package]]
+name = "asyncclick"
+version = "8.1.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cb/b5/e1e5fdf1c1bb7e6e614987c120a98d9324bf8edfaa5f5cd16a6235c9d91b/asyncclick-8.1.8.tar.gz", hash = "sha256:0f0eb0f280e04919d67cf71b9fcdfb4db2d9ff7203669c40284485c149578e4c", size = 232900 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/14/cc/a436f0fc2d04e57a0697e0f87a03b9eaed03ad043d2d5f887f8eebcec95f/asyncclick-8.1.8-py3-none-any.whl", hash = "sha256:eb1ccb44bc767f8f0695d592c7806fdf5bd575605b4ee246ffd5fadbcfdbd7c6", size = 99093 },
+    { url = "https://files.pythonhosted.org/packages/92/c4/ae9e9d25522c6dc96ff167903880a0fe94d7bd31ed999198ee5017d977ed/asyncclick-8.1.8.0-py3-none-any.whl", hash = "sha256:be146a2d8075d4fe372ff4e877f23c8b5af269d16705c1948123b9415f6fd678", size = 99115 },
 ]
 
 [[package]]
@@ -519,7 +532,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aerich", marker = "extra == 'migrations'", specifier = "~=0.7.2" },
+    { name = "aerich", marker = "extra == 'migrations'", specifier = "~=0.8.1" },
     { name = "aiohttp", specifier = "~=3.10" },
     { name = "aiolimiter", specifier = "~=1.1" },
     { name = "aiosubstrate", specifier = ">=0.1.0" },
@@ -543,7 +556,7 @@ requires-dist = [
     { name = "ruamel-yaml", specifier = "~=0.18.6" },
     { name = "sentry-sdk", specifier = "~=2.16" },
     { name = "sqlparse", specifier = "~=0.5" },
-    { name = "starknet-py", specifier = "~=0.24.3" },
+    { name = "starknet-py", specifier = "~=0.25.0" },
     { name = "strict-rfc3339", specifier = "~=0.7" },
     { name = "survey", specifier = "~=5.4" },
     { name = "tabulate", specifier = "~=0.9" },
@@ -1778,7 +1791,7 @@ wheels = [
 
 [[package]]
 name = "starknet-py"
-version = "0.24.3"
+version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1793,7 +1806,7 @@ dependencies = [
     { name = "pycryptodome" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7d/bb/54300a5a710a19fb1bef7ba4d93ca04e05498612f363671e38b2b4c21ff7/starknet_py-0.24.3.tar.gz", hash = "sha256:c27b0d8953cf18071086e4438b688f61ad0a2fa0bf6778cff241a4001aac043a", size = 97727 }
+sdist = { url = "https://files.pythonhosted.org/packages/36/ea/2ec249b38dccd8391b714a0dce2172d6298d7e043b063e529d897622f88d/starknet_py-0.25.0.tar.gz", hash = "sha256:452f2c9ed5e235540209ec2042d22dcf79c6cec2a6850f5b518d61b3fada3706", size = 97660 }
 
 [[package]]
 name = "strict-rfc3339"
@@ -1829,15 +1842,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ec/fe/802052aecb21e3797b8f7902564ab6ea0d60ff8ca23952079064155d1ae1/tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c", size = 81090 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/44/4a5f08c96eb108af5cb50b41f76142f0afa346dfa99d5296fe7202a11854/tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f", size = 35252 },
-]
-
-[[package]]
-name = "tomlkit"
-version = "0.13.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b1/09/a439bec5888f00a54b8b9f05fa94d7f901d6735ef4e55dcec9bc37b5d8fa/tomlkit-0.13.2.tar.gz", hash = "sha256:fff5fe59a87295b278abd31bec92c15d9bc4a06885ab12bcea52c71119392e79", size = 192885 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/b6/a447b5e4ec71e13871be01ba81f5dfc9d0af7e473da256ff46bc0e24026f/tomlkit-0.13.2-py3-none-any.whl", hash = "sha256:7a974427f6e119197f670fbbbeae7bef749a6c14e793db934baefc1b5f03efde", size = 37955 },
 ]
 
 [[package]]
