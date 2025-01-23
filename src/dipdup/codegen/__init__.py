@@ -43,13 +43,12 @@ class BatchHandlerConfig(HandlerConfig, CallbackMixin):
     callback: str = 'batch'
 
     def iter_imports(self, package: str) -> Iterator[tuple[str, str]]:
-        yield 'collections.abc', 'Iterable'
         yield 'dipdup.context', 'HandlerContext'
         yield 'dipdup.index', 'MatchedHandler'
 
     def iter_arguments(self) -> Iterator[tuple[str, str]]:
         yield 'ctx', 'HandlerContext'
-        yield 'handlers', 'Iterable[MatchedHandler]'
+        yield 'handlers', 'tuple[MatchedHandler, ...]'
 
 
 class _BaseCodeGenerator(ABC):

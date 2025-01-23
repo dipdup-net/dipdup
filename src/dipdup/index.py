@@ -145,7 +145,7 @@ class Index(ABC, Generic[IndexConfigT, IndexQueueItemT, IndexDatasourceT]):
             return
 
         started_at = time.time()
-        batch_handlers = (
+        batch_handlers = tuple(
             MatchedHandler(
                 index=self,
                 level=batch_level,
