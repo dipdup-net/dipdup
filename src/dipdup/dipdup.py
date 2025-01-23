@@ -962,6 +962,8 @@ class DipDup:
         if isinstance(self._config.database, SqliteDatabaseConfig):
             _logger.debug('SQLite database detected, skipping migrations initialization')
             return
+        if not env.MIGRATIONS:
+            return
 
         migrations_dir = self._ctx.package.migrations
         try:

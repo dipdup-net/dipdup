@@ -566,7 +566,13 @@ async def hasura_configure(ctx: click.Context, force: bool) -> None:
 @_cli_wrapper
 async def schema(ctx: click.Context) -> None:
     """Commands to manage database schema."""
-    if '--help' in sys.argv or ctx.invoked_subcommand not in AERICH_CMDS:
+    if any(
+        (
+            '--help' in sys.argv,
+            ctx.invoked_subcommand not in AERICH_CMDS,
+            not env.MIGRATIONS,
+        )
+    ):
         return
 
     config: DipDupConfig = ctx.obj.config

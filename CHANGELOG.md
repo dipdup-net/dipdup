@@ -23,6 +23,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Changed
 
+- env: Database migrations with aeric require `DIPDUP_MIGRATIONS` variable to be set.
 - evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
 - project: Expose Prometheus and internal API ports in default sqlite environment.
 

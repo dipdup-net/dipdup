@@ -1,4 +1,3 @@
-
 from dipdup.context import HandlerContext
 from dipdup.index import MatchedHandler
 

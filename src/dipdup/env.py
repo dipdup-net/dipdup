@@ -82,13 +82,14 @@ def get_path(key: str) -> Path | None:
 
 
 def reload_env() -> None:
-    global CI, DEBUG, DOCKER, JSON_LOG, LOW_MEMORY, NEXT, NO_SYMLINK, NO_VERSION_CHECK, PACKAGE_PATH, REPLAY_PATH, TEST
+    global CI, DEBUG, DOCKER, JSON_LOG, LOW_MEMORY, MIGRATIONS, NEXT, NO_SYMLINK, NO_VERSION_CHECK, PACKAGE_PATH, REPLAY_PATH, TEST
 
     CI = get_bool('DIPDUP_CI')
     DEBUG = get_bool('DIPDUP_DEBUG')
     DOCKER = get_bool('DIPDUP_DOCKER')
     JSON_LOG = get_bool('DIPDUP_JSON_LOG')
     LOW_MEMORY = get_bool('DIPDUP_LOW_MEMORY')
+    MIGRATIONS = get_bool('DIPDUP_MIGRATIONS')
     NEXT = get_bool('DIPDUP_NEXT')
     NO_SYMLINK = get_bool('DIPDUP_NO_SYMLINK')
     NO_VERSION_CHECK = get_bool('DIPDUP_NO_VERSION_CHECK')
@@ -108,6 +109,7 @@ DEBUG: bool = get_bool('DIPDUP_DEBUG')
 DOCKER: bool = get_bool('DIPDUP_DOCKER')
 JSON_LOG: bool = get_bool('DIPDUP_JSON_LOG')
 LOW_MEMORY: bool = get_bool('DIPDUP_LOW_MEMORY')
+MIGRATIONS: bool = get_bool('DIPDUP_MIGRATIONS')
 NEXT: bool = get_bool('DIPDUP_NEXT')
 NO_SYMLINK: bool = get_bool('DIPDUP_NO_SYMLINK')
 NO_VERSION_CHECK: bool = get_bool('DIPDUP_NO_VERSION_CHECK')
