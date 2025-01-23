@@ -137,8 +137,11 @@ class SubstrateRuntime:
         self._spec_versions: dict[str, SubstrateSpecVersion] = {}
 
     @property
-    def abi_path(self) -> Path:
-        return self._package.abi.joinpath(self._config.name)
+    def abi_paths(self) -> tuple[Path, Path]:
+        return (
+            self._package.abi.joinpath(self._config.name),
+            self._package.abi_local.joinpath(self._config.name),
+        )
 
     @cached_property
     def runtime_config(self) -> 'RuntimeConfigurationObject':
@@ -159,28 +162,33 @@ class SubstrateRuntime:
         return runtime_config
 
     def get_spec_version(self, name: str) -> SubstrateSpecVersion:
-        if name not in self._spec_versions:
-            _logger.info('loading spec version `%s`', name)
+        if name in self._spec_versions:
+            self._spec_versions[name]
 
-            metadata_path = self.abi_path.joinpath(f'v{name}.json')
+        _logger.info('loading spec version `%s`', name)
 
-            if not metadata_path.is_file():
-                metadata_path = self._package.abi_local.joinpath(self._config.name, f'v{name}.json')
+        metadata_paths = (
+            self.abi_paths[0].joinpath(f'v{name}.json'),
+            self.abi_paths[1].joinpath(f'v{name}.json'),
+        )
 
-            if not metadata_path.is_file():
-                # FIXME: Using last known version to help with missing abis
-                available = sorted_glob(self.abi_path, 'v*.json')
-                last_known = next(i for i in available if int(i.stem[1:]) >= int(name[1:]))
-                _logger.debug('using last known version `%s`', last_known.name)
-                self._spec_versions[name] = self.get_spec_version(last_known.stem[1:])
-            else:
-                metadata = orjson.loads(metadata_path.read_bytes())
-                self._spec_versions[name] = SubstrateSpecVersion(
-                    name=f'v{name}',
-                    metadata=metadata,
-                )
+        if metadata_paths[0].is_file():
+            metadata_path = metadata_paths[0]
+        elif metadata_paths[1].is_file():
+            metadata_path = metadata_paths[1]
+        else:
+            # NOTE: Using the last known version from the package; ABIs we use are expected to be the same
+            available = sorted_glob(self.abi_paths[0], 'v*.json')
+            metadata_path = next(i for i in available[::-1] if int(i.stem[1:]) <= int(name))
+            _logger.debug('using last known version `%s`', metadata_path.name)
 
-        return self._spec_versions[name]
+        metadata = orjson.loads(metadata_path.read_bytes())
+        spec_version = SubstrateSpecVersion(
+            name=f'v{name}',
+            metadata=metadata,
+        )
+        self._spec_versions[name] = spec_version
+        return spec_version
 
     def decode_event_args(
         self,
