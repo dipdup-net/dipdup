@@ -21,7 +21,7 @@ install:        ## Install dependencies
 	uv sync --all-extras --all-groups --locked
 
 update:         ## Update dependencies and dump requirements.txt
-	uv sync --all-extras --all-groups
+	uv sync -U --all-extras --all-groups
 	uv export --all-extras --locked --no-group lint --no-group test --no-group docs --no-group perf > requirements.txt
 
 
