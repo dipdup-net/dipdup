@@ -163,7 +163,7 @@ class SubstrateRuntime:
 
     def get_spec_version(self, name: str) -> SubstrateSpecVersion:
         if name in self._spec_versions:
-            self._spec_versions[name]
+            return self._spec_versions[name]
 
         _logger.info('loading spec version `%s`', name)
 
