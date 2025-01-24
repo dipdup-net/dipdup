@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [8.2.0rc1] - 2025-01-23
+## [8.2.0rc1] - 2025-01-24
 
 ### Added
 
@@ -23,7 +23,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Changed
 
-- env: Database migrations with aeric require `DIPDUP_MIGRATIONS` variable to be set.
+- env: Database migrations with aerich require `DIPDUP_MIGRATIONS` variable to be set.
 - evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
 - project: Expose Prometheus and internal API ports in default sqlite environment.
 
