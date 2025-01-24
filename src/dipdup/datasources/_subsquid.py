@@ -122,8 +122,7 @@ class AbstractSubsquidDatasource(
             worker_config.http = self._default_http_config
 
         # NOTE: Fail immediately; retries are handled one level up
-        if worker_config.http:
-            worker_config.http.retry_count = 0
+        worker_config.http.retry_count = 0
 
         return worker_config
 

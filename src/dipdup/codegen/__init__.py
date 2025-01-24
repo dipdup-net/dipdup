@@ -43,13 +43,12 @@ class BatchHandlerConfig(HandlerConfig, CallbackMixin):
     callback: str = 'batch'
 
     def iter_imports(self, package: str) -> Iterator[tuple[str, str]]:
-        yield 'collections.abc', 'Iterable'
         yield 'dipdup.context', 'HandlerContext'
         yield 'dipdup.index', 'MatchedHandler'
 
     def iter_arguments(self) -> Iterator[tuple[str, str]]:
         yield 'ctx', 'HandlerContext'
-        yield 'handlers', 'Iterable[MatchedHandler]'
+        yield 'handlers', 'tuple[MatchedHandler, ...]'
 
 
 class _BaseCodeGenerator(ABC):
@@ -170,11 +169,10 @@ class _BaseCodeGenerator(ABC):
         self._logger.info('Generating type `%s`', class_name)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         # TODO: make it configurable
-        model_type = (
-            dmcg.DataModelType.TypingTypedDict
-            if 'substrate' in str(output_path)
-            else dmcg.DataModelType.PydanticV2BaseModel
-        )
+        if 'substrate' in str(output_path):
+            model_type = dmcg.DataModelType.TypingTypedDict
+        else:
+            model_type = dmcg.DataModelType.PydanticV2BaseModel
         dmcg.generate(
             input_=schema_path,
             output=output_path,

@@ -1,19 +1,5 @@
 {{ header }}
-{%- if project.package_manager == 'none' %}
-[project]
-name = "{{ project.package }}"
-version = "{{ project.version }}"
-description = "{{ project.description }}"
-license = { text = "{{ project.license }}" }
-authors = [
-    { name = "{{ project.name }}", email = "{{ project.email }}" },
-]
-readme = "README.md"
-requires-python = ">=3.12,<3.13"
-dependencies = [
-    "dipdup>={{ project.dipdup_version }},<{{ project.dipdup_version | int + 1 }}",
-]
-{%- elif project.package_manager == 'pdm' %}
+{%- if project.package_manager != 'poetry' %}
 [project]
 name = "{{ project.package }}"
 version = "{{ project.version }}"
@@ -28,13 +14,13 @@ dependencies = [
     "dipdup>={{ project.dipdup_version }},<{{ project.dipdup_version | int + 1 }}",
 ]
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 dev = [
     "black",
     "ruff",
     "mypy",
 ]
-{% elif project.package_manager == 'poetry' %}
+{% else %}
 [tool.poetry]
 name = "{{ project.package }}"
 version = "{{ project.version }}"
@@ -79,7 +65,7 @@ exclude = "{{ project.package }}"
 module = "ruamel"
 ignore_missing_imports = true
 
-{% if project.package_manager == 'pdm' -%}
+{% if project.package_manager in ('pdm', 'uv', 'none') -%}
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"

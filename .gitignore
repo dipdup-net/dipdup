@@ -9,7 +9,7 @@
 !**/Makefile
 !**/pyproject.toml
 !**/requirements*
-!**/pdm.lock
+!**/*.lock
 !**/README.md
 !**/.keep
 !**/py.typed

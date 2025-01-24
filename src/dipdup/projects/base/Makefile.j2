@@ -16,23 +16,28 @@ all:            ## Run an entire CI pipeline
 ##
 
 install:        ## Install dependencies
-{%- if project.package_manager == 'none' %}
-	true
-{%- elif project.package_manager == 'pdm' %}
-	pdm install
+{%- if project.package_manager == 'uv' %}
+	uv sync --all-extras --all-groups
 {%- elif project.package_manager == 'poetry' %}
 	poetry install
+{%- elif project.package_manager == 'pdm' %}
+	pdm install
+{%- elif project.package_manager == 'none' %}
+	true
 {% endif %}
 
 update:         ## Update dependencies
-{%- if project.package_manager == 'none' %}
-	true
-{%- elif project.package_manager == 'pdm' %}
-	pdm update
 	dipdup self update -q
+{%- if project.package_manager == 'uv' %}
+	uv sync --all-extras --all-groups
 {%- elif project.package_manager == 'poetry' %}
 	poetry update
 	dipdup self update -q
+{%- elif project.package_manager == 'pdm' %}
+	pdm update
+	dipdup self update -q
+{%- elif project.package_manager == 'none' %}
+	true
 {% endif %}
 
 format:         ## Format with all tools

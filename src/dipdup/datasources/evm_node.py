@@ -10,9 +10,6 @@ from dataclasses import field
 from typing import TYPE_CHECKING
 from typing import Any
 
-import pysignalr
-import pysignalr.exceptions
-
 from dipdup.config import HttpConfig
 from dipdup.config.evm_node import EvmNodeDatasourceConfig
 from dipdup.datasources import JsonRpcDatasource
@@ -163,22 +160,6 @@ class EvmNodeDatasource(JsonRpcDatasource[EvmNodeDatasourceConfig]):
                     await self.emit_transactions(transactions)
 
             del self._level_data[head.hash]
-
-    async def _ws_loop(self) -> None:
-        self._logger.info('Establishing realtime connection')
-        client = self._get_ws_client()
-        retry_sleep = self._http_config.retry_sleep
-
-        for _ in range(1, self._http_config.retry_count + 1):
-            try:
-                await client.run()
-            except pysignalr.exceptions.ConnectionError as e:
-                self._logger.error('Websocket connection error: %s', e)
-                await self.emit_disconnected()
-                await asyncio.sleep(retry_sleep)
-                retry_sleep *= self._http_config.retry_multiplier
-
-        raise DatasourceError('Websocket connection failed', self.name)
 
     @property
     def ws_available(self) -> bool:

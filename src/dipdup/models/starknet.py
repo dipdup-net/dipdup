@@ -12,7 +12,7 @@ from dipdup.fetcher import HasLevel
 from dipdup.subscriptions import Subscription
 
 if TYPE_CHECKING:
-    from starknet_py.net.client_models import EmittedEvent  # type: ignore[import-untyped]
+    from starknet_py.net.client_models import EmittedEvent
 
 
 @dataclass(frozen=True)
@@ -128,8 +128,8 @@ class StarknetEventData(HasLevel):
         timestamp: int | None,
     ) -> Self:
         return cls(
-            level=event.block_number,
-            block_hash=hex(event.block_hash),
+            level=event.block_number,  # type: ignore[arg-type]
+            block_hash=hex(event.block_hash),  # type: ignore[arg-type]
             transaction_index=transaction_index,
             transaction_hash=hex(event.transaction_hash),
             timestamp=timestamp,

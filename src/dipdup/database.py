@@ -394,8 +394,15 @@ def prepare_models(package: str | None) -> None:
     EXECUTOR_CACHE.clear()
 
     db_tables: set[str] = set()
+    qualnames: set[str] = set()
 
     for app, model in iter_models(package):
+        # NOTE: Don't process internal models twice if imported from project
+        qualname = f'{model.__module__}.{model.__qualname__}'
+        if qualname in qualnames:
+            continue
+        qualnames.add(qualname)
+
         # NOTE: Enforce our class for user models
         if app != 'int_models' and not issubclass(model, dipdup.models.Model):
             raise InvalidModelsError(

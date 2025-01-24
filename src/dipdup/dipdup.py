@@ -839,7 +839,9 @@ class DipDup:
 
         from prometheus_client import start_http_server
 
-        _logger.info('Setting up Prometheus at %s:%s', self._config.prometheus.host, self._config.prometheus.port)
+        _logger.info(
+            'Setting up Prometheus at http://%s:%s', self._config.prometheus.host, self._config.prometheus.port
+        )
         start_http_server(self._config.prometheus.port, self._config.prometheus.host)
 
     async def _set_up_api(self, stack: AsyncExitStack) -> None:
@@ -847,11 +849,12 @@ class DipDup:
         if not api_config or env.TEST or env.CI:
             return
 
+        _logger.info('Setting up internal API at http://%s:%s', api_config.host, api_config.port)
+
         from aiohttp import web
 
         from dipdup.api import create_api
 
-        _logger.info('Setting up API')
         api = await create_api(self._ctx)
         runner = web.AppRunner(api)
         await runner.setup()
@@ -958,6 +961,8 @@ class DipDup:
         """Initialize database migrations with aerich."""
         if isinstance(self._config.database, SqliteDatabaseConfig):
             _logger.debug('SQLite database detected, skipping migrations initialization')
+            return
+        if not env.MIGRATIONS:
             return
 
         migrations_dir = self._ctx.package.migrations

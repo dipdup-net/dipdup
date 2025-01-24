@@ -8,11 +8,11 @@ RUN apt update && \
     touch /opt/dipdup/src/dipdup/__init__.py && \
     rm -r /var/log/* /var/lib/apt/lists/* /var/cache/* /var/lib/dpkg/status*
 WORKDIR /opt/dipdup
-ENV PATH="/opt/dipdup/.venv/bin:$PATH"
-ENV PATH="/root/.cargo/bin:$PATH"
+ENV PATH="/root/.cargo/bin:/opt/dipdup/.venv/bin:$PATH"
 
 COPY pyproject.toml requirements.txt README.md /opt/dipdup/
-RUN /usr/local/bin/pip install --prefix /opt/dipdup --no-cache-dir --disable-pip-version-check --no-deps \
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN uv pip install --prefix /opt/dipdup --compile-bytecode --no-cache --no-deps \
     -r /opt/dipdup/requirements.txt -e .
 
 FROM python:3.12-slim-bookworm AS build-image

@@ -11,13 +11,23 @@ from dipdup.fetcher import HasLevel
 from dipdup.runtimes import SubstrateRuntime
 
 
-class _BlockHeaderExtra(TypedDict):
-    number: int
+class _BlockHeader(TypedDict):
     hash: str
+    number: int
     parentHash: str
     stateRoot: str
     extrinsicsRoot: str
-    digest: str
+    digest: dict[str, dict[str, list[str]]]
+
+
+class _BlockHeaderExtra(TypedDict):
+    hash: str
+    number: int
+    parentHash: str
+    stateRoot: str
+    extrinsicsRoot: str
+    digest: dict[str, dict[str, list[str]]]
+
     specName: str
     specVersion: int
     implName: str
@@ -35,17 +45,11 @@ class _SubstrateSubsquidEventResponse(TypedDict):
     header: _BlockHeaderExtra
 
 
-class _BlockHeader(TypedDict):
-    hash: str
-    number: int
-    prev_root: str
-
-
 class _SubstrateNodeEventResponse(TypedDict):
     name: str
     index: int
     extrinsic_index: int
-    decoded_args: dict[str, Any]
+    decoded_args: dict[str, Any] | list[Any]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -55,9 +59,8 @@ class SubstrateEventData(HasLevel):
     index: int
     extrinsic_index: int
     call_address: list[str] | None
-    # we receive decoded args from node datasource and encoded from subsquid datasource
     args: list[Any] | None = None
-    decoded_args: dict[str, Any] | None = None
+    decoded_args: dict[str, Any] | list[Any] | None = None
     header: _BlockHeader
     header_extra: _BlockHeaderExtra | None
 
@@ -84,11 +87,7 @@ class SubstrateEventData(HasLevel):
             call_address=event_dict['callAddress'],
             args=event_dict['args'],
             decoded_args=None,
-            header={
-                'hash': event_dict['header']['hash'],
-                'number': event_dict['header']['number'],
-                'prev_root': event_dict['header']['parentHash'],
-            },
+            header=event_dict['header'],
             header_extra=event_dict['header'],
         )
 
@@ -112,20 +111,18 @@ class SubstrateEvent(Generic[PayloadT]):
     # TODO: Use lazy decoding in other models with typed payload
     @cached_property
     def payload(self) -> PayloadT:
-        # NOTE: from node datasource
+        # NOTE: We receive decoded args from node datasource and encoded from subsquid datasource
         if self.data.decoded_args is not None:
-            return cast(PayloadT, self.data.decoded_args)
-
-        # NOTE: from subsquid datasource
-        assert self.data.args is not None and self.data.header_extra is not None
-        return cast(
-            PayloadT,
-            self.runtime.decode_event_args(
-                name=self.name,
+            payload = self.data.decoded_args
+        elif self.data.args is not None and self.data.header_extra is not None:
+            payload = self.runtime.decode_event_args(
+                name=self.data.name,
                 args=self.data.args,
                 spec_version=str(self.data.header_extra['specVersion']),
-            ),
-        )
+            )
+        else:
+            raise NotImplementedError
+        return cast(PayloadT, payload)
 
     @property
     def level(self) -> int:

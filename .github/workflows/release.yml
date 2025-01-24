@@ -60,16 +60,18 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install PDM
-        run: pipx install pdm
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Run install
-        run: pdm install
+        run: make install
 
       - name: Run all checks
-        run: pdm run make all
+        run: uv run make all
         env:
-          NODE_API_KEY: ${{ secrets.ALCHEMY_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          ONFINALITY_API_KEY: ${{ secrets.ONFINALITY_API_KEY }}
 
       - name: Publish stable image
         uses: docker/build-push-action@v5

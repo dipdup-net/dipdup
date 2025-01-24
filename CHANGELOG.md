@@ -6,10 +6,11 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [8.2.0rc1] - ????-??-??
+## [8.2.0rc1] - 2025-01-23
 
 ### Added
 
+- project: Support uv package manager in the default project template.
 - substrate.events: Added `subtrate.events` index kind to process Substrate events.
 - substrate.node: Added `subtrate.node` datasource to receive data from Substrate node.
 - substrate.subscan: Added `substrate.subscan` datasource to fetch ABIs from Subscan.
@@ -17,11 +18,14 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
+- database: Don't process internal models twice if imported from the project.
 - evm.subsquid: Fixed event/transaction model deserialization.
 
 ### Changed
 
+- env: Database migrations with aeric require `DIPDUP_MIGRATIONS` variable to be set.
 - evm.etherscan: Datasource has been renamed from `abi.etherscan` to `evm.etherscan` for consistency.
+- project: Expose Prometheus and internal API ports in default sqlite environment.
 
 ## [8.1.4] - 2025-01-12
 

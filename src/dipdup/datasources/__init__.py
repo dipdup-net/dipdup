@@ -8,6 +8,7 @@ from typing import Generic
 from typing import TypeVar
 from uuid import uuid4
 
+from pysignalr.exceptions import ConnectionError
 from pysignalr.messages import CompletionMessage
 
 from dipdup.config import DatasourceConfig
@@ -159,6 +160,22 @@ class WebsocketDatasource(IndexDatasource[DatasourceConfigT]):
         self._ws_client.on_error(self._on_error)
 
         return self._ws_client
+
+    async def _ws_loop(self) -> None:
+        self._logger.info('Establishing realtime connection')
+        client = self._get_ws_client()
+        retry_sleep = self._http_config.retry_sleep
+
+        for _ in range(1, self._http_config.retry_count + 1):
+            try:
+                await client.run()
+            except ConnectionError as e:
+                self._logger.error('Websocket connection error: %s', e)
+                await self.emit_disconnected()
+                await asyncio.sleep(retry_sleep)
+                retry_sleep *= self._http_config.retry_multiplier
+
+        raise DatasourceError('Websocket connection failed', self.name)
 
 
 # FIXME: Not necessary a WS datasource

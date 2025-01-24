@@ -63,4 +63,4 @@ autodoc_typehints_format = 'short'
 
 from dipdup.config import DipDupConfig
 from pydantic.dataclasses import rebuild_dataclass
-rebuild_dataclass(DipDupConfig)
+rebuild_dataclass(DipDupConfig)  # type: ignore[arg-type]

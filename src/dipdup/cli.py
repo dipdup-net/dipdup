@@ -4,6 +4,7 @@ import atexit
 import logging
 import sys
 import traceback
+from collections import defaultdict
 from collections.abc import Callable
 from collections.abc import Coroutine
 from contextlib import AsyncExitStack
@@ -565,7 +566,13 @@ async def hasura_configure(ctx: click.Context, force: bool) -> None:
 @_cli_wrapper
 async def schema(ctx: click.Context) -> None:
     """Commands to manage database schema."""
-    if '--help' in sys.argv or ctx.invoked_subcommand not in AERICH_CMDS:
+    if any(
+        (
+            '--help' in sys.argv,
+            ctx.invoked_subcommand not in AERICH_CMDS,
+            not env.MIGRATIONS,
+        )
+    ):
         return
 
     config: DipDupConfig = ctx.obj.config
@@ -977,6 +984,51 @@ async def self_env(ctx: click.Context) -> None:
     env = dipdup.install.DipDupEnvironment()
     env.refresh()
     env.print()
+
+
+@cli.group(hidden=True)
+@click.pass_context
+@_cli_wrapper
+async def abi(ctx: click.Context) -> None:
+    pass
+
+
+@abi.command(name='lookup', hidden=True)
+@click.pass_context
+@click.argument('query', type=str)
+@_cli_wrapper
+async def abi_lookup(ctx: click.Context, query: str) -> None:
+    import subprocess
+
+    from dipdup.package import DipDupPackage
+
+    config: DipDupConfig = ctx.obj.config
+    package = DipDupPackage(config.package_path)
+    package.initialize()
+
+    abi_paths = (
+        package.abi,
+        package.abi_local,
+    )
+    # NOTE: save output instead of printing it
+    res = subprocess.run(
+        ('grep', '-n', '-r', query, *abi_paths),
+        capture_output=True,
+        check=False,
+    )
+    out = res.stdout.decode()
+    lines = out.splitlines()
+    grouped_lines = defaultdict(list)
+    for line in lines:
+        path, lineno, content = line.split(':', 2)
+        grouped_lines[path].append(f'{lineno:>6}: {content}')
+
+    for path, lines in grouped_lines.items():
+        echo('')
+        echo(path)
+        for line in sorted(lines):
+            echo('- ' + line)
+        echo('')
 
 
 @cli.group()

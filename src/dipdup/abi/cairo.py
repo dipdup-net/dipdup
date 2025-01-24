@@ -13,10 +13,10 @@ from dipdup.utils import json_dumps
 from dipdup.utils import touch
 
 if TYPE_CHECKING:
-    from starknet_py.abi.v2 import Abi  # type: ignore[import-untyped]
-    from starknet_py.cairo.data_types import CairoType  # type: ignore[import-untyped]
+    from starknet_py.abi.v2.model import Abi
+    from starknet_py.cairo.data_types import CairoType
     from starknet_py.cairo.data_types import EventType
-    from starknet_py.serialization import PayloadSerializer  # type: ignore[import-untyped]
+    from starknet_py.serialization.data_serializers.payload_serializer import PayloadSerializer
 
     from dipdup.package import DipDupPackage
 
@@ -33,23 +33,24 @@ class CairoAbi(TypedDict):
 
 
 def _convert_type(type_: CairoType) -> dict[str, Any]:
+    # FIXME: Fix typehints
     # TODO: Support all types
     if type_.__class__.__name__ in {'EventType', 'StructType'}:
-        if type_.name == 'Uint256':
+        if type_.name == 'Uint256':  # type: ignore[attr-defined]
             return {'type': 'integer'}
-        if type_.name == 'core::byte_array::ByteArray':
+        if type_.name == 'core::byte_array::ByteArray':  # type: ignore[attr-defined]
             return {'type': 'string'}
         return {
             'type': 'object',
-            'properties': {key: _convert_type(value) for key, value in type_.types.items()},
-            'required': tuple(type_.types.keys()),
+            'properties': {key: _convert_type(value) for key, value in type_.types.items()},  # type: ignore[attr-defined]
+            'required': tuple(type_.types.keys()),  # type: ignore[attr-defined]
             'additionalProperties': False,
         }
 
     if type_.__class__.__name__ == 'ArrayType':
         return {
             'type': 'array',
-            'items': _convert_type(type_.inner_type),
+            'items': _convert_type(type_.inner_type),  # type: ignore[attr-defined]
         }
 
     simple_type = {
@@ -76,8 +77,8 @@ def sn_keccak(x: str) -> str:
 @cache
 def _loaded_abis(package: DipDupPackage) -> dict[str, Abi]:
 
-    from starknet_py.abi.v2 import AbiParser
-    from starknet_py.abi.v2 import AbiParsingError
+    from starknet_py.abi.v2.parser import AbiParser
+    from starknet_py.abi.v2.parser import AbiParsingError
 
     result = {}
     for abi_path in package.cairo_abi_paths:
@@ -94,7 +95,7 @@ def _loaded_abis(package: DipDupPackage) -> dict[str, Abi]:
 
 
 def convert_abi(package: DipDupPackage) -> dict[str, CairoAbi]:
-    from starknet_py.serialization import serializer_for_event
+    from starknet_py.serialization.factory import serializer_for_event
 
     abi_by_typename: dict[str, CairoAbi] = {}
 
@@ -104,7 +105,7 @@ def convert_abi(package: DipDupPackage) -> dict[str, CairoAbi]:
         }
 
         for name, event_type in parsed_abi.events.items():
-            if name in converted_abi['events']:
+            if name in converted_abi['events']:  # type: ignore[comparison-overlap]
                 raise NotImplementedError('Multiple events with the same name are not supported')
             converted_abi['events'].append(
                 CairoEventAbi(

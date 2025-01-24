@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from asyncio import Event
 from collections import defaultdict
@@ -13,10 +12,8 @@ from enum import Enum
 from functools import partial
 from typing import Any
 from typing import NamedTuple
-from typing import NoReturn
 from typing import cast
 
-import pysignalr.exceptions
 from pysignalr.client import SignalRClient
 from pysignalr.messages import CompletionMessage
 
@@ -28,7 +25,7 @@ from dipdup.config.tezos import TezosContractConfig
 from dipdup.config.tezos_tzkt import TZKT_API_URLS
 from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
 from dipdup.datasources import Datasource
-from dipdup.datasources import IndexDatasource
+from dipdup.datasources import WebsocketDatasource
 from dipdup.exceptions import DatasourceError
 from dipdup.exceptions import FrameworkException
 from dipdup.models import Head
@@ -46,6 +43,7 @@ from dipdup.models.tezos import TezosTokenTransferData
 from dipdup.models.tezos_tzkt import HeadSubscription
 from dipdup.models.tezos_tzkt import TezosTzktMessageType
 from dipdup.models.tezos_tzkt import TezosTzktSubscription
+from dipdup.pysignalr import WebsocketTransport
 from dipdup.utils import split_by_chunks
 
 ORIGINATION_REQUEST_LIMIT = 100
@@ -231,7 +229,7 @@ class ContractHashes:
         return self._hashes_to_address[(code_hash, type_hash)]
 
 
-class TezosTzktDatasource(IndexDatasource[TezosTzktDatasourceConfig]):
+class TezosTzktDatasource(WebsocketDatasource[TezosTzktDatasourceConfig]):
     _default_http_config = HttpConfig(
         retry_sleep=1,
         retry_multiplier=1.1,
@@ -281,22 +279,8 @@ class TezosTzktDatasource(IndexDatasource[TezosTzktDatasourceConfig]):
     def request_limit(self) -> int:
         return self._http_config.batch_size
 
-    # FIXME: Join retry logic with other index datasources
     async def run(self) -> None:
-        self._logger.info('Establishing realtime connection')
-        signalr_client = self._get_signalr_client()
-        retry_sleep = self._http_config.retry_sleep
-
-        for _ in range(1, self._http_config.retry_count + 1):
-            try:
-                await signalr_client.run()
-            except pysignalr.exceptions.ConnectionError as e:
-                self._logger.error('Websocket connection error: %s', e)
-                await self.emit_disconnected()
-                await asyncio.sleep(retry_sleep)
-                retry_sleep *= self._http_config.retry_multiplier
-
-        raise DatasourceError('Websocket connection failed', self.name)
+        await self._ws_loop()
 
     async def initialize(self) -> None:
         head_block = await self.get_head_block()
@@ -1201,6 +1185,9 @@ class TezosTzktDatasource(IndexDatasource[TezosTzktDatasourceConfig]):
             else:
                 offset += self.request_limit
 
+    def _get_ws_client(self) -> WebsocketTransport:
+        return self._get_signalr_client()  # type: ignore[return-value]
+
     def _get_signalr_client(self) -> SignalRClient:
         """Create SignalR client, register message callbacks"""
         if self._signalr_client:
@@ -1235,23 +1222,7 @@ class TezosTzktDatasource(IndexDatasource[TezosTzktDatasourceConfig]):
         client = self._get_signalr_client()
         await client.send(method, arguments, on_invocation)  # type: ignore[arg-type]
 
-    async def _on_connected(self) -> None:
-        self._logger.info('Realtime connection established')
-        # NOTE: Subscribing here will block WebSocket loop, don't do it.
-        await self.emit_connected()
-
-    async def _on_disconnected(self) -> None:
-        self._logger.info('Realtime connection lost, resetting subscriptions')
-        self._subscriptions.reset()
-        # NOTE: Just in case
-        self._contract_hashes.reset()
-        await self.emit_disconnected()
-
-    async def _on_error(self, message: CompletionMessage) -> NoReturn:
-        """Raise exception from WS server's error message"""
-        raise DatasourceError(datasource=self.name, msg=cast(str, message.error))
-
-    async def _on_message(self, type_: TezosTzktMessageType, message: list[dict[str, Any]]) -> None:
+    async def _on_message(self, type_: TezosTzktMessageType, message: list[dict[str, Any]]) -> None:  # type: ignore[override]
         """Parse message received from Websocket, ensure it's correct in the current context and yield data."""
         # NOTE: Parse messages and either buffer or yield data
         for item in message:

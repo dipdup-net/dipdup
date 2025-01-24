@@ -8,16 +8,18 @@ import orjson
 
 from dipdup.codegen import CodeGenerator
 from dipdup.config import DipDupConfig
-from dipdup.config import HandlerConfig
 from dipdup.config.substrate import SubstrateIndexConfig
 from dipdup.config.substrate_events import SubstrateEventsIndexConfig
 from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
 from dipdup.datasources import Datasource
 from dipdup.datasources.substrate_node import SubstrateNodeDatasource
 from dipdup.datasources.substrate_subscan import SubstrateSubscanDatasource
+from dipdup.exceptions import ConfigurationError
 from dipdup.package import DipDupPackage
 from dipdup.runtimes import SubstrateRuntime
 from dipdup.runtimes import extract_args_name
+from dipdup.runtimes import extract_tuple_inner_types
+from dipdup.runtimes import get_type_key
 from dipdup.utils import json_dumps
 from dipdup.utils import pascal_to_snake
 from dipdup.utils import snake_to_pascal
@@ -31,8 +33,9 @@ def scale_type_to_jsonschema(
     type_registry: dict[str, Any],
     type_string: str,
 ) -> dict[str, Any]:
-    if type_string in type_registry['types']:
-        type_def = type_registry['types'][type_string]
+    type_key = get_type_key(type_string)
+    if {type_string, type_key} & set(type_registry['types']):
+        type_def = type_registry['types'][type_key]
         if isinstance(type_def, str):
             return scale_type_to_jsonschema(type_registry, type_def)
         if isinstance(type_def, dict):
@@ -67,6 +70,12 @@ def scale_type_to_jsonschema(
         schema['type'] = 'boolean'
     elif type_string in ['String', 'str']:
         schema['type'] = 'string'
+    # FIXME: We need to parse weird values like `Tuple:staging_xcm:v4:location:Locationstaging_xcm:v4:location:Location`; mind the missing delimeters
+    elif type_string.startswith('Tuple:'):
+        inner_types = extract_tuple_inner_types(type_string, type_registry)
+        schema['type'] = 'array'
+        schema['items'] = [scale_type_to_jsonschema(type_registry, t) for t in inner_types]
+
     elif type_string.startswith('Vec<'):
         inner_type = type_string[4:-1]
         schema['type'] = 'array'
@@ -83,9 +92,10 @@ def event_metadata_to_jsonschema(
     metadata: dict[str, Any],
 ) -> dict[str, Any]:
     description = '\n'.join(metadata['docs']).replace(r'\[', '[').replace(r'\]', ']')
-    args_name = [a for a in metadata.get('args_name', ()) if a]
+    args_name = tuple(a for a in metadata.get('args_name', ()) if a)
     if not args_name:
-        args_name = extract_args_name(description)  # type: ignore[assignment]
+        args_name = extract_args_name(tuple(metadata['docs']))
+
     schema = {
         '$schema': 'http://json-schema.org/draft-07/schema#',
         'title': metadata['name'],
@@ -150,10 +160,7 @@ class SubstrateCodeGenerator(CodeGenerator):
 
             processed.add(name)
 
-    async def generate_schemas(self) -> None:
-        self._cleanup_schemas()
-
-        handler_config: HandlerConfig
+    def get_target_events(self) -> dict[str, list[str]]:
         target_events: dict[str, list[str]] = {}
 
         for index_config in self._config.indexes.values():
@@ -163,6 +170,13 @@ class SubstrateCodeGenerator(CodeGenerator):
                     target_events[runtime_name] = []
                 for handler_config in index_config.handlers:
                     target_events[runtime_name].append(handler_config.name)
+
+        return target_events
+
+    async def generate_schemas(self) -> None:
+        self._cleanup_schemas()
+
+        target_events = self.get_target_events()
 
         if not target_events:
             return
@@ -180,6 +194,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                         qualname = f'{module["name"]}.{event_item["name"]}'
                         if qualname not in events:
                             continue
+                        target_events[runtime_name].remove(qualname)
 
                         # FIXME: ignore when only docs changed?
                         dump = orjson.dumps({**event_item, 'name': ''})
@@ -195,7 +210,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                             / 'substrate'
                             / runtime_name
                             / 'substrate_events'
-                            / pascal_to_snake(qualname)
+                            / pascal_to_snake(qualname.replace('.', ''))
                             / f'{metadata_path.stem.replace('.', '_')}.json'
                         )
                         if schema_path.exists():
@@ -205,14 +220,38 @@ class SubstrateCodeGenerator(CodeGenerator):
 
                         write(schema_path, json_dumps(jsonschema))
 
+        for runtime_name, events in target_events.items():
+            if events:
+                msg = f'Runtime `{runtime_name}` misses following events: {', '.join(events)}'
+                raise ConfigurationError(msg)
+
     async def _generate_types(self, force: bool = False) -> None:
         await super()._generate_types(force)
 
+        target_events = self.get_target_events()
+
         for typeclass_dir in self._package.types.glob('**/substrate_events/*'):
 
-            typeclass_name = f'{snake_to_pascal(typeclass_dir.name)}Payload'
+            # NOTE: Find corresponding event
+            try:
+                events = target_events[typeclass_dir.parts[-3]]
+            except KeyError:
+                self._logger.info(
+                    'No indexes in config use `%s` runtime; skipping `%s`', typeclass_dir.parts[-3], typeclass_dir.name
+                )
+                continue
 
-            versions = [p.stem[1:] for p in typeclass_dir.glob('*.py') if p.name.startswith('v')]
+            for event_name in events:
+                if pascal_to_snake(event_name.replace('.', '')) == typeclass_dir.stem:
+                    name = event_name
+                    break
+            else:
+                raise Exception(f'Event not found for {typeclass_dir.stem}')
+
+            # NOTE: Don't extract from typeclass path! XYK.Sell -> xyk_sell -> XykSellPayload; should be XYKSellPayload.
+            typeclass_name = f'{snake_to_pascal(name)}Payload'
+
+            versions = [p.stem[1:] for p in sorted_glob(typeclass_dir, '*.py') if p.name.startswith('v')]
             root_lines = [
                 *(f'from .v{v} import V{v}' for v in versions),
                 '',

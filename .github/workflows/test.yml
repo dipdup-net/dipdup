@@ -30,8 +30,8 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Install PDM
-        run: pipx install pdm
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -40,13 +40,15 @@ jobs:
           cache: 'pip'
 
       - name: Run install
-        run: pdm sync
+        run: make install
 
       - name: Run lint
-        run: pdm run make lint
+        run: uv run make lint
         if: contains(matrix.os, 'ubuntu') && contains(matrix.arch, 'amd64')
 
       - name: Run tests
-        run: pdm run make test
+        run: uv run make test
         env:
-          NODE_API_KEY: ${{ secrets.ALCHEMY_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          ONFINALITY_API_KEY: ${{ secrets.ONFINALITY_API_KEY }}

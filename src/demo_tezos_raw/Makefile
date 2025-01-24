@@ -16,11 +16,11 @@ all:            ## Run an entire CI pipeline
 ##
 
 install:        ## Install dependencies
-	pdm install
+	uv sync --all-extras --all-groups
 
 update:         ## Update dependencies
-	pdm update
 	dipdup self update -q
+	uv sync --all-extras --all-groups
 
 format:         ## Format with all tools
 	make black

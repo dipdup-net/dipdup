@@ -3,7 +3,7 @@
 
 # Add metadata and build files
 !pyproject.toml
-!pdm.lock
+!*.lock
 !README.md
 !requirements**
 

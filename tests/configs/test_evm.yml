@@ -8,5 +8,5 @@ datasources:
     api_key: ${ETHERSCAN_API_KEY:-''}
   evm_node:
     kind: evm.node
-    url: ${NODE_URL:-https://eth-mainnet.g.alchemy.com/v2}/${NODE_API_KEY:-''}
-    ws_url: ${NODE_WS_URL:-wss://eth-mainnet.g.alchemy.com/v2}/${NODE_API_KEY:-''}
+    url: ${NODE_URL:-https://eth-mainnet.g.alchemy.com/v2}/${ALCHEMY_API_KEY:-''}
+    ws_url: ${NODE_WS_URL:-wss://eth-mainnet.g.alchemy.com/v2}/${ALCHEMY_API_KEY:-''}
