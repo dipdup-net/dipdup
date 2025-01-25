@@ -7,7 +7,6 @@ concurrency:
 on:
   push:
     tags:
-      - '8.*.*'
       - 'docs'
       - 'docs-next'
     branches:

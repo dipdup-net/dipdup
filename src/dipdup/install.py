@@ -26,6 +26,7 @@ WHICH_CMDS = (
     'poetry',
     'pyvenv',
     'pyenv',
+    'uv',
 )
 ENV_VARS = (
     'SHELL',
@@ -183,6 +184,7 @@ def install(
     update: bool = False,
     with_pdm: bool = False,
     with_poetry: bool = False,
+    with_uv: bool = False,
 ) -> None:
     """Install DipDup and its dependencies with pipx"""
     if ref and path:
@@ -237,10 +239,14 @@ def install(
     for pm, with_pm in (
         ('pdm', with_pdm),
         ('poetry', with_poetry),
+        ('uv', with_uv),
     ):
         if pm in pipx_packages:
             if update:
                 env.run_cmd('pipx', 'upgrade', '--python', python_inter_pipx, pm, *pipx_args)
+        # NOTE: Installed from other sources; skip
+        elif env._commands.get(pm):
+            pass
         elif with_pm or force or quiet or ask(f'Install `{pm}`?', False):
             echo(f'Installing `{pm}`')
             env.run_cmd('pipx', 'install', '--python', python_inter_pipx, *pipx_args, pm)
@@ -294,6 +300,7 @@ def cli() -> None:
     parser.add_argument('-e', '--editable', action='store_true', help='Install DipDup in editable mode')
     parser.add_argument('--with-pdm', action='store_true', help='Install PDM')
     parser.add_argument('--with-poetry', action='store_true', help='Install Poetry')
+    parser.add_argument('--with-uv', action='store_true', help='Install uv')
     args = parser.parse_args()
 
     if not args.quiet:
@@ -313,6 +320,7 @@ def cli() -> None:
             update=args.update,
             with_pdm=args.with_pdm,
             with_poetry=args.with_poetry,
+            with_uv=args.with_uv,
         )
 
 
