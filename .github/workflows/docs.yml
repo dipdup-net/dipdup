@@ -18,7 +18,7 @@ on:
       - '.github/workflows/installer.yml'
 
 env:
-  FRONTEND_BRANCH: ${{ github.ref == 'refs/heads/docs-next' && 'dev' || 'master' }}
+  FRONTEND_BRANCH: ${{ github.ref_name == 'docs-next' && 'dev' || 'master' }}
   GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
 
 jobs:
