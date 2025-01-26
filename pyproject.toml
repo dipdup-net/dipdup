@@ -76,8 +76,7 @@ dependencies = [
     "strict-rfc3339~=0.7",
     "survey~=5.4",
     "tabulate~=0.9",
-    # TODO: 0.23.0 available
-    "tortoise-orm==0.21.7",  # pinned
+    "tortoise-orm==0.24.0",  # pinned
     "uvloop~=0.20",
     "web3~=7.2",
 ]
