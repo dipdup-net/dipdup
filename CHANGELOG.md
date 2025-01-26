@@ -461,7 +461,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 - demos: Fixed decimal overflow in `demo_uniswap` project.
 - evm.node: Fixed incorrect log request parameters.
 - evm.subsquid.events: Fixed issue with determining the last level when syncing with node.
-- hasura: Increated retry count for initial connection (healthcheck).
+- hasura: Increased retry count for initial connection (healthcheck).
 
 ## [7.0.0] - 2023-09-25
 
