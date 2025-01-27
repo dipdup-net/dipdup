@@ -62,6 +62,10 @@ class DipDupPackage:
         self.root = root
         self.name = root.name
 
+        # NOTE: Paths expected to exist in package root
+        self.pyproject = root.parent / 'pyproject.toml'
+        self.root_config = root.parent / 'dipdup.yaml'
+
         # NOTE: Package sections with .keep markers
         self.abi = root / 'abi'
         self.configs = root / 'configs'
@@ -163,6 +167,16 @@ class DipDupPackage:
             raise ProjectPackageError(f'`{self.name}` is not a valid Python package name')
         if self.root.exists() and not self.root.is_dir():
             raise ProjectPackageError(f'`{self.root}` exists and not a directory')
+
+        # TODO: Remove in 9.0
+        def act(x):
+            if env.NEXT:
+                raise ProjectPackageError(x)
+            _logger.warning(x)
+
+        for path in (self.root_config, self.pyproject):
+            if not path.is_file():
+                act(f'`{path}` not found. Have you created a project with `dipdup new` command?')
 
     def _post_init(self) -> None:
         # NOTE: Allows plain package structure to be imported
