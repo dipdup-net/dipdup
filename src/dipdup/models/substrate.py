@@ -114,7 +114,7 @@ class SubstrateEvent(Generic[PayloadT]):
         # NOTE: We receive decoded args from node datasource and encoded from subsquid datasource
         if self.data.decoded_args is not None:
             payload = self.data.decoded_args
-        elif self.data.args is not None and self.data.header_extra is not None:
+        elif self.data.args and self.data.header_extra:
             payload = self.runtime.decode_event_args(
                 name=self.data.name,
                 args=self.data.args,
@@ -122,6 +122,7 @@ class SubstrateEvent(Generic[PayloadT]):
             )
         else:
             raise NotImplementedError
+
         return cast(PayloadT, payload)
 
     @property

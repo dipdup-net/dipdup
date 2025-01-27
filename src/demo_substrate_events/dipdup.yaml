@@ -26,6 +26,7 @@ indexes:
     - subsquid
     - subscan
     - node
+    first_level: 8084519
     handlers:
     - callback: on_transfer
       name: Assets.Transferred

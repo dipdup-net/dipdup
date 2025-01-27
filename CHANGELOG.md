@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
+## [Unreleased]
+
+### Fixed
+
+- substrate.subsquid: Fixed parsing nested structures in response.
+
 ## [8.2.0rc1] - 2025-01-24
 
 ### Added
