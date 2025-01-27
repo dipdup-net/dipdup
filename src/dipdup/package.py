@@ -169,7 +169,7 @@ class DipDupPackage:
             raise ProjectPackageError(f'`{self.root}` exists and not a directory')
 
         # TODO: Remove in 9.0
-        def act(x):
+        def act(x: str) -> None:
             if env.NEXT:
                 raise ProjectPackageError(x)
             _logger.warning(x)
