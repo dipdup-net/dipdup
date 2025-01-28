@@ -6,7 +6,7 @@ services:
     depends_on:
       - db
       - hasura
-    command: ["-c", "dipdup.yaml", "-c", "configs/dipdup.swarm.yaml", "run"]
+    command: ["-C", "swarm", "run"]
     env_file: .env
     networks:
       - internal
@@ -50,7 +50,7 @@ services:
     logging: *logging
 
   hasura:
-    image: hasura/graphql-engine:latest
+    image: hasura/graphql-engine:latest-pg16
     depends_on:
       - db
     environment:

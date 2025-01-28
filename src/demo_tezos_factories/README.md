@@ -25,16 +25,13 @@ dipdup run
 Store data in SQLite database (defaults to /tmp, set `SQLITE_PATH` env variable):
 
 ```shell
-dipdup -c . -c configs/dipdup.sqlite.yaml run
+dipdup -C sqlite run
 ```
 
 Or spawn a Compose stack with PostgreSQL and Hasura:
 
 ```shell
-cd deploy
-cp .env.default .env
-# Edit .env file before running
-docker-compose up
+make up
 ```
 
 ## Development setup
