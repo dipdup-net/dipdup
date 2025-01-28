@@ -560,7 +560,7 @@ requires-dist = [
     { name = "strict-rfc3339", specifier = "~=0.7" },
     { name = "survey", specifier = "~=5.4" },
     { name = "tabulate", specifier = "~=0.9" },
-    { name = "tortoise-orm", specifier = "==0.22.1" },
+    { name = "tortoise-orm", specifier = "==0.24.0" },
     { name = "uvloop", specifier = "~=0.20" },
     { name = "web3", specifier = "~=7.2" },
 ]
@@ -1326,11 +1326,11 @@ wheels = [
 
 [[package]]
 name = "pypika-tortoise"
-version = "0.3.2"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f2/6f/d7bfc44f9d8d68e33866688f7ce9ba0785b485e4dec1590ae0a6ba73b5e2/pypika_tortoise-0.3.2.tar.gz", hash = "sha256:f5d508e2ef00255e52ec6ac79ef889e10dbab328f218c55cd134c4d02ff9f6f4", size = 40445 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/7b/74dce3354d81988f1d69b689f20b28c3e92f2dcc0c46975bdafd3eb37b18/pypika_tortoise-0.5.0.tar.gz", hash = "sha256:ed0f56761868dc222c03e477578638590b972280b03c7c45cd93345b18b61f58", size = 39701 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/8f/85ae29998186957487b9bab089e382e812b8104ed9da47d7815ba04d57bd/pypika_tortoise-0.3.2-py3-none-any.whl", hash = "sha256:c5c52bc4473fe6f3db36cf659340750246ec5dd0f980d04ae7811430e299c3a2", size = 50832 },
+    { url = "https://files.pythonhosted.org/packages/36/bc/830cfe07a84a9ff75d2ae96696b933744b7f20ef40ad69b002b8cf9265e3/pypika_tortoise-0.5.0-py3-none-any.whl", hash = "sha256:dbdc47eb52ce17407b05ce9f8560ce93b856d7b28beb01971d956b017846691f", size = 45915 },
 ]
 
 [[package]]
@@ -1855,18 +1855,17 @@ wheels = [
 
 [[package]]
 name = "tortoise-orm"
-version = "0.22.1"
+version = "0.24.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiosqlite" },
     { name = "iso8601" },
-    { name = "pydantic" },
     { name = "pypika-tortoise" },
     { name = "pytz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/be/97/49fa461b4bd802ffa1671c60662a4fe8acbeebcef4155258101cf9048d02/tortoise_orm-0.22.1.tar.gz", hash = "sha256:50cce7ab3eee5321553810ee31f411abde7a1806312655a377801c91e1b2cb77", size = 143909 }
+sdist = { url = "https://files.pythonhosted.org/packages/64/81/973b629f8a70fc928343f4f8be6121023b6c6f0ee0ae45695955db82af47/tortoise_orm-0.24.0.tar.gz", hash = "sha256:ae0704a93ea27931724fc899e57268c8081afce3b32b110b00037ec206553e7d", size = 143958 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d3/da/7e5783f9037c2a6bee9914b03a307396c37a5d9797d15f465ad04613d4a4/tortoise_orm-0.22.1-py3-none-any.whl", hash = "sha256:96b8dbc10956cb5cfb6f02841b238035924a6011b5a9737774a22859e1b7bcbf", size = 181570 },
+    { url = "https://files.pythonhosted.org/packages/96/88/313395d3ae15f24b18496c4f8077404ee0336eea2a9c648466c406f053b3/tortoise_orm-0.24.0-py3-none-any.whl", hash = "sha256:ee3b72b226767293b24c5c4906ae5f027d7cc84496cd503352c918564b4fd687", size = 164094 },
 ]
 
 [[package]]
