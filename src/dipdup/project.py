@@ -95,7 +95,7 @@ def get_default_answers() -> Answers:
         email='john_doe@example.com',
         postgres_image='postgres:16',
         postgres_data_path='/var/lib/postgresql/data',
-        hasura_image='hasura/graphql-engine:latest-pg16',
+        hasura_image='hasura/graphql-engine:latest',
         line_length='120',
         package_manager='uv',
         _survey_config=None,
