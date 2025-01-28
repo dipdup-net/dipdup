@@ -266,7 +266,7 @@ class UpdateQuery(TortoiseUpdateQuery):
         )
         self.filter_queryset = filter_queryset
 
-    async def _execute(self) -> int:
+    async def _execute(self, sql, values) -> int:
         _logger.debug('Prefetching query models: %s', self.filter_queryset)
         models = await self.filter_queryset
         _logger.debug('Got %s', len(models))
@@ -278,7 +278,7 @@ class UpdateQuery(TortoiseUpdateQuery):
             if update := ModelUpdate.from_model(model, ModelUpdateAction.UPDATE):
                 get_pending_updates().append(update)
 
-        return await super()._execute()
+        return await super()._execute(sql, values)
 
 
 class DeleteQuery(TortoiseDeleteQuery):
@@ -309,7 +309,7 @@ class DeleteQuery(TortoiseDeleteQuery):
 
 
 class BulkUpdateQuery(TortoiseBulkUpdateQuery):  # type: ignore[type-arg]
-    async def _execute(self) -> int:
+    async def _execute_many(self, queries_with_params: list[tuple[str, list[Any]]]) -> int:
         for model in self._objects:
             if update := ModelUpdate.from_model(
                 cast(Model, model),
@@ -317,11 +317,11 @@ class BulkUpdateQuery(TortoiseBulkUpdateQuery):  # type: ignore[type-arg]
             ):
                 get_pending_updates().append(update)
 
-        return await super()._execute()
+        return await super()._execute_many(queries_with_params)
 
 
 class BulkCreateQuery(TortoiseBulkCreateQuery):  # type: ignore[type-arg]
-    async def _execute(self) -> None:
+    async def _execute_many(self) -> int:
         for model in self._objects:
             if update := ModelUpdate.from_model(
                 cast(Model, model),
@@ -329,7 +329,7 @@ class BulkCreateQuery(TortoiseBulkCreateQuery):  # type: ignore[type-arg]
             ):
                 get_pending_updates().append(update)
 
-        await super()._execute()
+        await super()._execute_many()
 
         # NOTE: A bug; raises "You should first call .save()..." otherwise
         for model in self._objects:
