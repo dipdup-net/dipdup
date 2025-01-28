@@ -12,6 +12,10 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 - package: DipDup packages are expected to have `pyproject.toml` and `dipdup.yaml` files in the root directory. This will become a requirement in 9.0.
 
+### Other
+
+- deps: `tortoise-orm` updated to 0.24.0.
+
 ## [8.2.0rc1] - 2025-01-24
 
 ### Added
