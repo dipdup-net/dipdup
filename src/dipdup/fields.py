@@ -59,7 +59,7 @@ _EnumFieldT = TypeVar('_EnumFieldT', bound=Enum)
 
 
 JSONField = partial(
-    _JSONField,
+    _JSONField[Any],
     encoder=json_dumps_plain,
     decoder=orjson.loads,
 )
