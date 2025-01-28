@@ -251,9 +251,9 @@ def answers_from_terminal(template: str | None) -> Answers:
     _, answers['postgres_image'] = prompt_anyof(
         question='Choose PostgreSQL version. Try TimescaleDB when working with time series.',
         options=(
-            'postgres:15',
-            'timescale/timescaledb:latest-pg15',
-            'timescale/timescaledb-ha:pg15',
+            'postgres:16',
+            'timescale/timescaledb:latest-pg16',
+            'timescale/timescaledb-ha:pg16',
         ),
         comments=(
             'PostgreSQL',
