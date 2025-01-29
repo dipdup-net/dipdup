@@ -10,7 +10,7 @@ services:
     ports:
       - 46339
       - 9000
-    command: ["-c", "dipdup.yaml", "-c", "configs/dipdup.compose.yaml", "run"]
+    command: ["-C", "compose", "run"]
     depends_on:
       - db
       - hasura
