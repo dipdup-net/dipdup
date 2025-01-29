@@ -275,24 +275,23 @@ def extract_subsquid_payload(data: Any) -> Any:
 
     if isinstance(data, dict):
 
-        if '__kind' in data:
-            kind = data['__kind']
-            if 'value' in data:
-                value = data['value']
-                if isinstance(value, list):
-                    # Handle list of values
-                    value = tuple(extract_subsquid_payload(item) for item in value)
-                elif isinstance(value, str):
-                    value = int(value)
-                return {kind: value}
-            # NOTE: Special case
-            if 'key' in data:
-                return {kind: data['key']}
-            # If 'value' is not present, just use the kind
-            return kind
+        if (kind := data.get('__kind')) is None:
+            return {key: extract_subsquid_payload(value) for key, value in data.items()}
 
-        # Process other dictionaries
-        return {key: extract_subsquid_payload(value) for key, value in data.items()}
+        if 'value' in data:
+            value = data['value']
+            if isinstance(value, list | tuple):
+                # Handle list of values
+                value = tuple(extract_subsquid_payload(item) for item in value)
+            # FIXME: We probably shouldn't do this
+            elif isinstance(value, str):
+                value = int(value)
+            return {kind: value}
 
-    # Return primitive values as-is
+        # NOTE: Special case
+        if 'key' in data:
+            return {kind: data['key']}
+
+        return kind
+
     return data
