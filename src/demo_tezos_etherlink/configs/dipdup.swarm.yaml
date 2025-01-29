@@ -3,12 +3,12 @@ database:
   host: ${POSTGRES_HOST:-demo_tezos_etherlink_db}
   port: 5432
   user: ${POSTGRES_USER:-dipdup}
-  password: ${POSTGRES_PASSWORD}
+  password: ${POSTGRES_PASSWORD:-changeme}
   database: ${POSTGRES_DB:-dipdup}
 
 hasura:
   url: http://${HASURA_HOST:-demo_tezos_etherlink_hasura}:8080
-  admin_secret: ${HASURA_SECRET}
+  admin_secret: ${HASURA_SECRET:-changeme}
   allow_aggregations: ${HASURA_ALLOW_AGGREGATIONS:-false}
   select_limit: ${HASURA_SELECT_LIMIT:-100}
   camel_case: ${HASURA_CAMEL_CASE:-true}

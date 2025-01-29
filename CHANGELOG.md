@@ -8,6 +8,11 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ## [Unreleased]
 
+### Changed
+
+- project: Set default PostgreSQL password and Hasura secret (both are `changeme`) for new projects.
+- project: Use PostgreSQL 16 image for new projects.
+
 ### Deprecated
 
 - package: DipDup packages are expected to have `pyproject.toml` and `dipdup.yaml` files in the root directory. This will become a requirement in 9.0.
