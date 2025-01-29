@@ -31,6 +31,8 @@ dipdup -C sqlite run
 Or spawn a Compose stack with PostgreSQL and Hasura:
 
 ```shell
+cp deploy/.env.default deploy/.env
+# Edit .env file before running
 make up
 ```
 
