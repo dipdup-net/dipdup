@@ -270,46 +270,26 @@ class SubstrateRuntime:
 
 
 def extract_subsquid_payload(data: Any) -> Any:
-    if isinstance(data, list):
+    if isinstance(data, list | tuple):
         return tuple(extract_subsquid_payload(item) for item in data)
 
     if isinstance(data, dict):
-        if 'interior' in data:
-            # Handle interior dictionary
-            result = {'parents': data['parents']}
-            interior = data['interior']
 
-            if '__kind' in interior:
-                kind = interior['__kind']
-                if 'value' in interior:
-                    value = interior['value']
-                    if isinstance(value, list):
-                        # Handle list of values
-                        value = tuple(
-                            (
-                                {
-                                    item['__kind']: (
-                                        int(item['value'])
-                                        if isinstance(item['value'], str)
-                                        else (
-                                            tuple(item['value']) if isinstance(item['value'], list) else item['value']
-                                        )
-                                    )
-                                }
-                                if item.get('value')
-                                else item['__kind']
-                            )
-                            for item in value
-                        )
-                    elif isinstance(value, str):
-                        value = int(value)
-                    result['interior'] = {kind: value}
-                else:
-                    # If 'value' is not present, just use the kind
-                    result['interior'] = kind
-            else:
-                result['interior'] = extract_subsquid_payload(interior)
-            return result
+        if '__kind' in data:
+            kind = data['__kind']
+            if 'value' in data:
+                value = data['value']
+                if isinstance(value, list):
+                    # Handle list of values
+                    value = tuple(extract_subsquid_payload(item) for item in value)
+                elif isinstance(value, str):
+                    value = int(value)
+                return {kind: value}
+            # NOTE: Special case
+            if 'key' in data:
+                return {kind: data['key']}
+            # If 'value' is not present, just use the kind
+            return kind
 
         # Process other dictionaries
         return {key: extract_subsquid_payload(value) for key, value in data.items()}
