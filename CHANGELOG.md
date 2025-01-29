@@ -8,6 +8,10 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ## [Unreleased]
 
+### Fixed
+
+- substrate.subsquid: Fixed parsing nested structures in response.
+
 ### Changed
 
 - project: Set default PostgreSQL password and Hasura secret (both are `changeme`) for new projects.

@@ -263,4 +263,35 @@ class SubstrateRuntime:
                 new_key = pascal_to_snake(key)
                 payload[new_key] = payload.pop(key)
 
-        return payload
+        # NOTE: Also, we need to unpack TypeScript structures to the original form
+        payload = extract_subsquid_payload(payload)
+
+        return payload  # noqa: RET504
+
+
+def extract_subsquid_payload(data: Any) -> Any:
+    if isinstance(data, list | tuple):
+        return tuple(extract_subsquid_payload(item) for item in data)
+
+    if isinstance(data, dict):
+
+        if (kind := data.get('__kind')) is None:
+            return {key: extract_subsquid_payload(value) for key, value in data.items()}
+
+        if 'value' in data:
+            value = data['value']
+            if isinstance(value, list | tuple):
+                # Handle list of values
+                value = tuple(extract_subsquid_payload(item) for item in value)
+            # FIXME: We probably shouldn't do this
+            elif isinstance(value, str):
+                value = int(value)
+            return {kind: value}
+
+        # NOTE: Special case
+        if 'key' in data:
+            return {kind: data['key']}
+
+        return kind
+
+    return data
