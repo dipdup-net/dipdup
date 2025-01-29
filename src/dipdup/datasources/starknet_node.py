@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
@@ -70,3 +70,14 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             chunk_size=self._http_config.batch_size,
             continuation_token=continuation_token,
         )
+    
+    async def get_abi(self, address: str) -> dict[str, Any]:
+        class_at_response = await self.starknetpy.get_class_at(address, block_number='latest')
+        
+        parsed_abi = None
+        if isinstance(class_at_response.abi, str):
+            parsed_abi = class_at_response.parsed_abi()
+        else:
+            parsed_abi = class_at_response.abi()
+
+        return parsed_abi
