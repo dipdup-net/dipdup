@@ -309,30 +309,30 @@ class DeleteQuery(TortoiseDeleteQuery):
 
 
 class BulkUpdateQuery(TortoiseBulkUpdateQuery):  # type: ignore[type-arg]
-    async def _execute(self) -> int:
-        for model in self.objects:
+    async def _execute_many(self, queries_with_params: list[tuple[str, list[Any]]]) -> int:
+        for model in self._objects:
             if update := ModelUpdate.from_model(
                 cast(Model, model),
                 ModelUpdateAction.UPDATE,
             ):
                 get_pending_updates().append(update)
 
-        return await super()._execute()
+        return await super()._execute_many(queries_with_params)
 
 
 class BulkCreateQuery(TortoiseBulkCreateQuery):  # type: ignore[type-arg]
-    async def _execute(self) -> None:
-        for model in self.objects:
+    async def _execute_many(self, insert_sql: str, insert_sql_all: str) -> None:
+        for model in self._objects:
             if update := ModelUpdate.from_model(
                 cast(Model, model),
                 ModelUpdateAction.INSERT,
             ):
                 get_pending_updates().append(update)
 
-        await super()._execute()
+        await super()._execute_many(insert_sql, insert_sql_all)
 
         # NOTE: A bug; raises "You should first call .save()..." otherwise
-        for model in self.objects:
+        for model in self._objects:
             model._saved_in_db = True
 
 

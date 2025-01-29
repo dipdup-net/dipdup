@@ -928,6 +928,7 @@ async def self_install(
         editable=editable,
         with_pdm=replay is not None and replay['package_manager'] == 'pdm',
         with_poetry=replay is not None and replay['package_manager'] == 'poetry',
+        with_uv=replay is not None and replay['package_manager'] == 'uv',
     )
 
 
@@ -972,6 +973,7 @@ async def self_update(
         update=True,
         with_pdm=replay is not None and replay['package_manager'] == 'pdm',
         with_poetry=replay is not None and replay['package_manager'] == 'poetry',
+        with_uv=replay is not None and replay['package_manager'] == 'uv',
     )
 
 
