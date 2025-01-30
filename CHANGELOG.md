@@ -15,6 +15,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 ### Other
 
 - deps: `tortoise-orm` updated to 0.24.0.
+- starknet.node: Added methods for fetching contract ABI's
 
 ## [8.2.0rc1] - 2025-01-24
 

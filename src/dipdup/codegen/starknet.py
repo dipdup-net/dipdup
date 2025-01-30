@@ -25,19 +25,23 @@ class StarknetCodeGenerator(CodeGenerator):
                 await self._fetch_abi(index_config)
 
     async def _fetch_abi(self, index_config: StarknetEventsIndexConfig) -> None:
-        datasources: list[AbiDatasource[t.Any]] = [
-            self._datasources[datasource_config.name]
-            for datasource_config in index_config.datasources
-            if isinstance(datasource_config, StarknetNodeDatasourceConfig)
-        ]
-
         contracts: list[StarknetContractConfig] = [
             handler_config.contract
             for handler_config in index_config.handlers
             if isinstance(handler_config, StarknetEventsHandlerConfig)
         ]
 
-        if contracts and not datasources:
+        if not contracts:
+            self._logger.debug('No contract specified. No ABI to fetch.')
+            return
+
+        datasources: list[AbiDatasource[t.Any]] = [
+            self._datasources[datasource_config.name]
+            for datasource_config in index_config.datasources
+            if isinstance(datasource_config, StarknetNodeDatasourceConfig)
+        ]
+
+        if not datasources:
             raise ConfigurationError('No Starknet ABI datasources found')
 
         for contract in contracts:
