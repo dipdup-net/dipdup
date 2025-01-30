@@ -63,8 +63,8 @@ class DipDupPackage:
         self.name = root.name
 
         # NOTE: Paths expected to exist in package root
-        self.pyproject = root.parent / 'pyproject.toml'
-        self.root_config = root.parent / 'dipdup.yaml'
+        self.pyproject = root / 'pyproject.toml'
+        self.root_config = root / 'dipdup.yaml'
 
         # NOTE: Package sections with .keep markers
         self.abi = root / 'abi'
@@ -130,7 +130,6 @@ class DipDupPackage:
             self.types: '**/*.py',
             # NOTE: Python metadata
             Path(PEP_561_MARKER): None,
-            Path(PACKAGE_MARKER): None,
         }
 
     def in_migration(self) -> bool:
@@ -180,7 +179,11 @@ class DipDupPackage:
 
     def _post_init(self) -> None:
         # NOTE: Allows plain package structure to be imported
-        if self.root != Path.cwd() or env.NO_SYMLINK:
+        if env.NO_SYMLINK:
+            touch(self.root / PACKAGE_MARKER)
+            return
+
+        if self.root != Path.cwd():
             return
 
         symlink_path = self.root.joinpath(self.name)
