@@ -65,7 +65,7 @@ processed_path_1 = (
             'interior': {
                 'X2': (
                     {'PalletInstance': 50},
-                    {'GeneralIndex': 1337},
+                    {'GeneralIndex': '1337'},
                 ),
             },
         },

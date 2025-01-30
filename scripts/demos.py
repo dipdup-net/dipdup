@@ -17,6 +17,7 @@ DEFAULT_ENV = {
     **dict(os.environ),
     'POSTGRES_PASSWORD': '',
     'HASURA_SECRET': '',
+    'DIPDUP_NO_SYMLINK': '1',
 }
 
 
@@ -48,9 +49,6 @@ def _init_demo(path: Path) -> None:
         check=True,
         env=DEFAULT_ENV,
     )
-
-    # NOTE: We don't need magic symlinks in demo projects.
-    Path(package_path).joinpath(package).unlink(missing_ok=True)
 
 
 def _rm_demo(path: Path) -> None:

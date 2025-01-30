@@ -38,6 +38,7 @@ isort = { force-single-line = true}
 [tool.mypy]
 python_version = "3.12"
 plugins = ["pydantic.mypy"]
+explicit_package_bases = true
 strict = false
 exclude = "demo_tezos_domains"
 

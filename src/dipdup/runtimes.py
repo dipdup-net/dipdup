@@ -281,11 +281,8 @@ def extract_subsquid_payload(data: Any) -> Any:
         if 'value' in data:
             value = data['value']
             if isinstance(value, list | tuple):
-                # Handle list of values
                 value = tuple(extract_subsquid_payload(item) for item in value)
-            # FIXME: We probably shouldn't do this
-            elif isinstance(value, str):
-                value = int(value)
+
             return {kind: value}
 
         # NOTE: Special case
