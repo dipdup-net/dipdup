@@ -73,11 +73,10 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     
     async def get_abi(self, address: str) -> dict[str, Any]:
         class_at_response = await self.starknetpy.get_class_at(address, block_number='latest')
-        
         parsed_abi = None
         if isinstance(class_at_response.abi, str):
-            parsed_abi = class_at_response.parsed_abi()
+            parsed_abi = class_at_response.parsed_abi
         else:
-            parsed_abi = class_at_response.abi()
+            parsed_abi = class_at_response.abi
 
         return parsed_abi
