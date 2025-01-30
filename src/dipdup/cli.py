@@ -147,8 +147,8 @@ def _print_help_atexit(error: Exception, report_id: str) -> None:
             tb = traceback.extract_tb(error.__traceback__)
             for frame in tb:
                 if frame.name == 'fire_handler':
-                    module = next(f.filename for f in tb if '/handlers/' in f.filename or '/hooks/' in f.filename)
-                    echo(CallbackError(module=Path(module).stem, exc=error).help(), err=True)
+                    modules = tuple(f.filename for f in tb if '/handlers/' in f.filename or '/hooks/' in f.filename)
+                    echo(CallbackError(module=Path(modules[-1]).stem, exc=error).help(), err=True)
                     break
             else:
                 echo(Error.default_help(), err=True)

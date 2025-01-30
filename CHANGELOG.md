@@ -10,6 +10,7 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 
 ### Fixed
 
+- cli: Fixed help message on `CallbackError` reporting `batch` handler instead of actual one.
 - substrate.subsquid: Fixed parsing nested structures in response.
 
 ### Changed
