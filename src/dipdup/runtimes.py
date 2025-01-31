@@ -289,6 +289,16 @@ def extract_subsquid_payload(data: Any) -> Any:
         if 'key' in data:
             return {kind: data['key']}
 
+        # See: https://github.com/galacticcouncil/hydration-node/blob/master/precompiles/utils/src/solidity/codec/xcm.rs#L294
+        if (
+            'data' in data and
+            'length' in data and
+            isinstance(data['data'], str) and
+            data['data'].startswith('0x') and
+            isinstance(data['length'], int)
+        ):
+            return {kind: data['data'][:2+data['length']*2]}
+
         return kind
 
     return data

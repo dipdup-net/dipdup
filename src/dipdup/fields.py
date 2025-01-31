@@ -41,6 +41,7 @@ from tortoise.fields.relational import ForeignKeyRelation as ForeignKeyRelation
 from tortoise.fields.relational import ManyToManyFieldInstance as ManyToManyFieldInstance
 from tortoise.fields.relational import ManyToManyRelation as ManyToManyRelation
 from tortoise.fields.relational import OneToOneField as OneToOneField
+from tortoise.fields.relational import OneToOneFieldInstance as OneToOneFieldInstance
 from tortoise.fields.relational import OneToOneNullableRelation as OneToOneNullableRelation
 from tortoise.fields.relational import OneToOneRelation as OneToOneRelation
 from tortoise.fields.relational import ReverseRelation as ReverseRelation
