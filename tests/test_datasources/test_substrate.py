@@ -1,3 +1,4 @@
+from dipdup.runtimes import extract_multilocation_payload
 from dipdup.runtimes import extract_subsquid_payload
 
 path_1 = [
@@ -106,9 +107,33 @@ processed_path_3 = (
     },
 )
 
+extracted_path_1 = (
+    (
+        {
+            'parents': 0,
+            'interior': (
+                {'PalletInstance': 50},
+                {'GeneralIndex': '1337'},
+            ),
+        },
+        84640,
+    ),
+    (
+        {
+            'parents': 1,
+            'interior': 'Here',
+        },
+        122612710,
+    ),
+)
+
 
 def test_extract_subsquid_payload() -> None:
 
     assert extract_subsquid_payload(path_1) == processed_path_1
     assert extract_subsquid_payload(path_2) == processed_path_2
     assert extract_subsquid_payload(path_3) == processed_path_3
+
+
+def test_extract_multilocation_payload() -> None:
+    assert extract_multilocation_payload(processed_path_1) == extracted_path_1
