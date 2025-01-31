@@ -1,12 +1,13 @@
-import typing as t
 from pathlib import Path
+from typing import Any
+from typing import cast
 
 from dipdup.codegen import CodeGenerator
 from dipdup.config import HandlerConfig
-from dipdup.config import StarknetNodeDatasourceConfig
-from dipdup.config.starknet_events import StarknetContractConfig
+from dipdup.config.starknet import StarknetContractConfig
 from dipdup.config.starknet_events import StarknetEventsHandlerConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
+from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.datasources import AbiDatasource
 from dipdup.exceptions import AbiNotAvailableError
 from dipdup.exceptions import ConfigurationError
@@ -35,8 +36,8 @@ class StarknetCodeGenerator(CodeGenerator):
             self._logger.debug('No contract specified. No ABI to fetch.')
             return
 
-        datasources: list[AbiDatasource[t.Any]] = [
-            self._datasources[datasource_config.name]
+        datasources: list[AbiDatasource[Any]] = [
+            cast(AbiDatasource[Any], self._datasources[datasource_config.name])
             for datasource_config in index_config.datasources
             if isinstance(datasource_config, StarknetNodeDatasourceConfig)
         ]
@@ -52,20 +53,20 @@ class StarknetCodeGenerator(CodeGenerator):
 
             abi_json = None
 
+            address = contract.address or contract.abi
+            if not address:
+                raise ConfigurationError(f'`address` or `abi` must be specified for contract `{contract.module_name}`')
+
             for datasource in datasources:
                 try:
-                    abi_json = await datasource.get_abi(address=contract.address)
+                    abi_json = await datasource.get_abi(address=address)
                     break
                 except DatasourceError as e:
                     self._logger.warning('Failed to fetch ABI from `%s`: %s', datasource.name, e)
 
-            # TODO(baitcode): Maybe prioritise manual configuration?
-            if abi_json is None and contract.abi:
-                abi_json = contract.abi
-
             if abi_json is None:
                 raise AbiNotAvailableError(
-                    address=contract.address,
+                    address=address,
                     typename=contract.module_name,
                 )
 

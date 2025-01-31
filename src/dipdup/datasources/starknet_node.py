@@ -1,14 +1,20 @@
 import asyncio
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+from typing import Any
+
+from starknet_py.net.client_models import DeprecatedContractClass
+from starknet_py.net.client_models import EventsChunk
+from starknet_py.net.client_models import SierraContractClass
 
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.datasources import IndexDatasource
+from dipdup.datasources._starknetpy import StarknetpyClient
 
 if TYPE_CHECKING:
-    from starknet_py.net.client_models import EventsChunk
-
-    from dipdup.datasources._starknetpy import StarknetpyClient
+    from starknet_py.abi.v0.shape import AbiDictList as AbiDictListV0
+    from starknet_py.abi.v1.shape import AbiDictList as AbiDictListV1
+    from starknet_py.abi.v2.shape import AbiDictList as AbiDictListV2
 
 
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
@@ -70,13 +76,16 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             chunk_size=self._http_config.batch_size,
             continuation_token=continuation_token,
         )
-    
+
     async def get_abi(self, address: str) -> dict[str, Any]:
         class_at_response = await self.starknetpy.get_class_at(address, block_number='latest')
-        parsed_abi = None
-        if isinstance(class_at_response.abi, str):
+        # NOTE: for some reason
+        parsed_abi: AbiDictListV0 | None | AbiDictListV1 | AbiDictListV2
+        if isinstance(class_at_response, SierraContractClass):
             parsed_abi = class_at_response.parsed_abi
-        else:
+        elif isinstance(class_at_response, DeprecatedContractClass):
             parsed_abi = class_at_response.abi
+        else:
+            raise NotImplementedError(f'Unknown response class: {class_at_response}')
 
-        return parsed_abi
+        return {'starknet_py_abi': parsed_abi}
