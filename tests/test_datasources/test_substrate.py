@@ -1,3 +1,5 @@
+import pytest
+
 from dipdup.runtimes import extract_subsquid_payload
 
 path_1 = [
@@ -58,6 +60,35 @@ path_3 = [
     }
 ]
 
+subsquid_general_key_with_value_payload_example = {
+    'parents': 1,
+    'interior': {
+        '__kind': 'X2',
+        'value': [
+            {'__kind': 'Parachain', 'value': 2030},
+            {
+                '__kind': 'GeneralKey',
+                'value': '0x02c80084af223c8b598536178d9361dc55bfda6818',
+            },
+        ],
+    },
+}
+subsquid_general_key_with_data_and_length_payload_example = {
+    'parents': 1,
+    'interior': {
+        '__kind': 'X2',
+        'value': [
+            {'__kind': 'Parachain', 'value': 2030},
+            {
+                '__kind': 'GeneralKey',
+                'data': '0x0809000000000000000000000000000000000000000000000000000000000000',
+                'length': 2,
+            },
+        ],
+    },
+}
+
+
 processed_path_1 = (
     (
         {
@@ -105,10 +136,46 @@ processed_path_3 = (
         },
     },
 )
+node_general_key_with_value_payload_example = {
+    'parents': 1,
+    'interior': {
+        'X2': (
+            {'Parachain': 2030},
+            {'GeneralKey': '0x02c80084af223c8b598536178d9361dc55bfda6818'},
+        ),
+    },
+}
+node_general_key_with_data_and_length_payload_example = {
+    'parents': 1,
+    'interior': {
+        'X2': (
+            {'Parachain': 2030},
+            {
+                'GeneralKey': {
+                    'data': '0x0809000000000000000000000000000000000000000000000000000000000000',
+                    'length': 2,
+                }
+            },
+        ),
+    },
+}
 
 
-def test_extract_subsquid_payload() -> None:
-
-    assert extract_subsquid_payload(path_1) == processed_path_1
-    assert extract_subsquid_payload(path_2) == processed_path_2
-    assert extract_subsquid_payload(path_3) == processed_path_3
+@pytest.mark.parametrize(
+    'subsquid_payload, expected_node_payload',
+    (
+        (path_1, processed_path_1),
+        (path_2, processed_path_2),
+        (path_3, processed_path_3),
+        (
+            subsquid_general_key_with_value_payload_example,
+            node_general_key_with_value_payload_example,
+        ),
+        (
+            subsquid_general_key_with_data_and_length_payload_example,
+            node_general_key_with_data_and_length_payload_example,
+        ),
+    ),
+)
+def test_extract_subsquid_payload(subsquid_payload, expected_node_payload) -> None:
+    assert extract_subsquid_payload(subsquid_payload) == expected_node_payload
