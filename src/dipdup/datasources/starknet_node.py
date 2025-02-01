@@ -2,10 +2,6 @@ import asyncio
 from typing import TYPE_CHECKING
 from typing import Any
 
-from starknet_py.net.client_models import DeprecatedContractClass
-from starknet_py.net.client_models import EventsChunk
-from starknet_py.net.client_models import SierraContractClass
-
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.datasources import IndexDatasource
@@ -15,6 +11,7 @@ if TYPE_CHECKING:
     from starknet_py.abi.v0.shape import AbiDictList as AbiDictListV0
     from starknet_py.abi.v1.shape import AbiDictList as AbiDictListV1
     from starknet_py.abi.v2.shape import AbiDictList as AbiDictListV2
+    from starknet_py.net.client_models import EventsChunk
 
 
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
@@ -78,6 +75,9 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         )
 
     async def get_abi(self, address: str) -> dict[str, Any]:
+        from starknet_py.net.client_models import DeprecatedContractClass
+        from starknet_py.net.client_models import SierraContractClass
+
         class_at_response = await self.starknetpy.get_class_at(address, block_number='latest')
         # NOTE: for some reason
         parsed_abi: AbiDictListV0 | None | AbiDictListV1 | AbiDictListV2
