@@ -246,7 +246,7 @@ class SubstrateCodeGenerator(CodeGenerator):
                     name = event_name
                     break
             else:
-                raise Exception(f'Event not found for {typeclass_dir.stem}')
+                continue
 
             # NOTE: Don't extract from typeclass path! XYK.Sell -> xyk_sell -> XykSellPayload; should be XYKSellPayload.
             typeclass_name = f'{snake_to_pascal(name)}Payload'

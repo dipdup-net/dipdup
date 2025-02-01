@@ -1,5 +1,6 @@
 import pytest
 
+from dipdup.runtimes import extract_multilocation_payload
 from dipdup.runtimes import extract_subsquid_payload
 
 path_1 = [
@@ -160,6 +161,26 @@ node_general_key_with_data_and_length_payload_example = {
     },
 }
 
+extracted_path_1 = (
+    (
+        {
+            'parents': 0,
+            'interior': (
+                {'PalletInstance': 50},
+                {'GeneralIndex': '1337'},
+            ),
+        },
+        84640,
+    ),
+    (
+        {
+            'parents': 1,
+            'interior': 'Here',
+        },
+        122612710,
+    ),
+)
+
 
 @pytest.mark.parametrize(
     'subsquid_payload, expected_node_payload',
@@ -177,5 +198,9 @@ node_general_key_with_data_and_length_payload_example = {
         ),
     ),
 )
-def test_extract_subsquid_payload(subsquid_payload, expected_node_payload) -> None:
+def test_extract_subsquid_payload(subsquid_payload, expected_node_payload) -> None:  # type: ignore
     assert extract_subsquid_payload(subsquid_payload) == expected_node_payload
+
+
+def test_extract_multilocation_payload() -> None:
+    assert extract_multilocation_payload(processed_path_1) == extracted_path_1
