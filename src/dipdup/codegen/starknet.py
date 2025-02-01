@@ -46,7 +46,7 @@ class StarknetCodeGenerator(CodeGenerator):
             raise ConfigurationError('No Starknet ABI datasources found')
 
         for contract in contracts:
-            abi_path = self._package.abi / contract.module_name / 'abi.json'
+            abi_path = self._package.abi / contract.module_name / 'cairo_abi.json'
 
             if abi_path.exists():
                 continue
@@ -71,7 +71,7 @@ class StarknetCodeGenerator(CodeGenerator):
                 )
 
             touch(abi_path)
-            abi_path.write_bytes(json_dumps(abi_json))
+            abi_path.write_bytes(json_dumps(abi_json['cairo_abi']))
 
     async def generate_schemas(self) -> None:
         from dipdup.abi.cairo import abi_to_jsonschemas

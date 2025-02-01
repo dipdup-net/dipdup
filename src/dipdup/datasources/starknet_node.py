@@ -88,4 +88,4 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         else:
             raise NotImplementedError(f'Unknown response class: {class_at_response}')
 
-        return {'starknet_py_abi': parsed_abi}
+        return {'cairo_abi': parsed_abi}

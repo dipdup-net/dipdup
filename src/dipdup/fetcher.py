@@ -42,7 +42,7 @@ DatasourceT = TypeVar('DatasourceT', bound=IndexDatasource[Any])
 
 
 async def yield_by_level(
-    iterable: AsyncIterator[tuple[BufferT, ...]]
+    iterable: AsyncIterator[tuple[BufferT, ...]],
 ) -> AsyncGenerator[tuple[Level, tuple[BufferT, ...]], None]:
     items: tuple[BufferT, ...] = ()
 
