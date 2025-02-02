@@ -9,9 +9,7 @@ from dipdup.config.starknet_events import StarknetEventsHandlerConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
 from dipdup.datasources import AbiDatasource
-from dipdup.exceptions import AbiNotAvailableError
 from dipdup.exceptions import ConfigurationError
-from dipdup.exceptions import DatasourceError
 from dipdup.utils import json_dumps
 from dipdup.utils import snake_to_pascal
 from dipdup.utils import touch
@@ -36,39 +34,23 @@ class StarknetCodeGenerator(CodeGenerator):
             self._logger.debug('No contract specified. No ABI to fetch.')
             return
 
-        datasources: list[AbiDatasource[Any]] = [
-            cast(AbiDatasource[Any], self._datasources[datasource_config.name])
-            for datasource_config in index_config.datasources
-            if isinstance(datasource_config, StarknetNodeDatasourceConfig)
-        ]
+        # deduplicated (by name) Datasource list
+        datasources: list[AbiDatasource[Any]] = list(
+            {
+                datasource_config.name: cast(AbiDatasource[Any], self._datasources[datasource_config.name])
+                for datasource_config in index_config.datasources
+                if isinstance(datasource_config, StarknetNodeDatasourceConfig)
+            }.values()
+        )
 
         if not datasources:
             raise ConfigurationError('No Starknet ABI datasources found')
 
-        for contract in contracts:
+        async for contract, abi_json in AbiDatasource.lookup_abi_for(contracts, using=datasources, logger=self._logger):
             abi_path = self._package.abi / contract.module_name / 'cairo_abi.json'
 
             if abi_path.exists():
                 continue
-
-            abi_json = None
-
-            address = contract.address or contract.abi
-            if not address:
-                raise ConfigurationError(f'`address` or `abi` must be specified for contract `{contract.module_name}`')
-
-            for datasource in datasources:
-                try:
-                    abi_json = await datasource.get_abi(address=address)
-                    break
-                except DatasourceError as e:
-                    self._logger.warning('Failed to fetch ABI from `%s`: %s', datasource.name, e)
-
-            if abi_json is None:
-                raise AbiNotAvailableError(
-                    address=address,
-                    typename=contract.module_name,
-                )
 
             touch(abi_path)
             abi_path.write_bytes(json_dumps(abi_json))

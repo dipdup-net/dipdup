@@ -1,9 +1,9 @@
 import asyncio
 from typing import TYPE_CHECKING
-from typing import Any
 
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
+from dipdup.datasources import AbiJson
 from dipdup.datasources import IndexDatasource
 from dipdup.datasources._starknetpy import StarknetpyClient
 
@@ -74,7 +74,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             continuation_token=continuation_token,
         )
 
-    async def get_abi(self, address: str) -> dict[str, Any] | list[Any]:
+    async def get_abi(self, address: str) -> AbiJson:
         from starknet_py.net.client_models import DeprecatedContractClass
         from starknet_py.net.client_models import SierraContractClass
 
