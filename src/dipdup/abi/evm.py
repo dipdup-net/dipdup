@@ -96,12 +96,8 @@ def convert_abi(package: DipDupPackage) -> dict[str, EvmAbi]:
     abi_by_typename: dict[str, EvmAbi] = {}
 
     for abi_path in package.evm_abi_paths:
-        try:
-            converted_abi = _convert_abi(abi_path)
-            abi_by_typename[abi_path.parent.stem] = converted_abi
-        except KeyError as e:
-            _logger.error('Evm Abi manager can not decod abi file %s', abi_path, exc_info=e)
-            pass
+        converted_abi = _convert_abi(abi_path)
+        abi_by_typename[abi_path.parent.stem] = converted_abi
 
     return abi_by_typename
 

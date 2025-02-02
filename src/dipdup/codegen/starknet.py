@@ -71,7 +71,7 @@ class StarknetCodeGenerator(CodeGenerator):
                 )
 
             touch(abi_path)
-            abi_path.write_bytes(json_dumps(abi_json['cairo_abi']))
+            abi_path.write_bytes(json_dumps(abi_json))
 
     async def generate_schemas(self) -> None:
         from dipdup.abi.cairo import abi_to_jsonschemas

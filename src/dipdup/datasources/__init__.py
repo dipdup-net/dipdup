@@ -58,7 +58,7 @@ class Datasource(HTTPGateway, Generic[DatasourceConfigT]):
 
 class AbiDatasource(Datasource[DatasourceConfigT], Generic[DatasourceConfigT]):
     @abstractmethod
-    async def get_abi(self, address: str) -> dict[str, Any]: ...
+    async def get_abi(self, address: str) -> dict[str, Any] | list[Any]: ...
 
 
 # FIXME: inconsistent usage

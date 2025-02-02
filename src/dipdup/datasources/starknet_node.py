@@ -74,7 +74,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             continuation_token=continuation_token,
         )
 
-    async def get_abi(self, address: str) -> dict[str, Any]:
+    async def get_abi(self, address: str) -> dict[str, Any] | list[Any]:
         from starknet_py.net.client_models import DeprecatedContractClass
         from starknet_py.net.client_models import SierraContractClass
 
@@ -88,4 +88,4 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         else:
             raise NotImplementedError(f'Unknown response class: {class_at_response}')
 
-        return {'cairo_abi': parsed_abi}
+        return parsed_abi or []
