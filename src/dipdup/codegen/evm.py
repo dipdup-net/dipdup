@@ -82,6 +82,7 @@ class EvmCodeGenerator(CodeGenerator):
             self._logger.debug('No contract specified. No ABI to fetch.')
             return
 
+        # deduplicated (by name) Datasource list
         datasources: list[AbiDatasource[Any]] = list(
             {
                 datasource_config.name: cast(AbiDatasource[Any], self._datasources[datasource_config.name])
