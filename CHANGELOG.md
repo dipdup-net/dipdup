@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [Unreleased]
+## [8.2.0] - ????-??-??
+
+### Added
+
+- starknet.node: Added methods for fetching contract ABIs for `init` command.
 
 ### Fixed
 
@@ -26,7 +30,6 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 ### Other
 
 - deps: `tortoise-orm` updated to 0.24.0.
-- starknet.node: Added methods for fetching contract ABI's
 
 ## [8.2.0rc1] - 2025-01-24
 
@@ -613,7 +616,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 <!-- Versions -->
-[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.2.0rc1...HEAD
+[Unreleased]: https://github.com/dipdup-io/dipdup/compare/8.2.0...HEAD
+[8.2.0]: https://github.com/dipdup-io/dipdup/compare/8.2.0rc1...8.2.0
 [8.2.0rc1]: https://github.com/dipdup-io/dipdup/compare/8.1.4...8.2.0rc1
 [8.1.4]: https://github.com/dipdup-io/dipdup/compare/8.1.3...8.1.4
 [8.1.3]: https://github.com/dipdup-io/dipdup/compare/8.1.2...8.1.3
