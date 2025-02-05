@@ -74,7 +74,6 @@ def sn_keccak(x: str) -> str:
     return f'0x{int.from_bytes(keccak_hash, "big") & (1 << 250) - 1:x}'
 
 
-@cache
 def _loaded_abis(package: DipDupPackage) -> dict[str, Abi]:
 
     from starknet_py.abi.v2.parser import AbiParser

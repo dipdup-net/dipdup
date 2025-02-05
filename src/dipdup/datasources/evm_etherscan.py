@@ -24,7 +24,7 @@ class EvmEtherscanDatasource(AbiDatasource[EvmEtherscanDatasourceConfig]):
     async def run(self) -> None:
         pass
 
-    async def get_abi(self, address: str) -> dict[str, Any]:
+    async def get_abi(self, address: str) -> dict[str, Any] | list[Any]:
         params = {
             'module': 'contract',
             'action': 'getabi',

@@ -1,4 +1,6 @@
+from itertools import chain
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import cast
 
@@ -13,12 +15,13 @@ from dipdup.config.evm_events import EvmEventsIndexConfig
 from dipdup.config.evm_transactions import EvmTransactionsHandlerConfig
 from dipdup.config.evm_transactions import EvmTransactionsIndexConfig
 from dipdup.datasources import AbiDatasource
-from dipdup.exceptions import AbiNotAvailableError
 from dipdup.exceptions import ConfigurationError
-from dipdup.exceptions import DatasourceError
 from dipdup.utils import json_dumps
 from dipdup.utils import snake_to_pascal
 from dipdup.utils import touch
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class EvmCodeGenerator(CodeGenerator):
@@ -60,42 +63,42 @@ class EvmCodeGenerator(CodeGenerator):
         pass
 
     async def _fetch_abi(self, index_config: EvmIndexConfigU) -> None:
-        datasource_configs = tuple(c for c in index_config.datasources if isinstance(c, EvmEtherscanDatasourceConfig))
+        contracts_from_event_handlers: list[EvmContractConfig] = [
+            handler_config.contract
+            for handler_config in index_config.handlers
+            if isinstance(handler_config, EvmEventsHandlerConfig)
+        ]
+        contracts_from_transactions: list[EvmContractConfig] = [
+            handler_config.typed_contract
+            for handler_config in index_config.handlers
+            if (
+                isinstance(handler_config, EvmTransactionsHandlerConfig)
+                and handler_config.typed_contract is not None
+            )
+        ]
+        contracts: Iterable[EvmContractConfig] = chain(contracts_from_event_handlers, contracts_from_transactions)
 
-        contract: EvmContractConfig | None = None
+        if not contracts:
+            self._logger.debug('No contract specified. No ABI to fetch.')
+            return
 
-        for handler_config in index_config.handlers:
-            if isinstance(handler_config, EvmEventsHandlerConfig):
-                contract = handler_config.contract
-            elif isinstance(handler_config, EvmTransactionsHandlerConfig):
-                contract = handler_config.typed_contract
+        # deduplicated (by name) Datasource list
+        datasources: list[AbiDatasource[Any]] = list(
+            {
+                datasource_config.name: cast(AbiDatasource[Any], self._datasources[datasource_config.name])
+                for datasource_config in index_config.datasources
+                if isinstance(datasource_config, EvmEtherscanDatasourceConfig)
+            }.values()
+        )
 
-            if not contract:
-                continue
+        if not datasources:
+            raise ConfigurationError('No EVM ABI datasources found')
 
+        async for contract, abi_json in AbiDatasource.lookup_abi_for(contracts, using=datasources, logger=self._logger):
             abi_path = self._package.abi / contract.module_name / 'abi.json'
+
             if abi_path.exists():
                 continue
-            if not datasource_configs:
-                raise ConfigurationError('No EVM ABI datasources found')
-
-            address = contract.address or contract.abi
-            if not address:
-                raise ConfigurationError(f'`address` or `abi` must be specified for contract `{contract.module_name}`')
-
-            for datasource_config in datasource_configs:
-
-                datasource = cast(AbiDatasource[Any], self._datasources[datasource_config.name])
-                try:
-                    abi_json = await datasource.get_abi(address)
-                    break
-                except DatasourceError as e:
-                    self._logger.warning('Failed to fetch ABI from `%s`: %s', datasource_config.name, e)
-            else:
-                raise AbiNotAvailableError(
-                    address=address,
-                    typename=contract.module_name,
-                )
 
             touch(abi_path)
             abi_path.write_bytes(json_dumps(abi_json))

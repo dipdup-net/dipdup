@@ -3,11 +3,12 @@ from typing import cast
 
 from dipdup.config.substrate_subscan import SubstrateSubscanDatasourceConfig
 from dipdup.datasources import AbiDatasource
+from dipdup.datasources import AbiJson
 
 
 class SubstrateSubscanDatasource(AbiDatasource[SubstrateSubscanDatasourceConfig]):
     # FIXME: not used in codegen
-    async def get_abi(self, address: str) -> dict[str, Any]:
+    async def get_abi(self, address: str) -> AbiJson:
         raise NotImplementedError
 
     async def run(self) -> None:

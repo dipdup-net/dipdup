@@ -1,16 +1,59 @@
 from pathlib import Path
+from typing import Any
+from typing import cast
 
 from dipdup.codegen import CodeGenerator
 from dipdup.config import HandlerConfig
+from dipdup.config.starknet import StarknetContractConfig
+from dipdup.config.starknet_events import StarknetEventsHandlerConfig
 from dipdup.config.starknet_events import StarknetEventsIndexConfig
+from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
+from dipdup.datasources import AbiDatasource
+from dipdup.exceptions import ConfigurationError
+from dipdup.utils import json_dumps
 from dipdup.utils import snake_to_pascal
+from dipdup.utils import touch
 
 
 class StarknetCodeGenerator(CodeGenerator):
     kind = 'starknet'
 
-    # NOTE: For now ABIs need to be provided manually
-    async def generate_abis(self) -> None: ...
+    async def generate_abis(self) -> None:
+        for index_config in self._config.indexes.values():
+            if isinstance(index_config, StarknetEventsIndexConfig):
+                await self._fetch_abi(index_config)
+
+    async def _fetch_abi(self, index_config: StarknetEventsIndexConfig) -> None:
+        contracts: list[StarknetContractConfig] = [
+            handler_config.contract
+            for handler_config in index_config.handlers
+            if isinstance(handler_config, StarknetEventsHandlerConfig)
+        ]
+
+        if not contracts:
+            self._logger.debug('No contract specified. No ABI to fetch.')
+            return
+
+        # deduplicated (by name) Datasource list
+        datasources: list[AbiDatasource[Any]] = list(
+            {
+                datasource_config.name: cast(AbiDatasource[Any], self._datasources[datasource_config.name])
+                for datasource_config in index_config.datasources
+                if isinstance(datasource_config, StarknetNodeDatasourceConfig)
+            }.values()
+        )
+
+        if not datasources:
+            raise ConfigurationError('No Starknet ABI datasources found')
+
+        async for contract, abi_json in AbiDatasource.lookup_abi_for(contracts, using=datasources, logger=self._logger):
+            abi_path = self._package.abi / contract.module_name / 'cairo_abi.json'
+
+            if abi_path.exists():
+                continue
+
+            touch(abi_path)
+            abi_path.write_bytes(json_dumps(abi_json))
 
     async def generate_schemas(self) -> None:
         from dipdup.abi.cairo import abi_to_jsonschemas
