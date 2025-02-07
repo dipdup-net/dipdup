@@ -1,5 +1,7 @@
 import asyncio
+from collections import OrderedDict
 from typing import TYPE_CHECKING
+from typing import Union
 
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
@@ -12,10 +14,14 @@ if TYPE_CHECKING:
     from starknet_py.abi.v1.shape import AbiDictList as AbiDictListV1
     from starknet_py.abi.v2.shape import AbiDictList as AbiDictListV2
     from starknet_py.net.client_models import EventsChunk
+    from starknet_py.net.client_models import PendingStarknetBlock
+    from starknet_py.net.client_models import StarknetBlock
 
 
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     NODE_LAST_MILE = 128
+
+    
 
     _default_http_config = HttpConfig(
         batch_size=1000,
@@ -24,6 +30,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     def __init__(self, config: StarknetNodeDatasourceConfig, merge_subscriptions: bool = False) -> None:
         super().__init__(config, merge_subscriptions)
         self._starknetpy: StarknetpyClient | None = None
+        self._block_data_cache = OrderedDict[int, Union['StarknetBlock', 'PendingStarknetBlock']]()
 
     @property
     def starknetpy(self) -> 'StarknetpyClient':
@@ -73,6 +80,33 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             chunk_size=self._http_config.batch_size,
             continuation_token=continuation_token,
         )
+    
+    async def get_events_data_caching(self, block_hash: int, transaction_hash: int, cached_items_size: int) -> tuple[int | None, int | None]:
+        
+        block = self._block_data_cache.get(block_hash, None)
+        
+        if not block:
+            block = await self.get_block(block_hash)
+        
+        if not block:
+            return None, None
+
+        self._block_data_cache[block_hash] = block
+        
+        transaction_idx = None
+        
+        for idx, transaction in enumerate(block.transactions):
+            if transaction.hash == transaction_hash:
+                transaction_idx = idx
+                break
+
+        while len(self._block_data_cache) > cached_items_size:
+            self._block_data_cache.popitem(last=False)
+
+        return transaction_idx, block.timestamp
+
+    async def get_block(self, block_hash: int) -> Union['StarknetBlock', 'PendingStarknetBlock']:
+        return await self.starknetpy.get_block(block_hash=block_hash)
 
     async def get_abi(self, address: str) -> AbiJson:
         from starknet_py.net.client_models import DeprecatedContractClass
