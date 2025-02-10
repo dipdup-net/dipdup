@@ -21,8 +21,6 @@ if TYPE_CHECKING:
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     NODE_LAST_MILE = 128
 
-    
-
     _default_http_config = HttpConfig(
         batch_size=1000,
     )
@@ -80,21 +78,23 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             chunk_size=self._http_config.batch_size,
             continuation_token=continuation_token,
         )
-    
-    async def get_events_data_caching(self, block_hash: int, transaction_hash: int, cached_items_size: int) -> tuple[int | None, int | None]:
-        
+
+    async def get_events_data_caching(
+        self, block_hash: int, transaction_hash: int, cached_items_size: int
+    ) -> tuple[int | None, int | None]:
+
         block = self._block_data_cache.get(block_hash, None)
-        
+
         if not block:
             block = await self.get_block(block_hash)
-        
+
         if not block:
             return None, None
 
         self._block_data_cache[block_hash] = block
-        
+
         transaction_idx = None
-        
+
         for idx, transaction in enumerate(block.transactions):
             if transaction.hash == transaction_hash:
                 transaction_idx = idx

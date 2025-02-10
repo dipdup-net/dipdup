@@ -75,7 +75,6 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
                 # TODO(baitcode): shall I log that?
                 continue
 
-
             self._buffer[event.block_number].append(  # type: ignore[index]
                 StarknetEventData.from_starknetpy(
                     event=event,
