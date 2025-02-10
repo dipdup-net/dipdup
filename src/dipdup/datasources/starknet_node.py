@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from starknet_py.abi.v1.shape import AbiDictList as AbiDictListV1
     from starknet_py.abi.v2.shape import AbiDictList as AbiDictListV2
     from starknet_py.net.client_models import EventsChunk
-    from starknet_py.net.client_models import PendingStarknetBlock
-    from starknet_py.net.client_models import StarknetBlock
+    from starknet_py.net.client_models import PendingStarknetBlockWithTxHashes
+    from starknet_py.net.client_models import StarknetBlockWithTxHashes
 
 BLOCK_CACHE_SIZE = 10
 
@@ -31,7 +31,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     def __init__(self, config: StarknetNodeDatasourceConfig, merge_subscriptions: bool = False) -> None:
         super().__init__(config, merge_subscriptions)
         self._starknetpy: StarknetpyClient | None = None
-        self._block_cache: LRU[int, StarknetBlock | PendingStarknetBlock] = LRU(BLOCK_CACHE_SIZE)
+        self._block_cache: LRU[int, StarknetBlockWithTxHashes | PendingStarknetBlockWithTxHashes] = LRU(BLOCK_CACHE_SIZE)
 
     @property
     def starknetpy(self) -> 'StarknetpyClient':
@@ -82,36 +82,11 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             continuation_token=continuation_token,
         )
 
-    async def get_block_metadata(
-        self,
-        block_hash: int,
-        transaction_hash: int,
-    ) -> tuple[int | None, int | None]:
-
-        block = self._block_cache.get(block_hash, None)
-
-        if not block:
-            block = await self.get_block(block_hash)
-
-        if not block:
-            return None, None
-
-        self._block_cache[block_hash] = block
-
-        transaction_idx = None
-
-        for idx, transaction in enumerate(block.transactions):
-            if transaction.hash == transaction_hash:
-                transaction_idx = idx
-                break
-
-        return transaction_idx, block.timestamp
-
-    async def get_block(self, block_hash: int) -> Union['StarknetBlock', 'PendingStarknetBlock']:
+    async def get_block_with_tx_hashes(self, block_hash: int) -> Union['StarknetBlockWithTxHashes', 'PendingStarknetBlockWithTxHashes']:
         if block := self._block_cache.get(block_hash, None):
             return block
 
-        block = await self.starknetpy.get_block(block_hash=block_hash)
+        block = await self.starknetpy.get_block_with_tx_hashes(block_hash=block_hash)
         self._block_cache[block_hash] = block
         return block
 
