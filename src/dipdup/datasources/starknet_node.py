@@ -1,7 +1,8 @@
 import asyncio
-from collections import OrderedDict
 from typing import TYPE_CHECKING
 from typing import Union
+
+from lru import LRU
 
 from dipdup.config import HttpConfig
 from dipdup.config.starknet_node import StarknetNodeDatasourceConfig
@@ -30,7 +31,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     def __init__(self, config: StarknetNodeDatasourceConfig, merge_subscriptions: bool = False) -> None:
         super().__init__(config, merge_subscriptions)
         self._starknetpy: StarknetpyClient | None = None
-        self._block_data_cache = OrderedDict[int, Union['StarknetBlock', 'PendingStarknetBlock']]()
+        self._block_cache: LRU[int, StarknetBlock | PendingStarknetBlock] = LRU(BLOCK_CACHE_SIZE)
 
     @property
     def starknetpy(self) -> 'StarknetpyClient':
@@ -87,7 +88,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         transaction_hash: int,
     ) -> tuple[int | None, int | None]:
 
-        block = self._block_data_cache.get(block_hash, None)
+        block = self._block_cache.get(block_hash, None)
 
         if not block:
             block = await self.get_block(block_hash)
@@ -95,7 +96,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
         if not block:
             return None, None
 
-        self._block_data_cache[block_hash] = block
+        self._block_cache[block_hash] = block
 
         transaction_idx = None
 
@@ -104,13 +105,15 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
                 transaction_idx = idx
                 break
 
-        while len(self._block_data_cache) > BLOCK_CACHE_SIZE:
-            self._block_data_cache.popitem(last=False)
-
         return transaction_idx, block.timestamp
 
     async def get_block(self, block_hash: int) -> Union['StarknetBlock', 'PendingStarknetBlock']:
-        return await self.starknetpy.get_block(block_hash=block_hash)
+        if block := self._block_cache.get(block_hash, None):
+            return block
+
+        block = await self.starknetpy.get_block(block_hash=block_hash)
+        self._block_cache[block_hash] = block
+        return block
 
     async def get_abi(self, address: str) -> AbiJson:
         from starknet_py.net.client_models import DeprecatedContractClass
