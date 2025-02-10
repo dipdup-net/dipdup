@@ -52,7 +52,10 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
 
     async def fetch(self) -> None:
         address, key0s = next(iter(self._filter))
-        events_chunk = await self._datasources[0].get_events(
+        
+        datasource = self._datasources[0]
+
+        events_chunk = await datasource.get_events(
             address=address,
             keys=[list(key0s), [], []],
             first_level=self._first_level,
@@ -65,12 +68,19 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
             if event.block_hash is None or event.transaction_hash is None:
                 continue
 
-            transaction_idx, timestamp = await self._datasources[0].get_block_metadata(
+            block = await datasource.get_block_with_tx_hashes(
                 block_hash=event.block_hash,
-                transaction_hash=event.transaction_hash,
             )
 
-            if transaction_idx is None or timestamp is None:
+            # NOTE: If there is no block, then why events live in igloo?
+            if block is None:
+                continue
+
+            timestamp = block.timestamp
+            transaction_idx = block.transactions.index(event.transaction_hash)
+
+            # NOTE: This event is corrupt, possibly due to old age.
+            if transaction_idx < 0:
                 continue
 
             self._buffer[event.block_number].append(  # type: ignore[index]
