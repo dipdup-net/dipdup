@@ -17,6 +17,8 @@ if TYPE_CHECKING:
     from starknet_py.net.client_models import PendingStarknetBlock
     from starknet_py.net.client_models import StarknetBlock
 
+BLOCK_CACHE_SIZE = 10
+
 
 class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     NODE_LAST_MILE = 128
@@ -79,8 +81,10 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             continuation_token=continuation_token,
         )
 
-    async def get_events_data_caching(
-        self, block_hash: int, transaction_hash: int, cached_items_size: int
+    async def get_block_metadata(
+        self,
+        block_hash: int,
+        transaction_hash: int,
     ) -> tuple[int | None, int | None]:
 
         block = self._block_data_cache.get(block_hash, None)
@@ -100,7 +104,7 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
                 transaction_idx = idx
                 break
 
-        while len(self._block_data_cache) > cached_items_size:
+        while len(self._block_data_cache) > BLOCK_CACHE_SIZE:
             self._block_data_cache.popitem(last=False)
 
         return transaction_idx, block.timestamp

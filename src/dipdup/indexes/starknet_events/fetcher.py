@@ -61,18 +61,16 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
         )
 
         for event in events_chunk.events:
-            if not event.block_hash or not event.transaction_hash:
-                # TODO(baitcode): shall I log that?
+            # NOTE: Very old events may not have block_hash or transaction_hash
+            if event.block_hash is None or event.transaction_hash is None:
                 continue
 
-            transaction_idx, timestamp = await self._datasources[0].get_events_data_caching(
+            transaction_idx, timestamp = await self._datasources[0].get_block_metadata(
                 block_hash=event.block_hash,
                 transaction_hash=event.transaction_hash,
-                cached_items_size=10,
             )
 
-            if not transaction_idx or not timestamp:
-                # TODO(baitcode): shall I log that?
+            if transaction_idx is None or timestamp is None:
                 continue
 
             self._buffer[event.block_number].append(  # type: ignore[index]
