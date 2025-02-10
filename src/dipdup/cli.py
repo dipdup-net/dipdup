@@ -143,12 +143,13 @@ def _print_help_atexit(error: Exception, report_id: str) -> None:
         if isinstance(error, Error):
             echo(error.help(), err=True)
         else:
-            # NOTE: check the traceback  to find out if it's from a callback
+            # NOTE: Check the traceback to find out if exception is from a callback
             tb = traceback.extract_tb(error.__traceback__)
             for frame in tb:
                 if frame.name == 'fire_handler':
                     modules = tuple(f.filename for f in tb if '/handlers/' in f.filename or '/hooks/' in f.filename)
-                    echo(CallbackError(module=Path(modules[-1]).stem, exc=error).help(), err=True)
+                    module = '.'.join(Path(f).stem for f in modules)
+                    echo(CallbackError(module=module, exc=error).help(), err=True)
                     break
             else:
                 echo(Error.default_help(), err=True)

@@ -1118,7 +1118,7 @@ class DipDupConfig:
             for name, config in named_configs.items():
                 config._name = name
                 if name in names:
-                    _logger.warning('Alias `%s` used multiple times')
+                    _logger.warning('Alias `%s` used multiple times', name)
                 else:
                     names.add(name)
 
