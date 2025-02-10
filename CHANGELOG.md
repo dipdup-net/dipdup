@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 Releases prior to 7.0 has been removed from this file to declutter search results; see the [archived copy](https://github.com/dipdup-io/dipdup/blob/8.0.0b5/CHANGELOG.md) for the full list.
 
-## [8.2.0] - ????-??-??
+## [8.2.0] - 2025-02-10
 
 ### Added
 
@@ -15,6 +15,8 @@ Releases prior to 7.0 has been removed from this file to declutter search result
 ### Fixed
 
 - cli: Fixed help message on `CallbackError` reporting `batch` handler instead of actual one.
+- starknet: Process all data types correctly.
+- starknet.node: Fetch missing block timestamp and txn id when synching with node.
 - substrate.subsquid: Fixed parsing nested structures in response.
 - substrate.subsquid: Fixed parsing for `__kind` junctions with multiple keys.
 
