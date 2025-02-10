@@ -6,6 +6,19 @@ from typing import Any
 from typing import TypedDict
 
 import orjson
+from starknet_py.cairo.data_types import ArrayType
+from starknet_py.cairo.data_types import BoolType
+from starknet_py.cairo.data_types import CairoType
+from starknet_py.cairo.data_types import EnumType
+from starknet_py.cairo.data_types import EventType
+from starknet_py.cairo.data_types import FeltType
+from starknet_py.cairo.data_types import NamedTupleType
+from starknet_py.cairo.data_types import NonZeroType
+from starknet_py.cairo.data_types import OptionType
+from starknet_py.cairo.data_types import StructType
+from starknet_py.cairo.data_types import TupleType
+from starknet_py.cairo.data_types import UintType
+from starknet_py.cairo.data_types import UnitType
 
 from dipdup.abi import AbiManager
 from dipdup.exceptions import FrameworkException
@@ -14,8 +27,6 @@ from dipdup.utils import touch
 
 if TYPE_CHECKING:
     from starknet_py.abi.v2.model import Abi
-    from starknet_py.cairo.data_types import CairoType
-    from starknet_py.cairo.data_types import EventType
     from starknet_py.serialization.data_serializers.payload_serializer import PayloadSerializer
 
     from dipdup.package import DipDupPackage
@@ -32,33 +43,71 @@ class CairoAbi(TypedDict):
     events: list[CairoEventAbi]
 
 
-def _convert_type(type_: CairoType) -> dict[str, Any]:
-    # FIXME: Fix typehints
-    # TODO: Support all types
-    if type_.__class__.__name__ in {'EventType', 'StructType'}:
-        if type_.name == 'Uint256':  # type: ignore[attr-defined]
-            return {'type': 'integer'}
-        if type_.name == 'core::byte_array::ByteArray':  # type: ignore[attr-defined]
-            return {'type': 'string'}
+def _convert_type(cairo_type: CairoType) -> dict[str, Any]:
+
+    if isinstance(cairo_type, EventType | NamedTupleType):
         return {
             'type': 'object',
-            'properties': {key: _convert_type(value) for key, value in type_.types.items()},  # type: ignore[attr-defined]
-            'required': tuple(type_.types.keys()),  # type: ignore[attr-defined]
+            'properties': {
+                field_name: _convert_type(field_type) for field_name, field_type in cairo_type.types.items()
+            },
+            'required': tuple(cairo_type.types.keys()),
             'additionalProperties': False,
         }
 
-    if type_.__class__.__name__ == 'ArrayType':
+    if isinstance(cairo_type, StructType):
+        if cairo_type.name == 'Uint256':
+            return {'type': 'integer'}
+
+        if cairo_type.name == 'core::byte_array::ByteArray':
+            return {'type': 'string'}
+
         return {
-            'type': 'array',
-            'items': _convert_type(type_.inner_type),  # type: ignore[attr-defined]
+            'type': 'object',
+            'properties': {
+                field_name: _convert_type(field_type) for field_name, field_type in cairo_type.types.items()
+            },
+            'required': tuple(cairo_type.types.keys()),
+            'additionalProperties': False,
         }
 
-    simple_type = {
-        'FeltType': 'integer',
-        'UintType': 'integer',
-        'BoolType': 'boolean',
-    }[type_.__class__.__name__]
-    return {'type': simple_type}
+    if isinstance(cairo_type, BoolType):
+        return {'type': 'boolean'}
+
+    if isinstance(cairo_type, FeltType | UintType):
+        return {'type': 'integer'}
+
+    if isinstance(cairo_type, TupleType):
+        return {
+            'type': 'array',
+            'items': [_convert_type(t) for t in cairo_type.types],
+        }
+
+    if isinstance(cairo_type, EnumType):
+        return {
+            'description': cairo_type.name,
+            'type': 'string',
+            'enum': tuple(cairo_type.variants.keys()),
+        }
+
+    if isinstance(cairo_type, ArrayType):
+        return {
+            'type': 'array',
+            'items': _convert_type(cairo_type.inner_type),
+        }
+
+    if isinstance(cairo_type, OptionType):
+        return {
+            'oneOf': [{'type': 'null'}, _convert_type(cairo_type.type)],
+        }
+
+    if isinstance(cairo_type, NonZeroType):
+        return _convert_type(cairo_type.type)
+
+    if isinstance(cairo_type, UnitType):
+        return {'type': 'null'}
+
+    raise FrameworkException(f'`{cairo_type.__class__.__name__}` ABI type is not supported')
 
 
 def _jsonschema_from_event(event: EventType) -> dict[str, Any]:

@@ -71,10 +71,7 @@ class EvmCodeGenerator(CodeGenerator):
         contracts_from_transactions: list[EvmContractConfig] = [
             handler_config.typed_contract
             for handler_config in index_config.handlers
-            if (
-                isinstance(handler_config, EvmTransactionsHandlerConfig)
-                and handler_config.typed_contract is not None
-            )
+            if (isinstance(handler_config, EvmTransactionsHandlerConfig) and handler_config.typed_contract is not None)
         ]
         contracts: Iterable[EvmContractConfig] = chain(contracts_from_event_handlers, contracts_from_transactions)
 
