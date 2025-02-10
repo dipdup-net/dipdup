@@ -4,20 +4,20 @@ package: demo_tezos_etherlink
 datasources:
   tzkt:
     kind: tezos.tzkt
-    url: ${TZKT_URL:-https://api.parisnet.tzkt.io}
+    url: ${TZKT_URL:-https://api.tzkt.io}
 
 contracts:
   ticketer:
     kind: tezos
-    address: KT1AAi4DCQiTUv5MYoXtdiFwUrPH3t3Yhkjo
+    address: KT1UzfUMQDiEv7w6RQnnvt412qFXZmgjrLpd
     typename: ticketer
   ticket_helper:
     kind: tezos
-    address: KT1FcXb4oFBWtUVbEa96Do4DfQZXn6878yu1
+    address: KT1JJsiwXgGVhomcUQsPQYdALkRRqakvK3XC
     typename: ticket_helper
   rollup:
     kind: tezos
-    address: sr1GBHEgzZmpWH4URqshZEZFCxBpqzi6ahvL
+    address: sr1Ghq66tYK9y3r8CC1Tf8i8m5nxh8nTvZEf
     typename: rollup
 
 indexes:
@@ -55,5 +55,5 @@ indexes:
           - type: transaction
             source: ticketer
             entrypoint: transfer
-    first_level: 2838138
-    last_level: 2838138
+    first_level: 7001300
+    last_level: 7056600
