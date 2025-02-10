@@ -1,3 +1,4 @@
+import logging
 import random
 from collections.abc import AsyncIterator
 from typing import Any
@@ -10,6 +11,8 @@ from dipdup.indexes.starknet_node import StarknetNodeFetcher
 from dipdup.indexes.starknet_subsquid import StarknetSubsquidFetcher
 from dipdup.models.starknet import StarknetEventData
 from dipdup.models.starknet_subsquid import EventRequest
+
+_logger = logging.getLogger(__name__)
 
 
 class StarknetSubsquidEventFetcher(StarknetSubsquidFetcher[StarknetEventData]):
@@ -52,7 +55,10 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
 
     async def fetch(self) -> None:
         address, key0s = next(iter(self._filter))
-        events_chunk = await self._datasources[0].get_events(
+        
+        datasource = self._datasources[0]
+
+        events_chunk = await datasource.get_events(
             address=address,
             keys=[list(key0s), [], []],
             first_level=self._first_level,
@@ -61,20 +67,26 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
         )
 
         for event in events_chunk.events:
-            if not event.block_hash or not event.transaction_hash:
-                # TODO(baitcode): shall I log that?
+            # NOTE: 
+            if event.block_hash is None or event.transaction_hash is None:
+                _logger.info("Skipping event. No block_hash or transaction_hash found in %s", event)
                 continue
 
-            transaction_idx, timestamp = await self._datasources[0].get_events_data_caching(
+            block = await datasource.get_block_with_tx_hashes(
                 block_hash=event.block_hash,
-                transaction_hash=event.transaction_hash,
-                cached_items_size=10,
             )
 
-            if not transaction_idx or not timestamp:
-                # TODO(baitcode): shall I log that?
+            if block is None:
+                _logger.info("Skipping event. No block exists for block_hash. BlackHash=%s", event.block_hash)
                 continue
 
+            timestamp = block.timestamp
+            transaction_idx = block.transactions.index(event.transaction_hash)
+
+            # NOTE: This event is corrupt, possibly due to old age.
+            if transaction_idx < 0:
+                _logger.info("Skipping event. No transaction_hash exists in block. TxHash=%s", event.transaction_hash)
+                continue
 
             self._buffer[event.block_number].append(  # type: ignore[index]
                 StarknetEventData.from_starknetpy(

@@ -6,7 +6,9 @@ from decimal import Decimal
 from functools import partial
 
 import pytest
+from tortoise.functions import Sum
 
+import demo_tezos_etherlink.models
 from dipdup.database import tortoise_wrapper
 from dipdup.models.tezos import TezosOperationType
 from dipdup.test import run_in_tmp
@@ -170,6 +172,17 @@ async def assert_run_dao() -> None:
 
     assert proposals == 1
     assert votes == 1
+
+
+async def assert_run_etherlink() -> None:
+    query_set = demo_tezos_etherlink.models.Deposit.all()
+    deposits: int = await query_set.count()
+    tokens: list[str] = await query_set.distinct().values_list('token', flat=True)  # type: ignore
+    volume: int = await query_set.annotate(volume=Sum('amount')).first().values_list('volume', flat=True)  # type: ignore
+
+    assert deposits == 3
+    assert tokens == ['KT1MZg99PxMDEENwB4Fi64xkqAVh5d1rv8Z9']
+    assert volume == 15005
 
 
 test_args = ('config', 'package', 'cmd', 'assert_fn')

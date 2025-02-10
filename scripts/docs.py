@@ -719,10 +719,12 @@ def dump_demos() -> None:
         package, description = replay['package'], replay['description']
         if package in TEMPLATES['evm']:
             network = 'EVM'
-        elif package in TEMPLATES['tezos']:
-            network = 'Tezos'
         elif package in TEMPLATES['starknet']:
             network = 'Starknet'
+        elif package in TEMPLATES['substrate']:
+            network = 'Substrate'
+        elif package in TEMPLATES['tezos']:
+            network = 'Tezos'
         else:
             network = ''
         demos.append((package, network, description))
