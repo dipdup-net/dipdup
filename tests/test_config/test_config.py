@@ -24,7 +24,12 @@ from dipdup.yaml import DipDupYAMLConfig
 TEST_CONFIGS = Path(__file__).parent.parent / 'configs'
 
 
-@pytest.fixture(params=list(Path.glob(TEST_CONFIGS, 'demo_*.yml')))
+@pytest.fixture(params=Path.glob(TEST_CONFIGS, 'demo_*.yml'))
+def test_dipdup_config(request: SubRequest) -> Generator[Path, None, None]:
+    yield request.param
+
+
+@pytest.fixture(params=Path.glob(Path(__file__).parent.parent.parent / 'src', 'demo_*/dipdup.yaml'))
 def demo_dipdup_config(request: SubRequest) -> Generator[Path, None, None]:
     yield request.param
 
@@ -157,3 +162,7 @@ async def test_http_config() -> None:
 
 async def test_load_demo_config(demo_dipdup_config: Path) -> None:
     DipDupConfig.load([demo_dipdup_config])
+
+
+async def test_load_test_config(test_dipdup_config: Path) -> None:
+    DipDupConfig.load([test_dipdup_config])
