@@ -100,7 +100,7 @@ class SqliteDatabaseConfig:
     :param immune_tables: List of tables to preserve during reindexing
     """
 
-    kind: Literal['sqlite']
+    kind: Literal['sqlite'] = 'sqlite'
     path: str = DEFAULT_SQLITE_PATH
     immune_tables: set[str] = Field(default_factory=set)
 
@@ -139,7 +139,7 @@ class PostgresDatabaseConfig:
     :param connection_timeout: Connection timeout
     """
 
-    kind: Literal['postgres']
+    kind: Literal['postgres'] = 'postgres'
     host: str
     user: str = DEFAULT_POSTGRES_USER
     database: str = DEFAULT_POSTGRES_DATABASE
@@ -586,9 +586,7 @@ class DipDupConfig:
     spec_version: ToStr
     package: str
     datasources: dict[str, DatasourceConfigU] = Field(default_factory=dict)
-    database: SqliteDatabaseConfig | PostgresDatabaseConfig = Field(
-        default_factory=lambda *a, **kw: SqliteDatabaseConfig(kind='sqlite')
-    )
+    database: DatabaseConfigU = Field(default_factory=lambda *a, **kw: SqliteDatabaseConfig(kind='sqlite'))
     runtimes: dict[str, RuntimeConfigU] = Field(default_factory=dict)
     contracts: dict[str, ContractConfigU] = Field(default_factory=dict)
     indexes: dict[str, IndexConfigU] = Field(default_factory=dict)
@@ -1162,6 +1160,7 @@ from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
 from dipdup.config.tzip_metadata import TzipMetadataDatasourceConfig
 
 # NOTE: Unions for Pydantic config deserialization
+DatabaseConfigU = SqliteDatabaseConfig | PostgresDatabaseConfig
 RuntimeConfigU = SubstrateRuntimeConfig
 ContractConfigU = EvmContractConfig | TezosContractConfig | StarknetContractConfig
 DatasourceConfigU = (

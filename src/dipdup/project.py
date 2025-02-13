@@ -3,21 +3,26 @@
 Ask user some question with Click; render Jinja2 templates with answers.
 """
 
+import dataclasses
 import logging
 import re
+from itertools import chain
 from pathlib import Path
+from typing import Any
+from typing import get_args
 
 from pydantic import ConfigDict
 from pydantic import TypeAdapter
 from pydantic.dataclasses import dataclass
+from pydantic.fields import FieldInfo
 from typing_extensions import TypedDict
 
 from dipdup import __version__
-from dipdup._survey import DipDupSurveyConfig
-from dipdup._survey import prompt_anyof
-from dipdup._survey import query_survey_config
 from dipdup.cli import big_yellow_echo
 from dipdup.cli import echo
+from dipdup.config import DatabaseConfigU
+from dipdup.config import DatasourceConfigU
+from dipdup.config import RuntimeConfigU
 from dipdup.config import ToStr
 from dipdup.env import get_package_path
 from dipdup.env import get_pyproject_name
@@ -80,7 +85,7 @@ class Answers(TypedDict):
     hasura_image: str
     line_length: ToStr
     package_manager: str
-    _survey_config: DipDupSurveyConfig | None
+    _survey_config: dict[str, Any] | None
 
 
 def get_default_answers() -> Answers:
@@ -125,21 +130,22 @@ def get_replay_path(name: str) -> Path:
     return Path(__file__).parent / 'projects' / name / 'replay.yaml'
 
 
-def template_from_terminal() -> tuple[str | None, DipDupSurveyConfig | None]:
-    _, mode = prompt_anyof(
-        question='How would you like to set up your new DipDup project?',
-        options=(
-            'From template',
-            'Interactively',
-            'Blank',
-        ),
-        comments=(
-            'Use one of demo projects',
-            'Guided setup with prompts',
-            'Begin with an empty project',
-        ),
-        default=0,
-    )
+def template_from_terminal() -> tuple[str | None, dict[str, Any] | None]:
+    # _, mode = prompt_anyof(
+    #     question='How would you like to set up your new DipDup project?',
+    #     options=(
+    #         'From template',
+    #         'Interactively',
+    #         'Blank',
+    #     ),
+    #     comments=(
+    #         'Use one of demo projects',
+    #         'Guided setup with prompts',
+    #         'Begin with an empty project',
+    #     ),
+    #     default=0,
+    # )
+    mode = 'Interactively'
 
     if mode == 'Blank':
         return ('demo_blank', None)
@@ -151,25 +157,28 @@ def template_from_terminal() -> tuple[str | None, DipDupSurveyConfig | None]:
             'Starknet',
             'Substrate',
             'Tezos',
+            '[multiple]',
         ),
         comments=(
-            'EVM-compatible blockchains',
+            'EVM-compatible',
             'Starknet',
             'Substrate',
             'Tezos',
+            'Disable filtering',
         ),
         default=0,
     )
-    blockchain = res[1].lower()
+    namespace = res[1].lower() if res[1] != '[multiple]' else None
 
     if mode == 'Interactively':
         replay_path = get_replay_path('demo_blank')
-        survey_config = query_survey_config(blockchain)
+        survey_config = query_survey_config(namespace)
         return ('demo_blank', survey_config)
 
     if mode == 'From template':
         options, comments = [], []
-        for name in TEMPLATES[blockchain]:
+        templates = TEMPLATES[namespace] if namespace else chain(v for v in TEMPLATES.values())
+        for name in templates:
             replay_path = get_replay_path(name)
             _answers = answers_from_replay(replay_path)
             options.append(_answers['template'])
@@ -409,3 +418,102 @@ def _render(answers: Answers, template_path: Path, output_path: Path, force: boo
         )
 
     write(output_path, content, overwrite=force)
+
+
+def fill_config_from_input(
+    config: dict[str, Any],
+    section: str,
+    section_kinds: tuple[type],
+    filter: str,
+) -> None:
+    section_dict = config.get(section, {})
+    another = False
+
+    print(f'Configuring `{section}` section')
+
+    while True:
+        add_entity = input(f'Do you want to add{' another' if another else ''} one? (yes/no): ').strip().lower()
+        if add_entity != 'yes':
+            break
+
+        # Ask for the entity name
+        if section == 'database':
+            name = ''
+        else:
+            name = input('Enter a name for the entity: ').strip()
+
+        # Ask for the type of the entity
+        print('Available entity types:')
+        for i, entity_type in enumerate(section_kinds, start=1):
+            kind = entity_type.__dataclass_fields__['kind'].default
+            assert kind
+
+            if filter and '.' in kind and not kind.startswith(filter):
+                continue
+
+            print(f'{i}. {kind}')
+
+        type_choice = int(input('Choose an entity type (number): ').strip()) - 1
+        # entity_type_name = list(section_kinds)[type_choice]
+        entity_model = section_kinds[type_choice]
+
+        # Gather input for the fields of the chosen type
+        entity_data = {}
+        for field_name, field in entity_model.__dataclass_fields__.items():
+            if field_name in {'kind', 'http'}:
+                continue
+
+            default = field.default
+            if default is dataclasses.MISSING:
+                default = None
+            elif isinstance(default, FieldInfo):
+                # else:
+                # print(default.__dict__)
+                default = default.default_factory()
+
+            field_value = input(f'Enter value for `{field_name}` [{field.type}] ({default}): ').strip()
+            entity_data[field_name] = field_value or default
+
+        # Validate and add the entity
+        try:
+            entity_instance = entity_model(**entity_data)
+            section_dict[name] = entity_instance.__dict__
+            another = True
+        except Exception as e:
+            print(f'Error: {e}. Please try again.')
+
+
+def prompt_anyof(
+    question: str,
+    options: tuple[str, ...],
+    comments: tuple[str, ...],
+    default: int,
+) -> tuple[int, str]:
+    """Ask user to choose one of the options; returns index and value"""
+    import survey
+    from tabulate import tabulate
+
+    table = tabulate(
+        zip(options, comments, strict=False),
+        tablefmt='plain',
+    )
+    index = survey.routines.select(
+        question + '\n',
+        options=table.split('\n'),
+        index=default,
+    )
+    return index, options[index]
+
+
+def query_survey_config(namespace: str | None) -> dict[str, Any]:
+    config_dict = {}
+
+    # NOTE: It's not a config section; we'll handle it later
+    fill_config_from_input(config_dict, 'database', get_args(DatabaseConfigU), namespace)
+
+    if namespace == 'substrate':
+        fill_config_from_input(config_dict, 'runtimes', get_args(RuntimeConfigU), namespace)
+
+    fill_config_from_input(config_dict, 'datasources', get_args(DatasourceConfigU), namespace)
+
+    return config_dict

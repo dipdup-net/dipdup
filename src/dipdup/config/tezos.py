@@ -59,7 +59,7 @@ class TezosContractConfig(ContractConfig):
     :param typename: Alias for the contract script
     """
 
-    kind: Literal['tezos']
+    kind: Literal['tezos'] = 'tezos'
     address: TezosAddress | None = None
     code_hash: int | TezosAddress | None = None
     typename: str | None = None

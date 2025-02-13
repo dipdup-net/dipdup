@@ -55,7 +55,7 @@ class EvmContractConfig(ContractConfig):
     :param typename: Alias for the contract script
     """
 
-    kind: Literal['evm']
+    kind: Literal['evm'] = 'evm'
     address: EvmAddress | None = None
     abi: EvmAddress | None = None
     typename: str | None = None

@@ -18,6 +18,6 @@ class HttpDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['http']
+    kind: Literal['http'] = 'http'
     url: str
     http: HttpConfig | None = None

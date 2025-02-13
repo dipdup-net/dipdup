@@ -19,7 +19,7 @@ class EvmSubsquidDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['evm.subsquid']
+    kind: Literal['evm.subsquid'] = 'evm.subsquid'
     url: Url
     http: HttpConfig | None = None
 

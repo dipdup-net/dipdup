@@ -21,7 +21,7 @@ class CoinbaseDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['coinbase']
+    kind: Literal['coinbase'] = 'coinbase'
     api_key: str | None = None
     secret_key: str | None = Field(default=None, repr=False)
     passphrase: str | None = Field(default=None, repr=False)

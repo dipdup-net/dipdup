@@ -31,7 +31,9 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
     def __init__(self, config: StarknetNodeDatasourceConfig, merge_subscriptions: bool = False) -> None:
         super().__init__(config, merge_subscriptions)
         self._starknetpy: StarknetpyClient | None = None
-        self._block_cache: LRU[int, StarknetBlockWithTxHashes | PendingStarknetBlockWithTxHashes] = LRU(BLOCK_CACHE_SIZE)
+        self._block_cache: LRU[int, StarknetBlockWithTxHashes | PendingStarknetBlockWithTxHashes] = LRU(
+            BLOCK_CACHE_SIZE
+        )
 
     @property
     def starknetpy(self) -> 'StarknetpyClient':
@@ -82,7 +84,9 @@ class StarknetNodeDatasource(IndexDatasource[StarknetNodeDatasourceConfig]):
             continuation_token=continuation_token,
         )
 
-    async def get_block_with_tx_hashes(self, block_hash: int) -> Union['StarknetBlockWithTxHashes', 'PendingStarknetBlockWithTxHashes']:
+    async def get_block_with_tx_hashes(
+        self, block_hash: int
+    ) -> Union['StarknetBlockWithTxHashes', 'PendingStarknetBlockWithTxHashes']:
         if block := self._block_cache.get(block_hash, None):
             return block
 

@@ -34,7 +34,7 @@ class TezosTzktDatasourceConfig(DatasourceConfig):
     :param rollback_depth: Number of blocks to keep in the database to handle reorgs
     """
 
-    kind: Literal['tezos.tzkt']
+    kind: Literal['tezos.tzkt'] = 'tezos.tzkt'
     url: Url = DEFAULT_TZKT_URL
     http: HttpConfig | None = None
     buffer_size: int = 0
