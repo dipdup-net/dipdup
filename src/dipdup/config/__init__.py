@@ -316,7 +316,7 @@ class IndexTemplateConfig(NameMixin):
 
     """
 
-    kind = 'template'
+    kind: Literal['template'] = 'template'
     template: str
     values: dict[str, Any]
     first_level: int = 0

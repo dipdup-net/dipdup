@@ -27,6 +27,7 @@ from dipdup.exceptions import CallbackError
 from dipdup.install import EPILOG
 from dipdup.install import WELCOME_ASCII
 from dipdup.sys import set_up_process
+from dipdup.yaml import DipDupYAMLConfig
 
 if TYPE_CHECKING:
     from dipdup.config import DipDupConfig
@@ -849,6 +850,7 @@ async def new(
     from dipdup.project import answers_from_terminal
     from dipdup.project import get_default_answers
     from dipdup.project import render_project
+    from dipdup.project import template_from_terminal
 
     if quiet:
         answers = get_default_answers()
@@ -860,12 +862,29 @@ async def new(
             answers['template'] = template
     else:
         try:
-            answers = answers_from_terminal(template)
+            answers = answers_from_terminal()
+            answers['template'] = template or 'demo_blank'
+
+            if template:
+                echo(f'Using template `{template}`\n')
+                config_dict = {}
+            else:
+                template, config_dict = template_from_terminal()
+
         except Escape:
             return
 
     _logger.info('Rendering project')
     render_project(answers, force)
+
+    if config_dict:
+        config_dict['package'] = answers['package']
+        config_dict['spec_version'] = '3.0'
+
+        config = DipDupYAMLConfig(**config_dict)
+
+        path = env.get_package_path(config['package']) / ROOT_CONFIG
+        path.write_text(config.dump())
 
     _logger.info('Initializing project')
     config = DipDupConfig.load([Path(answers['package'])])
