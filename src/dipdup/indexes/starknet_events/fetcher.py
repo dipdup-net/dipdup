@@ -55,7 +55,7 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
 
     async def fetch(self) -> None:
         address, key0s = next(iter(self._filter))
-        
+
         datasource = self._datasources[0]
 
         events_chunk = await datasource.get_events(
@@ -67,9 +67,9 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
         )
 
         for event in events_chunk.events:
-            # NOTE: 
+            # NOTE:
             if event.block_hash is None or event.transaction_hash is None:
-                _logger.info("Skipping event. No block_hash or transaction_hash found in %s", event)
+                _logger.info('Skipping event. No block_hash or transaction_hash found in %s', event)
                 continue
 
             block = await datasource.get_block_with_tx_hashes(
@@ -77,7 +77,7 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
             )
 
             if block is None:
-                _logger.info("Skipping event. No block exists for block_hash. BlackHash=%s", event.block_hash)
+                _logger.info('Skipping event. No block exists for block_hash. BlackHash=%s', event.block_hash)
                 continue
 
             timestamp = block.timestamp
@@ -85,7 +85,7 @@ class EventFetcherChannel(FetcherChannel[StarknetEventData, StarknetNodeDatasour
 
             # NOTE: This event is corrupt, possibly due to old age.
             if transaction_idx < 0:
-                _logger.info("Skipping event. No transaction_hash exists in block. TxHash=%s", event.transaction_hash)
+                _logger.info('Skipping event. No transaction_hash exists in block. TxHash=%s', event.transaction_hash)
                 continue
 
             self._buffer[event.block_number].append(  # type: ignore[index]

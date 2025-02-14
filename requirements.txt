@@ -172,9 +172,9 @@ cytoolz==1.0.1 ; implementation_name == 'cpython' \
     --hash=sha256:c8231b9abbd8e368e036f4cc2e16902c9482d4cf9e02a6147ed0e9a3cd4a9ab0 \
     --hash=sha256:fb988c333f05ee30ad4693fe4da55d95ec0bb05775d2b60191236493ea2e01f9 \
     --hash=sha256:fcb8f7d0d65db1269022e7e0428471edee8c937bc288ebdcb72f13eaa67c2fe4
-datamodel-code-generator==0.27.2 \
-    --hash=sha256:1a7655f5fd3a61329b57534904f5c40dd850850e420696fd946ec7a4f59c32b8 \
-    --hash=sha256:efcbfbe6a1488d3411fc588b1ce1af5f854f5107810b1cc9026a6d6333a7c4d8
+datamodel-code-generator==0.27.3 \
+    --hash=sha256:01e928c00b800aec8d2ee77b5d4b47e1bc159a3a1c32f0f405df0a442d9ab5e7 \
+    --hash=sha256:ddef49e66e2b90a4c9b238f6ce42dc5a2a23f6ab1b8370eaca08576777921e43
 dictdiffer==0.9.0 \
     --hash=sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578 \
     --hash=sha256:442bfc693cfcadaf46674575d2eba1c53b42f5e404218ca2c2ff549f2df56595
@@ -190,9 +190,9 @@ eth-account==0.13.3 \
 eth-hash==0.7.1 \
     --hash=sha256:0fb1add2adf99ef28883fd6228eb447ef519ea72933535ad1a0b28c6f65f868a \
     --hash=sha256:d2411a403a0b0a62e8247b4117932d900ffb4c8c64b15f92620547ca5ce46be5
-eth-keyfile==0.9.0 \
-    --hash=sha256:45d3513b6433ad885370225ba0429ed26493ba23589c5b1ca5da024765020fef \
-    --hash=sha256:8621c35e83cbc05909d2f23dbb8a87633918733caea553ae0e298f6a06291526
+eth-keyfile==0.9.1 \
+    --hash=sha256:9789c3b4fa0bb6e2616cdc2bdd71b8755b42947d78ef1e900a0149480fabb5c2 \
+    --hash=sha256:c7a8bc6af4527d1ab2eb1d1b949d59925252e17663eaf90087da121327b51df6
 eth-keys==0.6.1 \
     --hash=sha256:7deae4cd56e862e099ec58b78176232b931c4ea5ecded2f50c7b1ccbc10c24cf \
     --hash=sha256:a43e263cbcabfd62fa769168efc6c27b1f5603040e4de22bb84d12567e4fd962
@@ -499,9 +499,9 @@ ruamel-yaml-clib==0.2.12 ; platform_python_implementation == 'CPython' \
 scalecodec==1.2.11 \
     --hash=sha256:99a2cdbfccdcaf22bd86b86da55a730a2855514ad2309faef4a4a93ac6cbeb8d \
     --hash=sha256:d15c94965f617caa25096f83a45f5f73031d05e6ee08d6039969f0a64fc35de1
-sentry-sdk==2.20.0 \
-    --hash=sha256:afa82713a92facf847df3c6f63cec71eb488d826a50965def3d7722aa6f0fdab \
-    --hash=sha256:c359a1edf950eb5e80cffd7d9111f3dbeef57994cb4415df37d39fda2cf22364
+sentry-sdk==2.21.0 \
+    --hash=sha256:7623cfa9e2c8150948a81ca253b8e2bfe4ce0b96ab12f8cd78e3ac9c490fd92f \
+    --hash=sha256:a6d38e0fb35edda191acf80b188ec713c863aaa5ad8d5798decb8671d02077b6
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
@@ -545,9 +545,9 @@ typing-inspect==0.9.0 \
 tzdata==2025.1 ; sys_platform == 'win32' \
     --hash=sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694 \
     --hash=sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639
-tzlocal==5.2 \
-    --hash=sha256:49816ef2fe65ea8ac19d19aa7a1ae0551c834303d5014c6d5a62e4cbda8047b8 \
-    --hash=sha256:8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e
+tzlocal==5.3 \
+    --hash=sha256:2fafbfc07e9d8b49ade18f898d6bcd37ae88ce3ad6486842a2e4f03af68323d2 \
+    --hash=sha256:3814135a1bb29763c6e4f08fd6e41dbb435c7a60bfbb03270211bcc537187d8c
 urllib3==2.3.0 \
     --hash=sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df \
     --hash=sha256:f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d
