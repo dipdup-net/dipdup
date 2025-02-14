@@ -630,7 +630,7 @@ class HasuraGateway(HTTPGateway):
     def _format_custom_column_names(self, fields: list[Field]) -> dict[str, Any]:
         """
         Deprecated
-        See: https://hasura.io/docs/latest/api-reference/syntax-defs/#customcolumnnames
+        See: https://hasura.io/docs/2.0/api-reference/syntax-defs/#customcolumnnames
         """
         if self._hasura_config.camel_case:
             return {humps.decamelize(f.name): humps.camelize(f.name) for f in fields}
