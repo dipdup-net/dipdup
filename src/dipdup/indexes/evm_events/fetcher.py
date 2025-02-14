@@ -66,7 +66,7 @@ class EvmNodeEventFetcher(EvmNodeFetcher[EvmEventData]):
 
         while batch_first_level <= self._last_level:
             node = self.random_datasource
-            batch_size = self.get_next_batch_size(batch_size, ratelimited)
+            batch_size = node._http_config.batch_size or self.get_next_batch_size(batch_size, ratelimited)
             ratelimited = False
 
             started = time.time()
