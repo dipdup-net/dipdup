@@ -79,7 +79,7 @@ class TezosBigMapsIndexConfig(TezosIndexConfig):
     :param last_level: Level to stop indexing at
     """
 
-    kind: Literal['tezos.big_maps']
+    kind: Literal['tezos.big_maps'] = 'tezos.big_maps'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     handlers: tuple[TezosBigMapsHandlerConfig, ...]
 

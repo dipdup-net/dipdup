@@ -62,7 +62,7 @@ class SubstrateEventsIndexConfig(SubstrateIndexConfig):
     :param runtime: Substrate runtime
     """
 
-    kind: Literal['substrate.events']
+    kind: Literal['substrate.events'] = 'substrate.events'
     datasources: tuple[Alias[SubstrateDatasourceConfigU], ...]
     handlers: tuple[SubstrateEventsHandlerConfig, ...]
     runtime: Alias[SubstrateRuntimeConfig]

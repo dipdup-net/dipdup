@@ -19,7 +19,7 @@ class SubstrateSubsquidDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['substrate.subsquid']
+    kind: Literal['substrate.subsquid'] = 'substrate.subsquid'
     url: Url
     http: HttpConfig | None = None
 

@@ -65,7 +65,7 @@ class StarknetContractConfig(ContractConfig):
     :param typename: Alias for the contract script
     """
 
-    kind: Literal['starknet']
+    kind: Literal['starknet'] = 'starknet'
     address: StarknetAddress | None = None
     abi: StarknetAddress | None = None
     typename: str | None = None

@@ -23,7 +23,7 @@ class EvmEtherscanDatasourceConfig(DatasourceConfig):
     """
 
     # NOTE: Alias, remove in 9.0
-    kind: Literal['evm.etherscan'] | Literal['abi.etherscan']
+    kind: Literal['evm.etherscan'] | Literal['abi.etherscan'] = 'evm.etherscan'
     url: str
     api_key: str | None = None
 

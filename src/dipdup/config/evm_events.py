@@ -61,7 +61,7 @@ class EvmEventsIndexConfig(EvmIndexConfig):
     :param last_level: Level to stop indexing and disable this index
     """
 
-    kind: Literal['evm.events']
+    kind: Literal['evm.events'] = 'evm.events'
     datasources: tuple[Alias[EvmDatasourceConfigU], ...]
     handlers: tuple[EvmEventsHandlerConfig, ...]
 

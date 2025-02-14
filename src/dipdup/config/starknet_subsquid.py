@@ -19,7 +19,7 @@ class StarknetSubsquidDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['starknet.subsquid']
+    kind: Literal['starknet.subsquid'] = 'starknet.subsquid'
     url: Url
     http: HttpConfig | None = None
 

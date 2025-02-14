@@ -93,7 +93,7 @@ class EvmTransactionsIndexConfig(EvmIndexConfig):
     :param last_level: Level to stop indexing at
     """
 
-    kind: Literal['evm.transactions']
+    kind: Literal['evm.transactions'] = 'evm.transactions'
 
     datasources: tuple[Alias[EvmDatasourceConfigU], ...]
     handlers: tuple[EvmTransactionsHandlerConfig, ...]

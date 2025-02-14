@@ -22,7 +22,7 @@ class TzipMetadataDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['tzip_metadata']
+    kind: Literal['tzip_metadata'] = 'tzip_metadata'
     network: TzipMetadataNetwork
     url: str = DEFAULT_TZIP_METADATA_URL
     http: HttpConfig | None = None

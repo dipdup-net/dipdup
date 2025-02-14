@@ -41,7 +41,7 @@ class TezosHeadIndexConfig(TezosIndexConfig):
     :param datasources: `tezos` datasources to use
     """
 
-    kind: Literal['tezos.head']
+    kind: Literal['tezos.head'] = 'tezos.head'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     callback: str
 

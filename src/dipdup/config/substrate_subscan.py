@@ -19,7 +19,7 @@ class SubstrateSubscanDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['substrate.subscan']
+    kind: Literal['substrate.subscan'] = 'substrate.subscan'
     url: str
     api_key: str | None = None
 

@@ -20,6 +20,6 @@ class IpfsDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['ipfs']
+    kind: Literal['ipfs'] = 'ipfs'
     url: str = DEFAULT_IPFS_URL
     http: HttpConfig | None = None

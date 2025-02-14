@@ -21,7 +21,7 @@ class SubstrateNodeDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['substrate.node']
+    kind: Literal['substrate.node'] = 'substrate.node'
     url: Url
     ws_url: WsUrl | None = None
     http: HttpConfig | None = None

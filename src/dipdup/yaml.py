@@ -45,7 +45,7 @@ def exclude_none(config_json: Any) -> Any:
     if isinstance(config_json, list | tuple):
         return [exclude_none(i) for i in config_json if i is not None]
     if isinstance(config_json, dict):
-        return {k: exclude_none(v) for k, v in config_json.items() if v is not None}
+        return {k: exclude_none(v) for k, v in config_json.items() if v is not None and not k.startswith('_')}
     return config_json
 
 
