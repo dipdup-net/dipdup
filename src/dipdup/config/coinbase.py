@@ -29,5 +29,5 @@ class CoinbaseDatasourceConfig(DatasourceConfig):
     http: HttpConfig | None = None
 
     @property
-    def url(self) -> str:
+    def url(self) -> str:  # type: ignore[override]
         return 'https://api.pro.coinbase.com'

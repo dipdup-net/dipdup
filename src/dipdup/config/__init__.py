@@ -30,8 +30,10 @@ from typing import TYPE_CHECKING
 from typing import Annotated
 from typing import Any
 from typing import Literal
+from typing import Self
 from typing import TypeVar
 from typing import cast
+from typing import get_args
 from urllib.parse import quote_plus
 
 import orjson
@@ -47,8 +49,10 @@ from pydantic_core import to_jsonable_python
 from dipdup import __spec_version__
 from dipdup import env
 from dipdup.config._mixin import CallbackMixin
+from dipdup.config._mixin import InteractiveMixin
 from dipdup.config._mixin import NameMixin
 from dipdup.config._mixin import ParentMixin
+from dipdup.config._mixin import TerminalOptions
 from dipdup.exceptions import ConfigInitializationException
 from dipdup.exceptions import ConfigurationError
 from dipdup.exceptions import IndexAlreadyExistsError
@@ -561,7 +565,7 @@ class AdvancedConfig:
 
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
-class DipDupConfig:
+class DipDupConfig(InteractiveMixin):
     """DipDup project configuration file
 
     :param spec_version: Version of config specification, currently always `3.0`
@@ -616,6 +620,29 @@ class DipDupConfig:
     @property
     def package_path(self) -> Path:
         return env.get_package_path(self.package)
+
+    @classmethod
+    def from_terminal(cls, opts: TerminalOptions) -> Self:
+        from dipdup.project import fill_config_from_input
+
+        config_dict = {}
+
+        # NOTE: Substrate or multichain
+        if opts.namespace in {'substrate', None}:
+            fill_config_from_input(config_dict, 'runtimes', get_args(RuntimeConfigU), opts.namespace)
+
+        fill_config_from_input(config_dict, 'datasources', get_args(DatasourceConfigU), opts.namespace)
+        fill_config_from_input(config_dict, 'indexes', get_args(IndexConfigU), opts.namespace)
+        fill_config_from_input(config_dict, 'hooks', (HookConfig,), None)
+        fill_config_from_input(config_dict, 'jobs', (JobConfig,), None)
+
+        config_dict = {
+            'package': opts.package,
+            'spec_version': '3.0',
+            **config_dict,
+        }
+
+        return cls(**config_dict)
 
     @classmethod
     def load(

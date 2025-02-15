@@ -7,6 +7,7 @@ from pydoc import locate
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generic
+from typing import Self
 from typing import TypeVar
 from typing import cast
 
@@ -121,3 +122,17 @@ class SubgroupIndexMixin:
     @subgroup_index.setter
     def subgroup_index(self, value: int) -> None:
         self._subgroup_index = value
+
+
+@dataclass
+class TerminalOptions:
+    package: str
+    namespace: str | None = None
+
+
+@dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
+class InteractiveMixin:
+
+    @classmethod
+    @abstractmethod
+    def from_terminal(cls, opts: TerminalOptions) -> Self: ...

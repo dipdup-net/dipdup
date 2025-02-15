@@ -869,7 +869,7 @@ async def new(
                 echo(f'Using template `{template}`\n')
                 config_dict = {}
             else:
-                template, config_dict = template_from_terminal()
+                template, config_dict = template_from_terminal(answers['package'])
 
         except Escape:
             return

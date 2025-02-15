@@ -9,7 +9,6 @@ import re
 from itertools import chain
 from pathlib import Path
 from typing import Any
-from typing import get_args
 
 from pydantic import ConfigDict
 from pydantic import TypeAdapter
@@ -20,12 +19,9 @@ from typing_extensions import TypedDict
 from dipdup import __version__
 from dipdup.cli import big_yellow_echo
 from dipdup.cli import echo
-from dipdup.config import DatasourceConfigU
-from dipdup.config import HookConfig
-from dipdup.config import IndexConfigU
-from dipdup.config import JobConfig
-from dipdup.config import RuntimeConfigU
+from dipdup.config import DipDupConfig
 from dipdup.config import ToStr
+from dipdup.config._mixin import TerminalOptions
 from dipdup.env import get_package_path
 from dipdup.env import get_pyproject_name
 from dipdup.utils import load_template
@@ -138,25 +134,7 @@ def get_replay_path(name: str) -> Path:
     return Path(__file__).parent / 'projects' / name / 'replay.yaml'
 
 
-def template_from_terminal() -> tuple[str | None, dict[str, Any] | None]:
-    _, mode = prompt_anyof(
-        question='How would you like to set up your new DipDup project?',
-        options=(
-            'Interactively',
-            'From template',
-            'Blank',
-        ),
-        comments=(
-            'Guided setup with prompts',
-            'Use one of demo projects',
-            'Begin with an empty project',
-        ),
-        default=0,
-    )
-
-    if mode == 'Blank':
-        return ('demo_blank', None)
-
+def namespace_from_terminal() -> str | None:
     res = prompt_anyof(
         question='What blockchain are you going to index?',
         options=(
@@ -175,12 +153,38 @@ def template_from_terminal() -> tuple[str | None, dict[str, Any] | None]:
         ),
         default=0,
     )
-    namespace = res[1].lower() if res[1] != '[multiple]' else None
+    return res[1].lower() if res[1] != '[multiple]' else None
+
+
+def template_from_terminal(package: str) -> tuple[str | None, dict[str, Any] | None]:
+    _, mode = prompt_anyof(
+        question='How would you like to set up your new DipDup project?',
+        options=(
+            'Interactively',
+            'From template',
+            'Blank',
+        ),
+        comments=(
+            'Guided setup with prompts',
+            'Use one of demo projects',
+            'Begin with an empty project',
+        ),
+        default=0,
+    )
+
+    if mode == 'Blank':
+        return ('demo_blank', None)
+
+    namespace = namespace_from_terminal()
 
     if mode == 'Interactively':
         replay_path = get_replay_path('demo_blank')
-        config_dict = config_from_terminal(namespace)
-        return ('demo_blank', config_dict)
+        opts = TerminalOptions(
+            package=package,
+            namespace=namespace,
+        )
+        config = DipDupConfig.from_terminal(opts)
+        return ('demo_blank', config._json)
 
     if mode == 'From template':
         options, comments = [], []
@@ -431,8 +435,6 @@ def fill_config_from_input(
     section_dict = config.get(section, {})
     another = False
 
-    print(f'Configuring `{section}` section \n')
-
     while True:
         entity_singular = SINGULAR_FORMS[section]
 
@@ -463,7 +465,6 @@ def fill_config_from_input(
         # NOTE: Prepare a filtered (or not) list of entity types
 
         # Ask for the type of the entity
-        print(f'Available {entity_singular} kinds:')
         matched = {}
         for entity_type in section_kinds:
             try:
@@ -481,8 +482,6 @@ def fill_config_from_input(
         if len(matched) != 1:
             kinds = sorted(matched.keys())
             comments = tuple('' for _ in kinds)
-            print(f'Available {entity_singular} kinds: {kinds} {comments}')
-
             _, kind = prompt_anyof(
                 f'Choose {entity_singular} kind: ',
                 kinds,
@@ -514,7 +513,7 @@ def fill_config_from_input(
             # field_value = input(f'Enter value for `{field_name}` [{field.type}] ({default}): ').strip()
             field_value = survey.routines.input(
                 f'Enter value for `{field_name}` [{field.type}]: ',
-                value=default or '',
+                value=str(default) if default is not None else '',
             )
             if field_value == '':
                 field_value = default
@@ -529,7 +528,7 @@ def fill_config_from_input(
         # Validate and add the entity
         try:
             entity_instance = entity_model(**entity_data)
-            section_dict[name] = entity_instance.__dict__
+            section_dict[name] = {k: v for k, v in entity_instance.__dict__.items() if not k.startswith('_')}
             another = True
         except Exception as e:
             print(f'Error: {e}. Please try again.')
@@ -559,18 +558,3 @@ def prompt_anyof(
         index=default,
     )
     return index, options[index]
-
-
-def config_from_terminal(namespace: str | None) -> dict[str, Any]:
-    config_dict = {}
-
-    # NOTE: Substrate or multichain
-    if namespace in {'substrate', None}:
-        fill_config_from_input(config_dict, 'runtimes', get_args(RuntimeConfigU), namespace)
-
-    fill_config_from_input(config_dict, 'datasources', get_args(DatasourceConfigU), namespace)
-    fill_config_from_input(config_dict, 'indexes', get_args(IndexConfigU), namespace)
-    fill_config_from_input(config_dict, 'hooks', (HookConfig,), None)
-    fill_config_from_input(config_dict, 'jobs', (JobConfig,), None)
-
-    return config_dict
