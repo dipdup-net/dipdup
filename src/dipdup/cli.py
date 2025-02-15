@@ -878,8 +878,12 @@ async def new(
     render_project(answers, force)
 
     if config_dict:
-        config_dict['package'] = answers['package']
-        config_dict['spec_version'] = '3.0'
+        # NOTE: Preserve the header at the top of the file
+        config_dict = {
+            'package': answers['package'],
+            'spec_version': '3.0',
+            **config_dict,
+        }
 
         config = DipDupYAMLConfig(**config_dict)
 

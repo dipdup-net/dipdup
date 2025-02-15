@@ -27,3 +27,7 @@ class CoinbaseDatasourceConfig(DatasourceConfig):
     passphrase: str | None = Field(default=None, repr=False)
 
     http: HttpConfig | None = None
+
+    @property
+    def url(self) -> str:
+        return 'https://api.pro.coinbase.com'

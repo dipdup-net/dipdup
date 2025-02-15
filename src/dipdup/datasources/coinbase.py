@@ -11,7 +11,6 @@ from dipdup.models.coinbase import CoinbaseCandleData
 from dipdup.models.coinbase import CoinbaseCandleInterval
 
 CANDLES_REQUEST_LIMIT = 300
-API_URL = 'https://api.pro.coinbase.com'
 
 
 class CoinbaseDatasource(Datasource[CoinbaseDatasourceConfig]):
