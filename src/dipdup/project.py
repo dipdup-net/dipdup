@@ -281,29 +281,29 @@ def answers_from_terminal() -> Answers:
             fg='yellow',
         )
 
-    big_yellow_echo('Miscellaneous tunables; leave default values if unsure')
+    # big_yellow_echo('Miscellaneous tunables; leave default values if unsure')
 
-    _, answers['package_manager'] = prompt_anyof(
-        question='Choose package manager',
-        options=(
-            'uv',
-            'poetry',
-            'pdm',
-            'none',
-        ),
-        comments=(
-            'uv (recommended)',
-            'Poetry',
-            'PDM',
-            '[none]',
-        ),
-        default=0,
-    )
+    # _, answers['package_manager'] = prompt_anyof(
+    #     question='Choose package manager',
+    #     options=(
+    #         'uv',
+    #         'poetry',
+    #         'pdm',
+    #         'none',
+    #     ),
+    #     comments=(
+    #         'uv (recommended)',
+    #         'Poetry',
+    #         'PDM',
+    #         '[none]',
+    #     ),
+    #     default=0,
+    # )
 
-    answers['line_length'] = survey.routines.input(
-        'Enter maximum line length for linters: ',
-        value=answers['line_length'],
-    )
+    # answers['line_length'] = survey.routines.input(
+    #     'Enter maximum line length for linters: ',
+    #     value=answers['line_length'],
+    # )
 
     return answers
 
@@ -438,10 +438,45 @@ def prompt_bool(
     return value == 'yes'
 
 
+def prompt_kind(
+    entity: str,
+    types: tuple[type, ...],
+    filter: str | None,
+) -> type:
+
+    matched = {}
+    for entity_type in types:
+        try:
+            kind = entity_type.__dataclass_fields__['kind'].default
+        except KeyError:
+            kind = entity_type.__name__
+
+        assert kind
+
+        if filter and '.' in kind and not kind.startswith(filter):
+            continue
+
+        matched[kind] = entity_type
+
+    if len(matched) == 1:
+        return next(iter(matched))
+
+    kinds = sorted(matched.keys())
+    comments = tuple('' for _ in kinds)
+    _, kind = prompt_anyof(
+        f'Choose {entity} kind: ',
+        kinds,
+        comments,
+        default=0,
+    )
+    return matched[kind]
+
+        
+
 def fill_config_from_input(
     config: dict[str, Any],
     section: str,
-    section_kinds: tuple[type],
+    types: tuple[type, ...],
     filter: str | None,
 ) -> None:
     import survey
@@ -450,54 +485,28 @@ def fill_config_from_input(
     another = False
 
     while True:
-        entity_singular = SINGULAR_FORMS[section]
-        another_str = 'another' if another else 'the first'
+        section_singular = SINGULAR_FORMS[section]
 
         if not prompt_bool(
-            f'Do you want to add {another_str} {entity_singular}?',
+            f'Do you want to add {'another' if another else 'the first'} {section_singular}?',
             default=not another,
         ):
             break
 
         # NOTE: All sections are mappings alias to dict
         name = survey.routines.input(
-            f'Enter {entity_singular} name: ',
+            f'Enter {section_singular} name: ',
         )
 
-        # NOTE: Prepare a filtered (or not) list of entity types
-
-        # Ask for the type of the entity
-        matched = {}
-        for entity_type in section_kinds:
-            try:
-                kind = entity_type.__dataclass_fields__['kind'].default
-            except KeyError:
-                kind = entity_type.__name__
-
-            assert kind
-
-            if filter and '.' in kind and not kind.startswith(filter):
-                continue
-
-            matched[kind] = entity_type
-
-        if len(matched) != 1:
-            kinds = sorted(matched.keys())
-            comments = tuple('' for _ in kinds)
-            _, kind = prompt_anyof(
-                f'Choose {entity_singular} kind: ',
-                kinds,
-                comments,
-                default=0,
-            )
-        else:
-            kind = next(iter(matched))
-
-        entity_model = matched[kind]
+        type_ = prompt_kind(
+            section_singular,
+            types,
+            filter,
+        )
 
         # Gather input for the fields of the chosen type
         entity_data = {}
-        for field_name, field in entity_model.__dataclass_fields__.items():
+        for field_name, field in type_.__dataclass_fields__.items():
             # print(field)
 
             if field_name in {'kind', 'http'}:
@@ -539,8 +548,8 @@ def fill_config_from_input(
 
         # Validate and add the entity
         try:
-            entity_instance = entity_model(**entity_data)
-            section_dict[name] = {k: v for k, v in entity_instance.__dict__.items() if not k.startswith('_')}
+            obj = type_(**entity_data)
+            section_dict[name] = {k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
             another = True
         except Exception as e:
             print(f'Error: {e}. Please try again.')
