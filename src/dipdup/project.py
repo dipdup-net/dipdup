@@ -424,6 +424,20 @@ def _render(answers: Answers, template_path: Path, output_path: Path, force: boo
     write(output_path, content, overwrite=force)
 
 
+def prompt_bool(
+    question: str,
+    default: bool = False,
+) -> bool:
+    choices = ('yes', 'no') if default else ('no', 'yes')
+    _, value = prompt_anyof(
+        question,
+        choices,
+        ('', ''),
+        default=0,
+    )
+    return value == 'yes'
+
+
 def fill_config_from_input(
     config: dict[str, Any],
     section: str,
@@ -437,24 +451,12 @@ def fill_config_from_input(
 
     while True:
         entity_singular = SINGULAR_FORMS[section]
+        another_str = 'another' if another else 'the first'
 
-        if another:
-            another_str = 'another'
-            choices = ('no', 'yes')
-        else:
-            another_str = 'the first'
-            choices = (
-                'yes',
-                'no',
-            )
-
-        _, add_entity = prompt_anyof(
+        if not prompt_bool(
             f'Do you want to add {another_str} {entity_singular}?',
-            choices,
-            ('', ''),
-            default=0,
-        )
-        if add_entity != 'yes':
+            default=not another,
+        ):
             break
 
         # NOTE: All sections are mappings alias to dict
@@ -496,6 +498,8 @@ def fill_config_from_input(
         # Gather input for the fields of the chosen type
         entity_data = {}
         for field_name, field in entity_model.__dataclass_fields__.items():
+            # print(field)
+
             if field_name in {'kind', 'http'}:
                 continue
             if field_name.startswith('_'):
@@ -505,25 +509,33 @@ def fill_config_from_input(
                 continue
 
             default = field.default
+
             if default == dataclasses.MISSING:
                 default = None
             elif isinstance(default, FieldInfo):
                 default = default.default_factory() if default.default_factory else default.default
 
-            # field_value = input(f'Enter value for `{field_name}` [{field.type}] ({default}): ').strip()
             field_value = survey.routines.input(
                 f'Enter value for `{field_name}` [{field.type}]: ',
                 value=str(default) if default is not None else '',
             )
-            if field_value == '':
-                field_value = default
+
+            if field.default_factory == dataclasses.MISSING:
+                default = None
 
             # NOTE: Basic transformations: string lists
-            if isinstance(field_value, str):
-                if ',' in field_value:
+            if 'tuple' in field.type or 'list' in field.type:
+                if not field_value:
+                    field_value = default
+                elif ',' in field_value:
                     field_value = field_value.split(',')
+                else:
+                    field_value = [field_value]
 
             entity_data[field_name] = field_value or default
+
+            # print(default, 'default')
+            # print(entity_data[field_name], 'field_value')
 
         # Validate and add the entity
         try:
@@ -533,7 +545,7 @@ def fill_config_from_input(
         except Exception as e:
             print(f'Error: {e}. Please try again.')
 
-        print(section_dict)
+        # print(section_dict)
 
     config[section] = section_dict
 

@@ -295,6 +295,10 @@ class DatasourceConfig(ABC, NameMixin):
     ws_url: WsUrl | None = None
     http: HttpConfig | None = None
 
+    # @classmethod
+    # def from_terminal(cls, opts):
+    #     return super().from_terminal(opts)
+
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HandlerConfig(CallbackMixin, ParentMixin['IndexConfig']):
