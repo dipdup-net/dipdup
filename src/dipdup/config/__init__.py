@@ -627,18 +627,59 @@ class DipDupConfig(InteractiveMixin):
 
     @classmethod
     def from_terminal(cls, opts: TerminalOptions) -> Self:
-        from dipdup.project import fill_config_from_input
+        import survey
 
-        config_dict = {}
+        from dipdup.project import SINGULAR_FORMS
+        from dipdup.project import fill_type_from_input
+        from dipdup.project import prompt_bool
+        from dipdup.project import prompt_kind
 
+        config_dict = defaultdict(dict)
+
+        sections = {
+            'datasources': get_args(DatasourceConfigU),
+            'runtimes': get_args(RuntimeConfigU),
+            'contracts': get_args(ContractConfigU),
+            # NOTE: Skip the `template` kind
+            'indexes': get_args(ResolvedIndexConfigU),
+        }
         # NOTE: Substrate or multichain
         if opts.namespace in {'substrate', None}:
-            fill_config_from_input(config_dict, 'runtimes', get_args(RuntimeConfigU), opts.namespace)
+            sections['runtimes'] = get_args(RuntimeConfigU)
 
-        fill_config_from_input(config_dict, 'datasources', get_args(DatasourceConfigU), opts.namespace)
-        fill_config_from_input(config_dict, 'indexes', get_args(IndexConfigU), opts.namespace)
-        fill_config_from_input(config_dict, 'hooks', (HookConfig,), None)
-        fill_config_from_input(config_dict, 'jobs', (JobConfig,), None)
+        for section, types in sections.items():
+            another = False
+
+            while True:
+                section_singular = SINGULAR_FORMS[section]
+
+                if not prompt_bool(
+                    f'Do you want to add {'another' if another else 'the first'} {section_singular}?',
+                    default=not another,
+                ):
+                    break
+
+                # NOTE: All sections are mappings alias to dict
+                name = survey.routines.input(
+                    f'Enter {section_singular} name: ',
+                )
+
+                type_ = prompt_kind(
+                    section_singular,
+                    types,
+                    opts.namespace,
+                )
+
+                if issubclass(type_, InteractiveMixin):
+
+                    res = type_.from_terminal(opts)
+                else:
+                    _logger.debug('Not an `InteractiveMixin`; falling back to field inspection', type_.__name__)
+                    res = fill_type_from_input(type_)
+
+                if res is not None:
+                    config_dict[section][name] = res
+                    another = True
 
         config_dict = {
             'package': opts.package,

@@ -471,92 +471,60 @@ def prompt_kind(
     )
     return matched[kind]
 
-        
 
-def fill_config_from_input(
-    config: dict[str, Any],
-    section: str,
-    types: tuple[type, ...],
-    filter: str | None,
-) -> None:
+def fill_type_from_input(
+    type_: type,
+) -> Any:
     import survey
 
-    section_dict = config.get(section, {})
-    another = False
+    # Gather input for the fields of the chosen type
+    entity_data = {}
+    for field_name, field in type_.__dataclass_fields__.items():
+        # print(field)
 
-    while True:
-        section_singular = SINGULAR_FORMS[section]
+        if field_name in {'kind', 'http'}:
+            continue
+        if field_name.startswith('_'):
+            continue
+        if field_name == 'handlers':
+            entity_data[field_name] = ()
+            continue
 
-        if not prompt_bool(
-            f'Do you want to add {'another' if another else 'the first'} {section_singular}?',
-            default=not another,
-        ):
-            break
+        default = field.default
 
-        # NOTE: All sections are mappings alias to dict
-        name = survey.routines.input(
-            f'Enter {section_singular} name: ',
+        if default == dataclasses.MISSING:
+            default = None
+        elif isinstance(default, FieldInfo):
+            default = default.default_factory() if default.default_factory else default.default
+
+        field_value = survey.routines.input(
+            f'Enter value for `{field_name}` [{field.type}]: ',
+            value=str(default) if default is not None else '',
         )
 
-        type_ = prompt_kind(
-            section_singular,
-            types,
-            filter,
-        )
+        if field.default_factory == dataclasses.MISSING:
+            default = None
 
-        # Gather input for the fields of the chosen type
-        entity_data = {}
-        for field_name, field in type_.__dataclass_fields__.items():
-            # print(field)
+        # NOTE: Basic transformations: string lists
+        if 'tuple' in field.type or 'list' in field.type:
+            if not field_value:
+                field_value = default
+            elif ',' in field_value:
+                field_value = field_value.split(',')
+            else:
+                field_value = [field_value]
 
-            if field_name in {'kind', 'http'}:
-                continue
-            if field_name.startswith('_'):
-                continue
-            if field_name == 'handlers':
-                entity_data[field_name] = ()
-                continue
+        entity_data[field_name] = field_value or default
 
-            default = field.default
+        # print(default, 'default')
+        # print(entity_data[field_name], 'field_value')
 
-            if default == dataclasses.MISSING:
-                default = None
-            elif isinstance(default, FieldInfo):
-                default = default.default_factory() if default.default_factory else default.default
-
-            field_value = survey.routines.input(
-                f'Enter value for `{field_name}` [{field.type}]: ',
-                value=str(default) if default is not None else '',
-            )
-
-            if field.default_factory == dataclasses.MISSING:
-                default = None
-
-            # NOTE: Basic transformations: string lists
-            if 'tuple' in field.type or 'list' in field.type:
-                if not field_value:
-                    field_value = default
-                elif ',' in field_value:
-                    field_value = field_value.split(',')
-                else:
-                    field_value = [field_value]
-
-            entity_data[field_name] = field_value or default
-
-            # print(default, 'default')
-            # print(entity_data[field_name], 'field_value')
-
-        # Validate and add the entity
-        try:
-            obj = type_(**entity_data)
-            section_dict[name] = {k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
-            another = True
-        except Exception as e:
-            print(f'Error: {e}. Please try again.')
-
-        # print(section_dict)
-
-    config[section] = section_dict
+    # Validate and add the entity
+    try:
+        obj = type_(**entity_data)
+        return {k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
+    except Exception as e:
+        print(f'Error: {e}. Please try again.')
 
 
 def prompt_anyof(
