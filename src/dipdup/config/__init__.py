@@ -75,6 +75,8 @@ DEFAULT_SQLITE_PATH = ':memory:'
 
 
 def _valid_url(v: str, ws: bool) -> str:
+    if not v:
+        raise ConfigurationError('URL is required')
     if not ws and not v.startswith(('http://', 'https://')):
         raise ConfigurationError(f'`{v}` is not a valid HTTP URL')
     if ws and not v.startswith(('ws://', 'wss://')):
@@ -627,14 +629,14 @@ class DipDupConfig(InteractiveMixin):
 
     @classmethod
     def from_terminal(cls, opts: TerminalOptions) -> Self:
-        import survey
+        import survey  # type: ignore[import-untyped]
 
         from dipdup.project import SINGULAR_FORMS
         from dipdup.project import fill_type_from_input
         from dipdup.project import prompt_bool
         from dipdup.project import prompt_kind
 
-        config_dict = defaultdict(dict)
+        config_dict: defaultdict[str, dict[str, Any]] = defaultdict(dict)
 
         sections = {
             'datasources': get_args(DatasourceConfigU),
@@ -660,9 +662,18 @@ class DipDupConfig(InteractiveMixin):
                     break
 
                 # NOTE: All sections are mappings alias to dict
-                name = survey.routines.input(
-                    f'Enter {section_singular} name: ',
-                )
+                name = None
+                while True:
+                    name = survey.routines.input(
+                        f'Enter {section_singular} name: ',
+                    )
+                    if not name:
+                        print('Name is required')
+                        continue
+                    if name in config_dict[section]:
+                        print(f'{section_singular.capitalize()} with name `{name}` already exists')
+                        continue
+                    break
 
                 type_ = prompt_kind(
                     section_singular,
@@ -681,13 +692,13 @@ class DipDupConfig(InteractiveMixin):
                     config_dict[section][name] = res
                     another = True
 
-        config_dict = {
+        config_dict = {  # type: ignore[assignment]
             'package': opts.package,
             'spec_version': '3.0',
             **config_dict,
         }
 
-        return cls(**config_dict)
+        return cls(**config_dict)  # type: ignore[arg-type]
 
     @classmethod
     def load(

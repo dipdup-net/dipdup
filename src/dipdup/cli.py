@@ -867,7 +867,7 @@ async def new(
 
             if template:
                 echo(f'Using template `{template}`\n')
-                config_dict = {}
+                config_dict: dict[str, Any] | None = {}
             else:
                 template, config_dict = template_from_terminal(answers['package'])
 
@@ -884,11 +884,8 @@ async def new(
             'spec_version': '3.0',
             **config_dict,
         }
-
-        config = DipDupYAMLConfig(**config_dict)
-
-        path = env.get_package_path(config['package']) / ROOT_CONFIG
-        path.write_text(config.dump())
+        path = env.get_package_path(config_dict['package']) / ROOT_CONFIG
+        path.write_text(DipDupYAMLConfig(**config_dict).dump())
 
     _logger.info('Initializing project')
     config = DipDupConfig.load([Path(answers['package'])])

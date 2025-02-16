@@ -135,7 +135,7 @@ def get_replay_path(name: str) -> Path:
 
 
 def namespace_from_terminal() -> str | None:
-    res = prompt_anyof(
+    _, res = prompt_anyof(
         question='What blockchain are you going to index?',
         options=(
             'EVM',
@@ -153,7 +153,10 @@ def namespace_from_terminal() -> str | None:
         ),
         default=0,
     )
-    return res[1].lower() if res[1] != '[multiple]' else None
+    print(res)
+    if res == '[multiple]':
+        return None
+    return res.lower()
 
 
 def template_from_terminal(package: str) -> tuple[str | None, dict[str, Any] | None]:
@@ -190,7 +193,7 @@ def template_from_terminal(package: str) -> tuple[str | None, dict[str, Any] | N
         options, comments = [], []
         templates = TEMPLATES[namespace] if namespace else chain(v for v in TEMPLATES.values())
         for name in templates:
-            replay_path = get_replay_path(name)
+            replay_path = get_replay_path(name)  # type: ignore[arg-type]
             _answers = answers_from_replay(replay_path)
             options.append(_answers['template'])
             comments.append(_answers['description'])
@@ -233,10 +236,10 @@ def answers_from_terminal() -> Answers:
         )
 
     answers['package'] = package
-    answers['version'] = survey.routines.input(
-        'Enter project version: ',
-        value=answers['version'],
-    )
+    # answers['version'] = survey.routines.input(
+    #     'Enter project version: ',
+    #     value=answers['version'],
+    # )
 
     # NOTE: Used in pyproject.toml, README.md and some other places
     answers['description'] = survey.routines.input(
@@ -447,7 +450,7 @@ def prompt_kind(
     matched = {}
     for entity_type in types:
         try:
-            kind = entity_type.__dataclass_fields__['kind'].default
+            kind = entity_type.__dataclass_fields__['kind'].default  # type: ignore[attr-defined]
         except KeyError:
             kind = entity_type.__name__
 
@@ -459,9 +462,9 @@ def prompt_kind(
         matched[kind] = entity_type
 
     if len(matched) == 1:
-        return next(iter(matched))
+        return next(iter(matched))  # type: ignore[no-any-return]
 
-    kinds = sorted(matched.keys())
+    kinds = tuple(sorted(matched.keys()))
     comments = tuple('' for _ in kinds)
     _, kind = prompt_anyof(
         f'Choose {entity} kind: ',
@@ -479,7 +482,7 @@ def fill_type_from_input(
 
     # Gather input for the fields of the chosen type
     entity_data = {}
-    for field_name, field in type_.__dataclass_fields__.items():
+    for field_name, field in type_.__dataclass_fields__.items():  # type: ignore[attr-defined]
         # print(field)
 
         if field_name in {'kind', 'http'}:
@@ -495,7 +498,7 @@ def fill_type_from_input(
         if default == dataclasses.MISSING:
             default = None
         elif isinstance(default, FieldInfo):
-            default = default.default_factory() if default.default_factory else default.default
+            default = default.default_factory() if default.default_factory else default.default  # type: ignore[call-arg]
 
         field_value = survey.routines.input(
             f'Enter value for `{field_name}` [{field.type}]: ',
