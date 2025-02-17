@@ -21,7 +21,7 @@ async def on_deposit(
     match deposit.storage.token:
         case Token(fa12=str(address)):
             pass
-        case Token1(fa2=Fa2(address=str(address), nat='0')):
+        case Token1(fa2=Fa2(address=str(address))):
             pass
         case _:
             raise ValueError

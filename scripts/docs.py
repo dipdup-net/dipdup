@@ -465,7 +465,7 @@ def check_links(source: Path, http: bool) -> None:
             green_echo(f'{i+1}/{len(http_links)}: checking link `{link}`')
             try:
                 res = subprocess.run(
-                    ('curl', '-s', '-L', '-o', '/dev/null', '-w', '%{http_code}', link),
+                    ('curl', '-s', '-L', '-o', '/dev/null', '-w', '%{http_code}', '--max-time', '10', link),
                     check=True,
                     capture_output=True,
                 )
