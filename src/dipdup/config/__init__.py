@@ -692,13 +692,16 @@ class DipDupConfig(InteractiveMixin):
                     config_dict[section][name] = res
                     another = True
 
+        # NOTE: Make sure that header is above other sections
         config_dict = {  # type: ignore[assignment]
             'package': opts.package,
             'spec_version': '3.0',
             **config_dict,
         }
 
-        return cls(**config_dict)  # type: ignore[arg-type]
+        self = cls(**config_dict)  # type: ignore[arg-type]
+        self._json = config_dict  # type: ignore[assignment]
+        return self
 
     @classmethod
     def load(
@@ -716,9 +719,6 @@ class DipDupConfig(InteractiveMixin):
         )
 
         try:
-            # from pydantic.dataclasses import rebuild_dataclass
-            # rebuild_dataclass(cls, force=True)
-
             config = TypeAdapter(cls).validate_python(config_json)
         except ConfigurationError:
             raise
