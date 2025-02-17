@@ -852,6 +852,8 @@ async def new(
     from dipdup.project import render_project
     from dipdup.project import template_from_terminal
 
+    config_dict: dict[str, Any] = {}
+
     if quiet:
         answers = get_default_answers()
         if template:
@@ -867,7 +869,6 @@ async def new(
 
             if template:
                 echo(f'Using template `{template}`\n')
-                config_dict: dict[str, Any] | None = {}
             else:
                 template, config_dict = template_from_terminal(answers['package'])
 
