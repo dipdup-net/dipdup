@@ -22,7 +22,7 @@ class StarknetNodeDatasourceConfig(DatasourceConfig):
     :param rollback_depth: A number of blocks to store in database for rollback
     """
 
-    kind: Literal['starknet.node']
+    kind: Literal['starknet.node'] = 'starknet.node'
     url: Url
     ws_url: WsUrl | None = None
     http: HttpConfig | None = None

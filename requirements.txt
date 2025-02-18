@@ -172,9 +172,9 @@ cytoolz==1.0.1 ; implementation_name == 'cpython' \
     --hash=sha256:c8231b9abbd8e368e036f4cc2e16902c9482d4cf9e02a6147ed0e9a3cd4a9ab0 \
     --hash=sha256:fb988c333f05ee30ad4693fe4da55d95ec0bb05775d2b60191236493ea2e01f9 \
     --hash=sha256:fcb8f7d0d65db1269022e7e0428471edee8c937bc288ebdcb72f13eaa67c2fe4
-datamodel-code-generator==0.27.3 \
-    --hash=sha256:01e928c00b800aec8d2ee77b5d4b47e1bc159a3a1c32f0f405df0a442d9ab5e7 \
-    --hash=sha256:ddef49e66e2b90a4c9b238f6ce42dc5a2a23f6ab1b8370eaca08576777921e43
+datamodel-code-generator==0.28.1 \
+    --hash=sha256:1ff8a56f9550a82bcba3e1ad7ebdb89bc655eeabbc4bc6acfb05977cbdc6381c \
+    --hash=sha256:37ef5f3b488f7d7a3f0b5b3ba0f2bc1ae01bab4dc7e0f6b99ff6c40713a6beb3
 dictdiffer==0.9.0 \
     --hash=sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578 \
     --hash=sha256:442bfc693cfcadaf46674575d2eba1c53b42f5e404218ca2c2ff549f2df56595
@@ -530,9 +530,9 @@ toolz==1.0.0 ; implementation_name == 'cpython' or implementation_name == 'pypy'
 tortoise-orm==0.24.0 \
     --hash=sha256:ae0704a93ea27931724fc899e57268c8081afce3b32b110b00037ec206553e7d \
     --hash=sha256:ee3b72b226767293b24c5c4906ae5f027d7cc84496cd503352c918564b4fd687
-typeguard==4.4.1 \
-    --hash=sha256:0d22a89d00b453b47c49875f42b6601b961757541a2e1e0ef517b6e24213c21b \
-    --hash=sha256:9324ec07a27ec67fc54a9c063020ca4c0ae6abad5e9f0f9804ca59aee68c6e21
+typeguard==4.4.2 \
+    --hash=sha256:77a78f11f09777aeae7fa08585f33b5f4ef0e7335af40005b0c422ed398ff48c \
+    --hash=sha256:a6f1065813e32ef365bc3b3f503af8a96f9dd4e0033a02c28c4a4983de8c6c49
 types-requests==2.32.0.20241016 \
     --hash=sha256:0d9cad2f27515d0e3e3da7134a1b6f28fb97129d86b867f24d9c726452634d95 \
     --hash=sha256:4195d62d6d3e043a4eaaf08ff8a62184584d2e8684e9d2aa178c7915a7da3747

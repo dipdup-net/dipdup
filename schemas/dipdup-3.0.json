@@ -134,6 +134,7 @@
         },
         "kind": {
           "const": "coinbase",
+          "default": "coinbase",
           "description": "always 'coinbase'",
           "title": "kind",
           "type": "string"
@@ -165,9 +166,6 @@
           "title": "secret_key"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "CoinbaseDatasourceConfig",
       "type": "object"
     },
@@ -212,6 +210,7 @@
         },
         "kind": {
           "const": "evm",
+          "default": "evm",
           "description": "Always `evm`",
           "title": "kind",
           "type": "string"
@@ -230,9 +229,6 @@
           "title": "typename"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "EvmContractConfig",
       "type": "object"
     },
@@ -277,17 +273,17 @@
               "type": "string"
             }
           ],
+          "default": "evm.etherscan",
           "description": "always 'evm.etherscan'",
           "title": "kind"
         },
         "url": {
+          "$ref": "#/$defs/Url",
           "description": "API URL",
-          "title": "url",
-          "type": "string"
+          "title": "url"
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "EvmEtherscanDatasourceConfig",
@@ -369,6 +365,7 @@
         },
         "kind": {
           "const": "evm.events",
+          "default": "evm.events",
           "description": "Always 'evm.events'",
           "title": "kind",
           "type": "string"
@@ -381,7 +378,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -407,6 +403,7 @@
         },
         "kind": {
           "const": "evm.node",
+          "default": "evm.node",
           "description": "Always 'evm.node'",
           "title": "kind",
           "type": "string"
@@ -437,7 +434,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "EvmNodeDatasourceConfig",
@@ -462,6 +458,7 @@
         },
         "kind": {
           "const": "evm.subsquid",
+          "default": "evm.subsquid",
           "description": "always 'evm.subsquid'",
           "title": "kind",
           "type": "string"
@@ -473,7 +470,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "EvmSubsquidDatasourceConfig",
@@ -594,6 +590,7 @@
         },
         "kind": {
           "const": "evm.transactions",
+          "default": "evm.transactions",
           "description": "always 'evm.transactions'",
           "title": "kind",
           "type": "string"
@@ -606,7 +603,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -957,18 +953,18 @@
         },
         "kind": {
           "const": "http",
+          "default": "http",
           "description": "always 'http'",
           "title": "kind",
           "type": "string"
         },
         "url": {
+          "$ref": "#/$defs/Url",
           "description": "URL to fetch data from",
-          "title": "url",
-          "type": "string"
+          "title": "url"
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "HttpDatasourceConfig",
@@ -983,6 +979,13 @@
           "description": "Level to start indexing from",
           "title": "first_level",
           "type": "integer"
+        },
+        "kind": {
+          "const": "template",
+          "default": "template",
+          "description": "always 'template'",
+          "title": "kind",
+          "type": "string"
         },
         "last_level": {
           "default": 0,
@@ -1027,20 +1030,18 @@
         },
         "kind": {
           "const": "ipfs",
+          "default": "ipfs",
           "description": "always 'ipfs'",
           "title": "kind",
           "type": "string"
         },
         "url": {
+          "$ref": "#/$defs/Url",
           "default": "https://ipfs.io/ipfs",
           "description": "IPFS node URL, e.g. https://ipfs.io/ipfs/",
-          "title": "url",
-          "type": "string"
+          "title": "url"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "IpfsDatasourceConfig",
       "type": "object"
     },
@@ -1136,6 +1137,7 @@
         },
         "kind": {
           "const": "postgres",
+          "default": "postgres",
           "description": "always 'postgres'",
           "title": "kind",
           "type": "string"
@@ -1166,7 +1168,6 @@
         }
       },
       "required": [
-        "kind",
         "host"
       ],
       "title": "PostgresDatabaseConfig",
@@ -1324,6 +1325,7 @@
         },
         "kind": {
           "const": "sqlite",
+          "default": "sqlite",
           "description": "always 'sqlite'",
           "title": "kind",
           "type": "string"
@@ -1335,9 +1337,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "SqliteDatabaseConfig",
       "type": "object"
     },
@@ -1382,6 +1381,7 @@
         },
         "kind": {
           "const": "starknet",
+          "default": "starknet",
           "description": "Always `starknet`",
           "title": "kind",
           "type": "string"
@@ -1400,9 +1400,6 @@
           "title": "typename"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "StarknetContractConfig",
       "type": "object"
     },
@@ -1479,6 +1476,7 @@
         },
         "kind": {
           "const": "starknet.events",
+          "default": "starknet.events",
           "description": "Always 'starknet.events'",
           "title": "kind",
           "type": "string"
@@ -1491,7 +1489,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -1517,6 +1514,7 @@
         },
         "kind": {
           "const": "starknet.node",
+          "default": "starknet.node",
           "description": "Always 'starknet.node'",
           "title": "kind",
           "type": "string"
@@ -1547,7 +1545,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "StarknetNodeDatasourceConfig",
@@ -1572,6 +1569,7 @@
         },
         "kind": {
           "const": "starknet.subsquid",
+          "default": "starknet.subsquid",
           "description": "always 'starknet.subsquid'",
           "title": "kind",
           "type": "string"
@@ -1583,7 +1581,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "StarknetSubsquidDatasourceConfig",
@@ -1652,6 +1649,7 @@
         },
         "kind": {
           "const": "substrate.events",
+          "default": "substrate.events",
           "description": "Always 'substrate.events'",
           "title": "kind",
           "type": "string"
@@ -1676,7 +1674,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "runtime",
         "handlers"
@@ -1703,6 +1700,7 @@
         },
         "kind": {
           "const": "substrate.node",
+          "default": "substrate.node",
           "description": "Always 'substrate.node'",
           "title": "kind",
           "type": "string"
@@ -1727,7 +1725,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "SubstrateNodeDatasourceConfig",
@@ -1793,18 +1790,18 @@
         },
         "kind": {
           "const": "substrate.subscan",
+          "default": "substrate.subscan",
           "description": "always 'substrate.subscan'",
           "title": "kind",
           "type": "string"
         },
         "url": {
+          "$ref": "#/$defs/Url",
           "description": "API URL",
-          "title": "url",
-          "type": "string"
+          "title": "url"
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "SubstrateSubscanDatasourceConfig",
@@ -1829,6 +1826,7 @@
         },
         "kind": {
           "const": "substrate.subsquid",
+          "default": "substrate.subsquid",
           "description": "always 'substrate.subsquid'",
           "title": "kind",
           "type": "string"
@@ -1840,7 +1838,6 @@
         }
       },
       "required": [
-        "kind",
         "url"
       ],
       "title": "SubstrateSubsquidDatasourceConfig",
@@ -1919,6 +1916,7 @@
         },
         "kind": {
           "const": "tezos.big_maps",
+          "default": "tezos.big_maps",
           "description": "always 'tezos.big_maps'",
           "title": "kind",
           "type": "string"
@@ -1937,7 +1935,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -1979,6 +1976,7 @@
         },
         "kind": {
           "const": "tezos",
+          "default": "tezos",
           "description": "Always `tezos`",
           "title": "kind",
           "type": "string"
@@ -1997,9 +1995,6 @@
           "title": "typename"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "TezosContractConfig",
       "type": "object"
     },
@@ -2080,6 +2075,7 @@
         },
         "kind": {
           "const": "tezos.events",
+          "default": "tezos.events",
           "description": "always 'tezos.events'",
           "title": "kind",
           "type": "string"
@@ -2092,7 +2088,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -2154,13 +2149,13 @@
         },
         "kind": {
           "const": "tezos.head",
+          "default": "tezos.head",
           "description": "always 'tezos.head'",
           "title": "kind",
           "type": "string"
         }
       },
       "required": [
-        "kind",
         "datasources",
         "callback"
       ],
@@ -2550,6 +2545,7 @@
         },
         "kind": {
           "const": "tezos.operations",
+          "default": "tezos.operations",
           "description": "always 'tezos.operations'",
           "title": "kind",
           "type": "string"
@@ -2573,7 +2569,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -2612,6 +2607,7 @@
         },
         "kind": {
           "const": "tezos.operations_unfiltered",
+          "default": "tezos.operations_unfiltered",
           "description": "always 'tezos.operations_unfiltered'",
           "title": "kind",
           "type": "string"
@@ -2635,7 +2631,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "callback"
       ],
@@ -2722,6 +2717,7 @@
         },
         "kind": {
           "const": "tezos.token_balances",
+          "default": "tezos.token_balances",
           "description": "always 'tezos.token_balances'",
           "title": "kind",
           "type": "string"
@@ -2734,7 +2730,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -2853,6 +2848,7 @@
         },
         "kind": {
           "const": "tezos.token_transfers",
+          "default": "tezos.token_transfers",
           "description": "always 'tezos.token_transfers'",
           "title": "kind",
           "type": "string"
@@ -2865,7 +2861,6 @@
         }
       },
       "required": [
-        "kind",
         "datasources",
         "handlers"
       ],
@@ -2897,6 +2892,7 @@
         },
         "kind": {
           "const": "tezos.tzkt",
+          "default": "tezos.tzkt",
           "description": "always 'tezos.tzkt'",
           "title": "kind",
           "type": "string"
@@ -2920,9 +2916,6 @@
           "title": "url"
         }
       },
-      "required": [
-        "kind"
-      ],
       "title": "TezosTzktDatasourceConfig",
       "type": "object"
     },
@@ -2955,6 +2948,7 @@
         },
         "kind": {
           "const": "tzip_metadata",
+          "default": "tzip_metadata",
           "description": "always 'tzip_metadata'",
           "title": "kind",
           "type": "string"
@@ -2965,14 +2959,13 @@
           "title": "network"
         },
         "url": {
+          "$ref": "#/$defs/Url",
           "default": "https://metadata.dipdup.net",
           "description": "GraphQL API URL, e.g. https://metadata.dipdup.net",
-          "title": "url",
-          "type": "string"
+          "title": "url"
         }
       },
       "required": [
-        "kind",
         "network"
       ],
       "title": "TzipMetadataDatasourceConfig",

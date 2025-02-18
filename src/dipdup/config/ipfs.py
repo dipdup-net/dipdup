@@ -7,6 +7,7 @@ from pydantic.dataclasses import dataclass
 
 from dipdup.config import DatasourceConfig
 from dipdup.config import HttpConfig
+from dipdup.config import Url
 
 DEFAULT_IPFS_URL = 'https://ipfs.io/ipfs'
 
@@ -20,6 +21,6 @@ class IpfsDatasourceConfig(DatasourceConfig):
     :param http: HTTP client configuration
     """
 
-    kind: Literal['ipfs']
-    url: str = DEFAULT_IPFS_URL
+    kind: Literal['ipfs'] = 'ipfs'
+    url: Url = DEFAULT_IPFS_URL
     http: HttpConfig | None = None

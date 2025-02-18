@@ -446,7 +446,7 @@ wheels = [
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.27.3"
+version = "0.28.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "argcomplete" },
@@ -459,9 +459,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/17/53cec24a4edb2021c3b89a3c50c83a9a8dd0e506495d5f7ce486be4a24fa/datamodel_code_generator-0.27.3.tar.gz", hash = "sha256:01e928c00b800aec8d2ee77b5d4b47e1bc159a3a1c32f0f405df0a442d9ab5e7", size = 440612 }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/d3/80f6a2394bbf3b46b150fc75afa5b0050f91baa5771e9be87df148013d83/datamodel_code_generator-0.28.1.tar.gz", hash = "sha256:37ef5f3b488f7d7a3f0b5b3ba0f2bc1ae01bab4dc7e0f6b99ff6c40713a6beb3", size = 434901 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/08/28/a72154c09d09b4c331fee613bb43451a8c43860b52f349777db7935dde04/datamodel_code_generator-0.27.3-py3-none-any.whl", hash = "sha256:ddef49e66e2b90a4c9b238f6ce42dc5a2a23f6ab1b8370eaca08576777921e43", size = 116023 },
+    { url = "https://files.pythonhosted.org/packages/c8/17/2876ca0a4ac7dd7cb5f56a2f0f6d9ac910969f467e8142c847c45a76b897/datamodel_code_generator-0.28.1-py3-none-any.whl", hash = "sha256:1ff8a56f9550a82bcba3e1ad7ebdb89bc655eeabbc4bc6acfb05977cbdc6381c", size = 115601 },
 ]
 
 [[package]]
@@ -1869,14 +1869,14 @@ wheels = [
 
 [[package]]
 name = "typeguard"
-version = "4.4.1"
+version = "4.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/62/c3/400917dd37d7b8c07e9723f3046818530423e1e759a56a22133362adab00/typeguard-4.4.1.tar.gz", hash = "sha256:0d22a89d00b453b47c49875f42b6601b961757541a2e1e0ef517b6e24213c21b", size = 74959 }
+sdist = { url = "https://files.pythonhosted.org/packages/70/60/8cd6a3d78d00ceeb2193c02b7ed08f063d5341ccdfb24df88e61f383048e/typeguard-4.4.2.tar.gz", hash = "sha256:a6f1065813e32ef365bc3b3f503af8a96f9dd4e0033a02c28c4a4983de8c6c49", size = 75746 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/53/9465dedf2d69fe26008e7732cf6e0a385e387c240869e7d54eed49782a3c/typeguard-4.4.1-py3-none-any.whl", hash = "sha256:9324ec07a27ec67fc54a9c063020ca4c0ae6abad5e9f0f9804ca59aee68c6e21", size = 35635 },
+    { url = "https://files.pythonhosted.org/packages/cf/4b/9a77dc721aa0b7f74440a42e4ef6f9a4fae7324e17f64f88b96f4c25cc05/typeguard-4.4.2-py3-none-any.whl", hash = "sha256:77a78f11f09777aeae7fa08585f33b5f4ef0e7335af40005b0c422ed398ff48c", size = 35801 },
 ]
 
 [[package]]

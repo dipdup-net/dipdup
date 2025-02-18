@@ -22,7 +22,7 @@ class EvmNodeDatasourceConfig(DatasourceConfig):
     :param rollback_depth: A number of blocks to store in database for rollback
     """
 
-    kind: Literal['evm.node']
+    kind: Literal['evm.node'] = 'evm.node'
     url: Url
     ws_url: WsUrl | None = None
     http: HttpConfig | None = None

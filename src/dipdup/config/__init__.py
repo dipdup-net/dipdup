@@ -30,8 +30,10 @@ from typing import TYPE_CHECKING
 from typing import Annotated
 from typing import Any
 from typing import Literal
+from typing import Self
 from typing import TypeVar
 from typing import cast
+from typing import get_args
 from urllib.parse import quote_plus
 
 import orjson
@@ -47,8 +49,10 @@ from pydantic_core import to_jsonable_python
 from dipdup import __spec_version__
 from dipdup import env
 from dipdup.config._mixin import CallbackMixin
+from dipdup.config._mixin import InteractiveMixin
 from dipdup.config._mixin import NameMixin
 from dipdup.config._mixin import ParentMixin
+from dipdup.config._mixin import TerminalOptions
 from dipdup.exceptions import ConfigInitializationException
 from dipdup.exceptions import ConfigurationError
 from dipdup.exceptions import IndexAlreadyExistsError
@@ -71,6 +75,8 @@ DEFAULT_SQLITE_PATH = ':memory:'
 
 
 def _valid_url(v: str, ws: bool) -> str:
+    if not v:
+        raise ConfigurationError('URL is required')
     if not ws and not v.startswith(('http://', 'https://')):
         raise ConfigurationError(f'`{v}` is not a valid HTTP URL')
     if ws and not v.startswith(('ws://', 'wss://')):
@@ -100,7 +106,7 @@ class SqliteDatabaseConfig:
     :param immune_tables: List of tables to preserve during reindexing
     """
 
-    kind: Literal['sqlite']
+    kind: Literal['sqlite'] = 'sqlite'
     path: str = DEFAULT_SQLITE_PATH
     immune_tables: set[str] = Field(default_factory=set)
 
@@ -139,7 +145,7 @@ class PostgresDatabaseConfig:
     :param connection_timeout: Connection timeout
     """
 
-    kind: Literal['postgres']
+    kind: Literal['postgres'] = 'postgres'
     host: str
     user: str = DEFAULT_POSTGRES_USER
     database: str = DEFAULT_POSTGRES_DATABASE
@@ -291,6 +297,10 @@ class DatasourceConfig(ABC, NameMixin):
     ws_url: WsUrl | None = None
     http: HttpConfig | None = None
 
+    # @classmethod
+    # def from_terminal(cls, opts):
+    #     return super().from_terminal(opts)
+
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
 class HandlerConfig(CallbackMixin, ParentMixin['IndexConfig']):
@@ -316,7 +326,7 @@ class IndexTemplateConfig(NameMixin):
 
     """
 
-    kind = 'template'
+    kind: Literal['template'] = 'template'
     template: str
     values: dict[str, Any]
     first_level: int = 0
@@ -561,7 +571,7 @@ class AdvancedConfig:
 
 
 @dataclass(config=ConfigDict(extra='forbid', defer_build=True), kw_only=True)
-class DipDupConfig:
+class DipDupConfig(InteractiveMixin):
     """DipDup project configuration file
 
     :param spec_version: Version of config specification, currently always `3.0`
@@ -586,9 +596,7 @@ class DipDupConfig:
     spec_version: ToStr
     package: str
     datasources: dict[str, DatasourceConfigU] = Field(default_factory=dict)
-    database: SqliteDatabaseConfig | PostgresDatabaseConfig = Field(
-        default_factory=lambda *a, **kw: SqliteDatabaseConfig(kind='sqlite')
-    )
+    database: DatabaseConfigU = Field(default_factory=lambda *a, **kw: SqliteDatabaseConfig(kind='sqlite'))
     runtimes: dict[str, RuntimeConfigU] = Field(default_factory=dict)
     contracts: dict[str, ContractConfigU] = Field(default_factory=dict)
     indexes: dict[str, IndexConfigU] = Field(default_factory=dict)
@@ -620,6 +628,82 @@ class DipDupConfig:
         return env.get_package_path(self.package)
 
     @classmethod
+    def from_terminal(cls, opts: TerminalOptions) -> Self:
+        import survey  # type: ignore[import-untyped]
+
+        from dipdup.project import SINGULAR_FORMS
+        from dipdup.project import fill_type_from_input
+        from dipdup.project import prompt_bool
+        from dipdup.project import prompt_kind
+
+        config_dict: defaultdict[str, dict[str, Any]] = defaultdict(dict)
+
+        sections = {
+            'datasources': get_args(DatasourceConfigU),
+            'runtimes': get_args(RuntimeConfigU),
+            'contracts': get_args(ContractConfigU),
+            # NOTE: Skip the `template` kind
+            'indexes': get_args(ResolvedIndexConfigU),
+        }
+        # NOTE: Substrate or multichain
+        if opts.namespace in {'substrate', None}:
+            sections['runtimes'] = get_args(RuntimeConfigU)
+
+        for section, types in sections.items():
+            another = False
+
+            while True:
+                section_singular = SINGULAR_FORMS[section]
+
+                if not prompt_bool(
+                    f'Do you want to add {'another' if another else 'the first'} {section_singular}?',
+                    default=not another,
+                ):
+                    break
+
+                # NOTE: All sections are mappings alias to dict
+                name = None
+                while True:
+                    name = survey.routines.input(
+                        f'Enter {section_singular} name: ',
+                    )
+                    if not name:
+                        print('Name is required')
+                        continue
+                    if name in config_dict[section]:
+                        print(f'{section_singular.capitalize()} with name `{name}` already exists')
+                        continue
+                    break
+
+                type_ = prompt_kind(
+                    section_singular,
+                    types,
+                    opts.namespace,
+                )
+
+                if issubclass(type_, InteractiveMixin):
+
+                    res = type_.from_terminal(opts)
+                else:
+                    _logger.debug('Not an `InteractiveMixin`; falling back to field inspection', type_.__name__)
+                    res = fill_type_from_input(type_)
+
+                if res is not None:
+                    config_dict[section][name] = res
+                    another = True
+
+        # NOTE: Make sure that header is above other sections
+        config_dict = {  # type: ignore[assignment]
+            'package': opts.package,
+            'spec_version': '3.0',
+            **config_dict,
+        }
+
+        self = cls(**config_dict)  # type: ignore[arg-type]
+        self._json = config_dict  # type: ignore[assignment]
+        return self
+
+    @classmethod
     def load(
         cls,
         paths: list[Path],
@@ -635,9 +719,6 @@ class DipDupConfig:
         )
 
         try:
-            # from pydantic.dataclasses import rebuild_dataclass
-            # rebuild_dataclass(cls, force=True)
-
             config = TypeAdapter(cls).validate_python(config_json)
         except ConfigurationError:
             raise
@@ -1162,6 +1243,7 @@ from dipdup.config.tezos_tzkt import TezosTzktDatasourceConfig
 from dipdup.config.tzip_metadata import TzipMetadataDatasourceConfig
 
 # NOTE: Unions for Pydantic config deserialization
+DatabaseConfigU = SqliteDatabaseConfig | PostgresDatabaseConfig
 RuntimeConfigU = SubstrateRuntimeConfig
 ContractConfigU = EvmContractConfig | TezosContractConfig | StarknetContractConfig
 DatasourceConfigU = (

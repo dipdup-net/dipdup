@@ -59,7 +59,7 @@ class TezosTokenTransfersIndexConfig(TezosIndexConfig):
     :param last_level: Level to stop indexing at
     """
 
-    kind: Literal['tezos.token_transfers']
+    kind: Literal['tezos.token_transfers'] = 'tezos.token_transfers'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     handlers: tuple[TezosTokenTransfersHandlerConfig, ...]
 

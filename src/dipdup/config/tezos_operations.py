@@ -306,7 +306,7 @@ class TezosOperationsIndexConfig(TezosIndexConfig):
     :param last_level: Level to stop indexing at
     """
 
-    kind: Literal['tezos.operations']
+    kind: Literal['tezos.operations'] = 'tezos.operations'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     handlers: tuple[TezosOperationsHandlerConfig, ...]
     contracts: list[Alias[TezosContractConfig]] = Field(default_factory=list)
@@ -431,7 +431,7 @@ class TezosOperationsUnfilteredIndexConfig(TezosIndexConfig):
     :param last_level: Level to stop indexing at
     """
 
-    kind: Literal['tezos.operations_unfiltered']
+    kind: Literal['tezos.operations_unfiltered'] = 'tezos.operations_unfiltered'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     callback: str
     types: tuple[TezosOperationType, ...] = (TezosOperationType.transaction,)

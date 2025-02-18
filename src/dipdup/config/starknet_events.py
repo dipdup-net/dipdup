@@ -61,7 +61,7 @@ class StarknetEventsIndexConfig(StarknetIndexConfig):
 
     """
 
-    kind: Literal['starknet.events']
+    kind: Literal['starknet.events'] = 'starknet.events'
     datasources: tuple[Alias[StarknetDatasourceConfigU], ...]
     handlers: tuple[StarknetEventsHandlerConfig, ...]
 

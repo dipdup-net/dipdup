@@ -83,7 +83,7 @@ class TezosEventsIndexConfig(TezosIndexConfig):
     :param last_level: Last block level to index
     """
 
-    kind: Literal['tezos.events']
+    kind: Literal['tezos.events'] = 'tezos.events'
     datasources: tuple[Alias[TezosTzktDatasourceConfig], ...]
     handlers: tuple[TezosEventsHandlerConfigU, ...]
 
