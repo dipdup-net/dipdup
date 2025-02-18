@@ -163,13 +163,13 @@ def template_from_terminal(package: str) -> tuple[str | None, dict[str, Any] | N
     _, mode = prompt_anyof(
         question='How would you like to set up your new DipDup project?',
         options=(
-            'Interactively',
             'From template',
+            'Interactively',
             'Blank',
         ),
         comments=(
-            'Guided setup with prompts',
             'Use one of demo projects',
+            'Guided setup with prompts',
             'Begin with an empty project',
         ),
         default=0,

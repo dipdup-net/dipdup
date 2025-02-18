@@ -852,7 +852,7 @@ async def new(
     from dipdup.project import render_project
     from dipdup.project import template_from_terminal
 
-    config_dict: dict[str, Any] = {}
+    config_dict: dict[str, Any] | None = None
 
     if quiet:
         answers = get_default_answers()
